@@ -19,8 +19,8 @@
     --text-primary: #f0ede8;
     --text-secondary: #8a8880;
     --text-muted: #505050;
-    --accent: #c8b89a;
-    --accent-dim: rgba(200,184,154,0.12);
+    --accent: #e63946;
+    --accent-dim: rgba(230,57,70,0.12);
     --nav-w: 220px;
     --panel-w: 340px;
 
@@ -196,7 +196,7 @@
 <nav id="nav">
   <div id="nav-logo">
     <div class="title">MBTA Communities<br>Station Area Typologies</div>
-    <div class="sub">Thesis · 2025</div>
+    <div class="sub">Thesis · 2026</div>
   </div>
   <div id="nav-links">
     <div class="nav-item active" data-page="map">
@@ -256,6 +256,10 @@
       <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Auto-Oriented Suburban</div>
       <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Employment Hub</div>
       <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Outer Commuter Fringe</div>
+      <div style="border-top:1px solid rgba(255,255,255,0.07);margin:8px 0;"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:3px 0;">
+        <div style="width:20px;height:2px;border-top:2px dashed #e63946;flex-shrink:0;"></div>MBTA Communities
+      </div>
     </div>
 
     <div id="side-panel">
@@ -384,7 +388,7 @@
     </div>
     <div id="data-body">
       <div id="datawrapper-embed">
-        <iframe title="Station Cluster Lookup" aria-label="Table" id="datawrapper-chart-HLE1J" src="https://datawrapper.dwcdn.net/HLE1J/11/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="1142" data-external="1"></iframe>
+        <iframe title="Station Cluster Lookup" aria-label="Table" id="datawrapper-chart-HLE1J" src="https://datawrapper.dwcdn.net/HLE1J/11/?dark=true" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="1142" data-external="1"></iframe>
         <script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}}})</script>
       </div>
     </div>
@@ -438,10 +442,12 @@ let map;
 // ─────────────────────────────────────────────
 Promise.all([
   fetch('data/stations.json').then(r => r.json()),
-  fetch('data/buffers.geojson').then(r => r.json())
-]).then(([stations, buffers]) => {
+  fetch('data/buffers.geojson').then(r => r.json()),
+  fetch('data/mbta_communities.geojson').then(r => r.json())
+]).then(([stations, buffers, communities]) => {
   STATIONS  = stations;
   window._buffers = buffers;
+  window._communities = communities;
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
@@ -472,7 +478,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
 function initMap() {
   if (MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
     document.getElementById('map-loading').innerHTML =
-      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#c8b89a">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#c8b89a" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
+      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#e63946">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#e63946" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
     return;
   }
 
@@ -506,6 +512,20 @@ function clusterColorExpr() {
 }
 
 function addDataToMap() {
+  // ── MBTA Communities municipality boundaries ──────────────────────
+  map.addSource('communities', { type: 'geojson', data: window._communities });
+  map.addLayer({
+    id: 'community-outline',
+    type: 'line',
+    source: 'communities',
+    paint: {
+      'line-color': '#e63946',
+      'line-width': 1.2,
+      'line-opacity': 0.6,
+      'line-dasharray': [4, 3]
+    }
+  });
+
   // ── Buffer polygons ──────────────────────────────────────────────
   map.addSource('buffers', { type: 'geojson', data: window._buffers });
   map.addLayer({
@@ -548,6 +568,29 @@ function addDataToMap() {
       'circle-stroke-width': 1.5,
       'circle-stroke-color': 'rgba(255,255,255,0.3)',
       'circle-opacity': 0.95
+    }
+  });
+
+  // ── Station name labels (appear when zoomed in) ──────────────────
+  map.addLayer({
+    id: 'station-labels',
+    type: 'symbol',
+    source: 'stations',
+    minzoom: 11,
+    layout: {
+      'text-field': ['get', 'name'],
+      'text-font': ['DIN Pro Regular', 'Arial Unicode MS Regular'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 13],
+      'text-offset': [0.7, 0],
+      'text-anchor': 'left',
+      'text-allow-overlap': false,
+      'text-ignore-placement': false
+    },
+    paint: {
+      'text-color': '#f0ede8',
+      'text-halo-color': 'rgba(14,15,17,0.85)',
+      'text-halo-width': 1.5,
+      'text-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0, 12, 1]
     }
   });
 
@@ -596,10 +639,25 @@ document.getElementById('panel-close').addEventListener('click', () => {
   document.getElementById('side-panel').classList.remove('open');
 });
 
+// Satellite adjustments: lighter + 25% less saturated
+function applySatelliteAdjustments() {
+  const style = map.getStyle();
+  if (!style) return;
+  style.layers.forEach(layer => {
+    if (layer.type === 'raster') {
+      try {
+        map.setPaintProperty(layer.id, 'raster-brightness-min', 0.12);
+        map.setPaintProperty(layer.id, 'raster-saturation', -0.25);
+      } catch(e) {}
+    }
+  });
+}
+
 // Basemap toggle — re-add layers after style swap
 function restoreLayersAfterStyleSwap() {
   map.once('styledata', () => {
     if (dataReady) addDataToMap();
+    if (currentStyle === 'satellite') applySatelliteAdjustments();
   });
 }
 
@@ -642,7 +700,7 @@ function buildPlot() {
       z: stations.map(s => s.pc3),
       text: stations.map(s => s.name),
       textposition: 'top center',
-      textfont: { size: 8, color: 'rgba(220,220,220,0.75)', family: 'DM Mono, monospace' },
+      textfont: { size: 16, color: 'rgba(220,220,220,0.75)', family: 'DM Mono, monospace' },
       hovertext: stations.map(s =>
         `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
       hoverinfo: 'text',
