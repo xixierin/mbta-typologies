@@ -521,8 +521,7 @@ function addDataToMap() {
     paint: {
       'line-color': '#a8dadc',
       'line-width': 1.2,
-      'line-opacity': 0.6,
-      'line-dasharray': [4, 3]
+      'line-opacity': 0.6
     }
   });
 
@@ -651,6 +650,11 @@ function applySatelliteAdjustments() {
       } catch(e) {}
     }
   });
+  try {
+    map.setPaintProperty('buffer-fill', 'fill-opacity', 0.38);
+    map.setPaintProperty('buffer-outline', 'line-width', 2);
+    map.setPaintProperty('buffer-outline', 'line-opacity', 0.85);
+  } catch(e) {}
 }
 
 // Basemap toggle — re-add layers after style swap
