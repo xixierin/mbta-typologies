@@ -495,12 +495,12 @@ function initMap() {
 
 function clusterColorExpr() {
   return ['match', ['get', 'cluster'],
-    1, CLUSTER_META[1].color,
-    2, CLUSTER_META[2].color,
-    3, CLUSTER_META[3].color,
-    4, CLUSTER_META[4].color,
-    5, CLUSTER_META[5].color,
-    6, CLUSTER_META[6].color,
+    '1', CLUSTER_META[1].color,
+    '2', CLUSTER_META[2].color,
+    '3', CLUSTER_META[3].color,
+    '4', CLUSTER_META[4].color,
+    '5', CLUSTER_META[5].color,
+    '6', CLUSTER_META[6].color,
     '#888'
   ];
 }
@@ -576,6 +576,11 @@ function onStationClick(e) {
   const svImg = document.getElementById('sv-img');
   const svPh  = document.getElementById('sv-placeholder');
   if (GOOGLE_SV_KEY) {
+    svImg.onerror = () => {
+      svImg.style.display = 'none';
+      svPh.style.display  = 'block';
+      svPh.textContent = 'No Street View available for this location.';
+    };
     svImg.src = `https://maps.googleapis.com/maps/api/streetview?size=300x170&location=${props.lat},${props.lng}&key=${GOOGLE_SV_KEY}&fov=90`;
     svImg.style.display = 'block';
     svPh.style.display  = 'none';
@@ -630,11 +635,14 @@ function buildPlot() {
   const traces = Object.entries(byCluster).map(([c, stations]) => {
     const meta = CLUSTER_META[+c];
     return {
-      type: 'scatter3d', mode: 'markers',
+      type: 'scatter3d', mode: 'markers+text',
       name: `${c}: ${meta.name}`,
       x: stations.map(s => s.pc1),
       y: stations.map(s => s.pc2),
       z: stations.map(s => s.pc3),
+      text: stations.map(s => s.name),
+      textposition: 'top center',
+      textfont: { size: 8, color: 'rgba(220,220,220,0.75)', family: 'DM Mono, monospace' },
       hovertext: stations.map(s =>
         `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
       hoverinfo: 'text',
