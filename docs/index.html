@@ -19,8 +19,8 @@
     --text-primary: #f0ede8;
     --text-secondary: #8a8880;
     --text-muted: #505050;
-    --accent: #e63946;
-    --accent-dim: rgba(230,57,70,0.12);
+    --accent: #a8dadc;
+    --accent-dim: rgba(168,218,220,0.12);
     --nav-w: 220px;
     --panel-w: 340px;
 
@@ -258,7 +258,7 @@
       <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Outer Commuter Fringe</div>
       <div style="border-top:1px solid rgba(255,255,255,0.07);margin:8px 0;"></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:3px 0;">
-        <div style="width:20px;height:2px;border-top:2px dashed #e63946;flex-shrink:0;"></div>MBTA Communities
+        <div style="width:20px;height:2px;border-top:2px dashed #a8dadc;flex-shrink:0;"></div>MBTA Communities
       </div>
     </div>
 
@@ -478,7 +478,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
 function initMap() {
   if (MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
     document.getElementById('map-loading').innerHTML =
-      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#e63946">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#e63946" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
+      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#a8dadc">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#a8dadc" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
     return;
   }
 
@@ -519,7 +519,7 @@ function addDataToMap() {
     type: 'line',
     source: 'communities',
     paint: {
-      'line-color': '#e63946',
+      'line-color': '#a8dadc',
       'line-width': 1.2,
       'line-opacity': 0.6,
       'line-dasharray': [4, 3]
