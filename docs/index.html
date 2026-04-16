@@ -645,7 +645,7 @@ function applySatelliteAdjustments() {
   style.layers.forEach(layer => {
     if (layer.type === 'raster') {
       try {
-        map.setPaintProperty(layer.id, 'raster-brightness-min', 0.12);
+        map.setPaintProperty(layer.id, 'raster-brightness-min', -0.35);
         map.setPaintProperty(layer.id, 'raster-saturation', -0.25);
       } catch(e) {}
     }
