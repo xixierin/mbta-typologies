@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Station Area Typologies — MBTA Communities</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f11;
+    --bg-panel: #13141a;
+    --bg-card: #1a1c24;
+    --bg-card-hover: #20222e;
+    --border: rgba(255,255,255,0.07);
+    --border-mid: rgba(255,255,255,0.12);
+    --text-primary: #f0ede8;
+    --text-secondary: #8a8880;
+    --text-muted: #505050;
+    --accent: #c8b89a;
+    --accent-dim: rgba(200,184,154,0.12);
+    --nav-w: 220px;
+    --panel-w: 340px;
+
+    --c1: #E87B4A; --c1-bg: rgba(232,123,74,0.15);
+    --c2: #4EC9A0; --c2-bg: rgba(78,201,160,0.15);
+    --c3: #F5C842; --c3-bg: rgba(245,200,66,0.15);
+    --c4: #9B8FE8; --c4-bg: rgba(155,143,232,0.15);
+    --c5: #E87B9E; --c5-bg: rgba(232,123,158,0.15);
+    --c6: #5BAEE8; --c6-bg: rgba(91,174,232,0.15);
+  }
+
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; }
+
+  /* ── NAV ── */
+  #nav {
+    position: fixed; left: 0; top: 0; bottom: 0; width: var(--nav-w);
+    background: var(--bg-panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; z-index: 200;
+  }
+  #nav-logo { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
+  #nav-logo .title { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); line-height: 1.4; }
+  #nav-logo .sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  #nav-links { padding: 12px 0; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; cursor: pointer;
+    font-size: 12px; font-weight: 400; color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--accent-dim); }
+  .nav-item .nav-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  #nav-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 10px; color: var(--text-muted); font-family: 'DM Mono', monospace; line-height: 1.6; }
+
+  /* ── PAGES ── */
+  #app { margin-left: var(--nav-w); height: 100vh; overflow: hidden; }
+  .page { display: none; height: 100%; }
+  .page.active { display: flex; }
+
+  /* ── MAP PAGE ── */
+  #page-map { position: relative; overflow: hidden; }
+  #map { flex: 1; height: 100%; }
+  #map-loading {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); z-index: 5; flex-direction: column; gap: 12px;
+    font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace;
+  }
+  .spinner { width: 24px; height: 24px; border: 2px solid var(--border-mid); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; }
+  .map-btn {
+    height: 32px; padding: 0 14px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+    border-radius: 4px; cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .map-btn:hover { color: var(--text-primary); }
+  .map-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+  /* Side panel */
+  #side-panel {
+    width: var(--panel-w); height: 100%;
+    background: var(--bg-panel); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transform: translateX(var(--panel-w));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  #side-panel.open { transform: translateX(0); }
+  #panel-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-secondary); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, background 0.15s;
+  }
+  #panel-close:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+  #panel-content { padding: 48px 24px 24px; position: relative; }
+  #panel-cluster-bar { height: 3px; width: 40px; border-radius: 2px; margin-bottom: 16px; }
+  #panel-station-name { font-size: 18px; font-weight: 500; line-height: 1.2; margin-bottom: 4px; }
+  #panel-cluster-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 24px; font-family: 'DM Mono', monospace; }
+  .panel-section { margin-bottom: 24px; }
+  .panel-section-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { background: var(--bg-card); border-radius: 6px; padding: 12px; border: 1px solid var(--border); }
+  .stat-card .val { font-size: 20px; font-weight: 500; color: var(--text-primary); line-height: 1; }
+  .stat-card .lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  #sv-container {
+    border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
+    aspect-ratio: 16/9; background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px;
+  }
+  #sv-container img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  #sv-link { display: block; text-align: center; margin-top: 8px; font-size: 11px; color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; transition: opacity 0.15s; }
+  #sv-link:hover { opacity: 0.7; }
+
+  /* Map legend */
+  #map-legend {
+    position: absolute; bottom: 24px; left: 16px;
+    background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px; z-index: 10; min-width: 220px;
+  }
+  #map-legend .legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); padding: 3px 0; cursor: pointer; transition: color 0.15s; }
+  .legend-item:hover { color: var(--text-primary); }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── CLUSTERS PAGE ── */
+  #page-clusters { flex-direction: column; overflow: hidden; }
+  #clusters-header { padding: 28px 32px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #clusters-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+  #clusters-header p { font-size: 12px; color: var(--text-secondary); margin-bottom: 20px; max-width: 560px; line-height: 1.6; }
+  #clusters-tabs { display: flex; gap: 0; }
+  .cluster-tab { padding: 8px 18px; font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Mono', monospace; transition: color 0.15s, border-color 0.15s; }
+  .cluster-tab:hover { color: var(--text-secondary); }
+  .cluster-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  #clusters-body { flex: 1; overflow: hidden; display: flex; }
+  #plot-3d { flex: 1; height: 100%; }
+  #cluster-detail-panel { width: 280px; border-left: 1px solid var(--border); background: var(--bg-panel); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  #cluster-detail-panel h3 { font-size: 13px; font-weight: 500; }
+  #cluster-detail-panel p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .cluster-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .cluster-stat-row .k { color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 10px; }
+  .cluster-stat-row .v { color: var(--text-primary); font-weight: 500; }
+
+  /* ── METHODOLOGY PAGE ── */
+  #page-methodology { overflow-y: auto; }
+  #methodology-inner { max-width: 720px; margin: 0 auto; padding: 48px 32px 80px; }
+  #methodology-inner h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+  #methodology-inner .lead { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
+  .method-section { margin-bottom: 48px; }
+  .method-section h2 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-family: 'DM Mono', monospace; }
+  .method-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+  .method-section strong { color: var(--text-primary); font-weight: 500; }
+  .method-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .step-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 24px; padding-top: 1px; }
+  .step-body h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .step-body p { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .method-note { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 12px 16px; margin-top: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+  /* ── DATA PAGE ── */
+  #page-data { flex-direction: column; overflow: hidden; }
+  #data-header { padding: 28px 32px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #data-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+  #data-header p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  #data-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px; flex-direction: column; gap: 16px; }
+  .datawrapper-placeholder { width: 100%; max-width: 860px; border: 1px dashed var(--border-mid); border-radius: 8px; padding: 48px 32px; text-align: center; color: var(--text-muted); }
+  .datawrapper-placeholder .dw-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+  .datawrapper-placeholder h3 { font-size: 14px; font-weight: 400; color: var(--text-secondary); margin-bottom: 8px; }
+  .datawrapper-placeholder p { font-size: 12px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+  .datawrapper-placeholder code { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); background: var(--accent-dim); padding: 2px 6px; border-radius: 3px; }
+
+  /* Mapbox overrides */
+  .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { display: none; }
+  .mapboxgl-ctrl-top-right { top: 16px; right: 16px; }
+  .mapboxgl-ctrl-group { background: var(--bg-panel) !important; border: 1px solid var(--border-mid) !important; border-radius: 4px !important; }
+  .mapboxgl-ctrl-group button { background: transparent !important; }
+  .mapboxgl-ctrl-group button:hover { background: rgba(255,255,255,0.05) !important; }
+  .mapboxgl-ctrl-group .mapboxgl-ctrl-icon { filter: invert(1) opacity(0.5); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div id="nav-logo">
+    <div class="title">MBTA Communities<br>Station Area Typologies</div>
+    <div class="sub">Thesis · 2025</div>
+  </div>
+  <div id="nav-links">
+    <div class="nav-item active" data-page="map">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M2 4l4-2 4 2 4-2v10l-4 2-4-2-4 2V4z"/><path d="M6 2v10M10 4v10"/>
+      </svg>
+      Map
+    </div>
+    <div class="nav-item" data-page="clusters">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
+      </svg>
+      Clusters
+    </div>
+    <div class="nav-item" data-page="methodology">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M3 4h10M3 8h7M3 12h4"/>
+      </svg>
+      Methodology
+    </div>
+    <div class="nav-item" data-page="data">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="2" y="10" width="3" height="4" rx="1"/><rect x="6.5" y="6" width="3" height="8" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/>
+      </svg>
+      Data
+    </div>
+  </div>
+  <div id="nav-footer">
+    Beyond Density<br>
+    VMT-Informed Implementation<br>
+    of the MBTA Communities Act
+  </div>
+</nav>
+
+<!-- ── APP ── -->
+<div id="app">
+
+  <!-- MAP PAGE -->
+  <div class="page active" id="page-map">
+    <div id="map">
+      <div id="map-loading">
+        <div class="spinner"></div>
+        <span>Loading station data…</span>
+      </div>
+    </div>
+
+    <div id="map-controls">
+      <button class="map-btn active" id="btn-minimal">Minimal</button>
+      <button class="map-btn" id="btn-satellite">Satellite</button>
+    </div>
+
+    <div id="map-legend">
+      <div class="legend-title">Station typology</div>
+      <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Mixed-Use Rapid Transit</div>
+      <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Inner Commuter Rail Hub</div>
+      <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Rapid Transit Residential</div>
+      <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Auto-Oriented Suburban</div>
+      <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Employment Hub</div>
+      <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Outer Commuter Fringe</div>
+    </div>
+
+    <div id="side-panel">
+      <button id="panel-close">&#x2715;</button>
+      <div id="panel-content">
+        <div id="panel-cluster-bar"></div>
+        <div id="panel-station-name">Station Name</div>
+        <div id="panel-cluster-label">Cluster label</div>
+
+        <div class="panel-section">
+          <div class="panel-section-title">Key indicators</div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="val" id="p-vmt">—</div>
+              <div class="lbl">VMT per capita / yr</div>
+            </div>
+            <div class="stat-card">
+              <div class="val" id="p-density">—</div>
+              <div class="lbl">Housing units / acre</div>
+            </div>
+            <div class="stat-card">
+              <div class="val" id="p-entropy">—</div>
+              <div class="lbl">Land use entropy</div>
+            </div>
+            <div class="stat-card">
+              <div class="val" id="p-freq">—</div>
+              <div class="lbl">Peak trains / hr</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title">Street view</div>
+          <div id="sv-container">
+            <span id="sv-placeholder">Add a Google Street View Static API key to enable image previews.</span>
+            <img id="sv-img" alt="Street View" />
+          </div>
+          <a id="sv-link" href="#" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLUSTERS PAGE -->
+  <div class="page" id="page-clusters">
+    <div id="clusters-header">
+      <h1>Station area typologies</h1>
+      <p>Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
+      <div id="clusters-tabs">
+        <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
+      </div>
+    </div>
+    <div id="clusters-body">
+      <div id="plot-3d"></div>
+      <div id="cluster-detail-panel">
+        <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
+        <h3 id="cd-name">Click a point</h3>
+        <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
+        <div id="cd-stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METHODOLOGY PAGE -->
+  <div class="page" id="page-methodology">
+    <div id="methodology-inner">
+      <h1>Methodology</h1>
+      <p class="lead">This analysis links land use configuration at MBTA station areas to vehicle miles traveled per capita, using cross-sectional OLS regression, Ward hierarchical clustering, and longitudinal long-difference regression. The goal is to identify whether variation in station-area typology — not density alone — predicts VMT, and whether that variation has policy implications for differentiated implementation of the MBTA Communities Act.</p>
+
+      <div class="method-section">
+        <h2>Unit of analysis</h2>
+        <p>Each observation is a <strong>0.5-mile station area buffer</strong> around an MBTA Communities station (n=169, excluding Boston). VMT per capita is derived from Massachusetts Vehicle Census odometer readings, aggregated to buffers via block group clipping and area-weighted normalization. The dependent variable is log-transformed to address right skew.</p>
+      </div>
+
+      <div class="method-section">
+        <h2>Analytical pipeline</h2>
+        <div class="method-step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Cross-sectional OLS regression</h4>
+            <p>Establishes baseline relationships between land use variables and VMT per capita across station areas. Controls include median household income, young adult share (18–34), and senior share (65+). Housing density is retained as a policy-anchor variable regardless of VIF.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Hierarchical clustering (k=6)</h4>
+            <p>Ward.D2 linkage on Euclidean distances across four input variables: <strong>activity intensity</strong> (housing + job density composite), <strong>job mix</strong>, <strong>land use entropy</strong>, and <strong>peak transit frequency</strong>. VMT is deliberately excluded from clustering inputs to avoid circularity with its role as the regression outcome. Six clusters selected via dendrogram inspection and silhouette analysis.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Within-cluster regression</h4>
+            <p>OLS models estimated separately for each cluster typology, allowing the relationship between land use variables and VMT to vary by station type. This tests whether density, mix, and entropy operate differently across the typological spectrum.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Longitudinal long-difference regression</h4>
+            <p>Changes in VMT between two periods are regressed on changes in land use variables, identifying whether growth in housing or commercial density at station areas corresponds to measurable VMT reductions over time.</p>
+          </div>
+        </div>
+        <div class="method-note">
+          <strong>Limitations:</strong> Spatial autocorrelation has not been tested via Moran's I. Parking supply data may not reflect current conditions. The silhouette score for k=6 reflects cluster overlap visible in the PCA projection (PC1+PC2+PC3 explain 92.8% of clustering variable variance).
+        </div>
+      </div>
+
+      <div class="method-section">
+        <h2>Data sources</h2>
+        <p><strong>Massachusetts Vehicle Census</strong> — odometer readings aggregated to station area buffers as the primary VMT measure.</p>
+        <p><strong>MassBuild</strong> — housing units and commercial square footage by year, used to construct longitudinal land use change variables.</p>
+        <p><strong>GTFS / MBTA schedule data</strong> — peak hour train frequency as the transit input to clustering.</p>
+        <p><strong>US Census / ACS</strong> — demographic controls (income, age structure).</p>
+        <p><strong>MassGIS parcels + OSM</strong> — land use entropy and street network variables.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA PAGE -->
+  <div class="page" id="page-data">
+    <div id="data-header">
+      <h1>Station data explorer</h1>
+      <p>Search and filter VMT, land use, and cluster data across all MBTA Communities station areas.</p>
+    </div>
+    <div id="data-body">
+      <div class="datawrapper-placeholder">
+        <div class="dw-icon">⬡</div>
+        <h3>Datawrapper embed goes here</h3>
+        <p>Publish your searchable station table in Datawrapper, then replace this block with the embed code referencing <code>#datawrapper-embed</code>.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SCRIPTS ── -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIGURATION
+// ─────────────────────────────────────────────
+const MAPBOX_TOKEN = 'pk.eyJ1IjoieGl4aWVyaW4iLCJhIjoiY21vMTFpbmE5MGVnNTJwb2x6cjhyZ3BzbCJ9.FrcSWLXpL_ORxeXVdLxrnA';
+const GOOGLE_SV_KEY = '';   // optional — leave empty to skip Street View images
+
+const STYLE_MINIMAL   = 'mapbox://styles/mapbox/dark-v11';
+const STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-streets-v12';
+
+// ─────────────────────────────────────────────
+// CLUSTER METADATA  (matches Ward 4var k=6 model)
+// ─────────────────────────────────────────────
+const CLUSTER_META = {
+  1: { name: "Urban Mixed-Use Rapid Transit", color: "#E87B4A",
+       desc: "High activity intensity, mixed land uses, predominantly rapid transit. Highest transit frequency and strong walkability." },
+  2: { name: "Inner Commuter Rail Hub",       color: "#4EC9A0",
+       desc: "Moderate activity with diverse land uses. Served exclusively by commuter rail with low peak frequency." },
+  3: { name: "Rapid Transit Residential",     color: "#F5C842",
+       desc: "Moderate activity, predominantly residential land use, low job mix. All stations served by rapid transit." },
+  4: { name: "Auto-Oriented Suburban",        color: "#9B8FE8",
+       desc: "Low activity intensity, sparse land use mix, minimal transit access. Largest cluster (n=66); highest VMT." },
+  5: { name: "Employment Hub",                color: "#E87B9E",
+       desc: "Moderate activity with notably high job mix (employment-dominant). Mix of rapid transit and commuter rail." },
+  6: { name: "Outer Commuter Fringe",         color: "#5BAEE8",
+       desc: "Low activity, commuter rail only, varied land use entropy. Typically auto-dependent outer stations." }
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let STATIONS  = [];
+let mapReady  = false;
+let dataReady = false;
+let currentStyle = 'minimal';
+let map;
+
+// ─────────────────────────────────────────────
+// DATA LOADING
+// ─────────────────────────────────────────────
+Promise.all([
+  fetch('data/stations.json').then(r => r.json()),
+  fetch('data/buffers.geojson').then(r => r.json())
+]).then(([stations, buffers]) => {
+  STATIONS  = stations;
+  window._buffers = buffers;
+  dataReady = true;
+  document.getElementById('map-loading').style.display = 'none';
+  if (mapReady) addDataToMap();
+}).catch(err => {
+  console.error('Data load failed:', err);
+  document.getElementById('map-loading').innerHTML =
+    '<span style="color:#E87B4A">Failed to load station data.<br>Check the console for details.</span>';
+});
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('page-' + target).classList.add('active');
+    if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
+    if (target === 'map' && map) setTimeout(() => map.resize(), 50);
+  });
+});
+
+// ─────────────────────────────────────────────
+// MAP
+// ─────────────────────────────────────────────
+function initMap() {
+  if (MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
+    document.getElementById('map-loading').innerHTML =
+      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#c8b89a">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#c8b89a" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
+    return;
+  }
+
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: STYLE_MINIMAL,
+    center: [-71.1, 42.35],
+    zoom: 9.5,
+    attributionControl: false
+  });
+  window._map = map;
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+
+  map.on('load', () => {
+    mapReady = true;
+    if (dataReady) addDataToMap();
+  });
+}
+
+function clusterColorExpr() {
+  return ['match', ['get', 'cluster'],
+    1, CLUSTER_META[1].color,
+    2, CLUSTER_META[2].color,
+    3, CLUSTER_META[3].color,
+    4, CLUSTER_META[4].color,
+    5, CLUSTER_META[5].color,
+    6, CLUSTER_META[6].color,
+    '#888'
+  ];
+}
+
+function addDataToMap() {
+  // ── Buffer polygons ──────────────────────────────────────────────
+  map.addSource('buffers', { type: 'geojson', data: window._buffers });
+  map.addLayer({
+    id: 'buffer-fill',
+    type: 'fill',
+    source: 'buffers',
+    paint: {
+      'fill-color': clusterColorExpr(),
+      'fill-opacity': 0.18
+    }
+  });
+  map.addLayer({
+    id: 'buffer-outline',
+    type: 'line',
+    source: 'buffers',
+    paint: {
+      'line-color': clusterColorExpr(),
+      'line-width': 0.8,
+      'line-opacity': 0.5
+    }
+  });
+
+  // ── Station dots ─────────────────────────────────────────────────
+  const stationGeoJSON = {
+    type: 'FeatureCollection',
+    features: STATIONS.map(s => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+      properties: { ...s }
+    }))
+  };
+  map.addSource('stations', { type: 'geojson', data: stationGeoJSON });
+  map.addLayer({
+    id: 'station-dots',
+    type: 'circle',
+    source: 'stations',
+    paint: {
+      'circle-radius': 5,
+      'circle-color': clusterColorExpr(),
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': 'rgba(255,255,255,0.3)',
+      'circle-opacity': 0.95
+    }
+  });
+
+  map.on('click', 'station-dots', onStationClick);
+  map.on('mouseenter', 'station-dots', () => { map.getCanvas().style.cursor = 'pointer'; });
+  map.on('mouseleave', 'station-dots', () => { map.getCanvas().style.cursor = ''; });
+}
+
+function onStationClick(e) {
+  const props = e.features[0].properties;
+  const meta  = CLUSTER_META[props.cluster];
+
+  document.getElementById('panel-cluster-bar').style.background = meta.color;
+  document.getElementById('panel-station-name').textContent = props.name;
+  document.getElementById('panel-cluster-label').textContent =
+    `Cluster ${props.cluster} · ${meta.name}`;
+  document.getElementById('p-vmt').textContent =
+    props.vmt_pc != null ? Number(props.vmt_pc).toLocaleString() : '—';
+  document.getElementById('p-density').textContent =
+    props.hu_den != null ? Number(props.hu_den).toFixed(1) : '—';
+  document.getElementById('p-entropy').textContent =
+    props.lu_entropy != null ? Number(props.lu_entropy).toFixed(2) : '—';
+  document.getElementById('p-freq').textContent =
+    props.transit_phr != null ? Number(props.transit_phr).toFixed(1) : '—';
+
+  const svImg = document.getElementById('sv-img');
+  const svPh  = document.getElementById('sv-placeholder');
+  if (GOOGLE_SV_KEY) {
+    svImg.src = `https://maps.googleapis.com/maps/api/streetview?size=300x170&location=${props.lat},${props.lng}&key=${GOOGLE_SV_KEY}&fov=90`;
+    svImg.style.display = 'block';
+    svPh.style.display  = 'none';
+  }
+  document.getElementById('sv-link').href =
+    `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${props.lat},${props.lng}`;
+  document.getElementById('sv-link').textContent = `Open ${props.name} in Street View ↗`;
+
+  document.getElementById('side-panel').classList.add('open');
+}
+
+document.getElementById('panel-close').addEventListener('click', () => {
+  document.getElementById('side-panel').classList.remove('open');
+});
+
+// Basemap toggle — re-add layers after style swap
+function restoreLayersAfterStyleSwap() {
+  map.once('styledata', () => {
+    if (dataReady) addDataToMap();
+  });
+}
+
+document.getElementById('btn-minimal').addEventListener('click', () => {
+  if (currentStyle === 'minimal' || !map) return;
+  currentStyle = 'minimal';
+  document.getElementById('btn-minimal').classList.add('active');
+  document.getElementById('btn-satellite').classList.remove('active');
+  map.setStyle(STYLE_MINIMAL);
+  restoreLayersAfterStyleSwap();
+});
+
+document.getElementById('btn-satellite').addEventListener('click', () => {
+  if (currentStyle === 'satellite' || !map) return;
+  currentStyle = 'satellite';
+  document.getElementById('btn-satellite').classList.add('active');
+  document.getElementById('btn-minimal').classList.remove('active');
+  map.setStyle(STYLE_SATELLITE);
+  restoreLayersAfterStyleSwap();
+});
+
+// ─────────────────────────────────────────────
+// 3D CLUSTER PLOT
+// ─────────────────────────────────────────────
+function buildPlot() {
+  window._plotBuilt = true;
+  const byCluster = {};
+  STATIONS.forEach(s => {
+    if (!byCluster[s.cluster]) byCluster[s.cluster] = [];
+    byCluster[s.cluster].push(s);
+  });
+
+  const traces = Object.entries(byCluster).map(([c, stations]) => {
+    const meta = CLUSTER_META[+c];
+    return {
+      type: 'scatter3d', mode: 'markers',
+      name: `${c}: ${meta.name}`,
+      x: stations.map(s => s.pc1),
+      y: stations.map(s => s.pc2),
+      z: stations.map(s => s.pc3),
+      hovertext: stations.map(s =>
+        `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
+      hoverinfo: 'text',
+      customdata: stations.map(s => s.name),
+      marker: { size: 5, color: meta.color, opacity: 0.85,
+                line: { width: 0.5, color: 'rgba(255,255,255,0.2)' } }
+    };
+  });
+
+  const axStyle = { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#505050', size: 9 } };
+  const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: { l: 0, r: 0, t: 0, b: 0 }, showlegend: false,
+    scene: {
+      bgcolor: 'rgba(0,0,0,0)',
+      xaxis: { ...axStyle, title: { text: 'PC1 · Activity & Transit (43%)', font: { size: 10, color: '#505050' } } },
+      yaxis: { ...axStyle, title: { text: 'PC2 · Land Use Diversity (37%)', font: { size: 10, color: '#505050' } } },
+      zaxis: { ...axStyle, title: { text: 'PC3 · Job–Residential Balance (13%)', font: { size: 10, color: '#505050' } } },
+      camera: { eye: { x: 1.5, y: 1.5, z: 0.8 } }
+    },
+    font: { family: 'DM Mono, monospace', size: 10, color: '#8a8880' }
+  };
+
+  Plotly.newPlot('plot-3d', traces, layout, { displayModeBar: false, responsive: true });
+
+  document.getElementById('plot-3d').on('plotly_click', function(data) {
+    const pt = data.points[0];
+    const station = STATIONS.find(s => s.name === pt.customdata);
+    if (!station) return;
+    const meta = CLUSTER_META[station.cluster];
+    document.getElementById('cd-name').textContent = station.name;
+    document.getElementById('cd-name').style.color = meta.color;
+    document.getElementById('cd-desc').textContent = meta.desc;
+    document.getElementById('cd-stats').innerHTML = `
+      <div class="cluster-stat-row"><span class="k">Cluster</span><span class="v" style="color:${meta.color}">${station.cluster} · ${meta.name}</span></div>
+      <div class="cluster-stat-row"><span class="k">VMT / capita / yr</span><span class="v">${Number(station.vmt_pc).toLocaleString()}</span></div>
+      <div class="cluster-stat-row"><span class="k">Housing density</span><span class="v">${station.hu_den} /ac</span></div>
+      <div class="cluster-stat-row"><span class="k">Land use entropy</span><span class="v">${station.lu_entropy}</span></div>
+      <div class="cluster-stat-row"><span class="k">Peak trains / hr</span><span class="v">${station.transit_phr}</span></div>
+      <div class="cluster-stat-row"><span class="k">Activity intensity</span><span class="v">${station.activity_intensity}</span></div>
+      <div class="cluster-stat-row"><span class="k">Job mix</span><span class="v">${station.job_mix}</span></div>
+      <div class="cluster-stat-row"><span class="k">Transit type</span><span class="v">${station.type}</span></div>
+    `;
+  });
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+initMap();
+</script>
+</body>
+</html>
