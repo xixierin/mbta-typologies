@@ -204,6 +204,14 @@
   }
   #cd-goto-map:hover { background: var(--accent); color: var(--bg); }
 
+  /* ── SCATTER TAB ── */
+  #scatter-container { flex: 1; display: none; flex-direction: column; overflow: hidden; padding: 0 24px 12px; }
+  #scatter-controls { display: flex; gap: 20px; padding: 14px 0 12px; align-items: flex-end; flex-shrink: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+  .scatter-ctrl-group label { display: block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+  .scatter-ctrl-group select { background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 3px; cursor: pointer; min-width: 260px; appearance: none; -webkit-appearance: none; }
+  .scatter-ctrl-group select:focus { outline: none; border-color: var(--accent); }
+  #plot-scatter { flex: 1; min-height: 0; }
+
   /* ── METHODOLOGY PAGE ── */
   #page-methodology { overflow-y: auto; }
   #methodology-inner { max-width: 720px; margin: 0 auto; padding: 48px 32px 80px; }
@@ -350,7 +358,7 @@
         <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
 
         <div class="panel-section">
-          <div class="panel-section-title">VMT per capita / year</div>
+          <div class="panel-section-title"style="color:var(--text-primary);">VMT per capita / year</div>
           <div id="strip-vmt"></div>
         </div>
         <div class="panel-section">
@@ -431,10 +439,24 @@
       <p>Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
       <div id="clusters-tabs">
         <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
+        <div class="cluster-tab" data-ctab="scatter">Scatter plot</div>
       </div>
     </div>
     <div id="clusters-body">
       <div id="plot-3d"></div>
+      <div id="scatter-container">
+        <div id="scatter-controls">
+          <div class="scatter-ctrl-group">
+            <label>Y axis</label>
+            <select id="scatter-y"></select>
+          </div>
+          <div class="scatter-ctrl-group">
+            <label>X axis</label>
+            <select id="scatter-x"></select>
+          </div>
+        </div>
+        <div id="plot-scatter"></div>
+      </div>
       <div id="cluster-detail-panel">
         <div style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
         <h3 id="cd-name">Click a point</h3>
@@ -602,7 +624,33 @@ document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.add('active');
     document.getElementById('page-' + target).classList.add('active');
     if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
+    if (target === 'clusters') initScatterDropdowns();
     if (target === 'map' && map) setTimeout(() => map.resize(), 50);
+  });
+});
+
+// ─────────────────────────────────────────────
+// CLUSTER TAB SWITCHING
+// ─────────────────────────────────────────────
+document.querySelectorAll('.cluster-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.cluster-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const ctab = tab.dataset.ctab;
+    const plot3d      = document.getElementById('plot-3d');
+    const scatterCont = document.getElementById('scatter-container');
+    const detailPanel = document.getElementById('cluster-detail-panel');
+    if (ctab === '3d') {
+      plot3d.style.display      = '';
+      scatterCont.style.display = 'none';
+      detailPanel.style.display = '';
+      if (!window._plotBuilt && dataReady) buildPlot();
+    } else {
+      plot3d.style.display      = 'none';
+      scatterCont.style.display = 'flex';
+      detailPanel.style.display = 'none';
+      if (dataReady) buildScatter();
+    }
   });
 });
 
@@ -1252,6 +1300,197 @@ document.getElementById('cd-goto-map').addEventListener('click', function() {
     }, 80);
   }
 });
+
+// ─────────────────────────────────────────────
+// SCATTER PLOT
+// ─────────────────────────────────────────────
+const SCATTER_VARS = [
+  { key: 'vmt_pc',          label: 'Vehicle Miles Traveled per Capita' },
+  { key: 'hu_den',          label: 'Housing Density (D1)' },
+  { key: 'job_den',         label: 'Job Density (D1)' },
+  { key: 'job_mix',         label: 'Jobs-to-Pop Ratio (D2)' },
+  { key: 'lu_entropy',      label: 'Land-Use Entropy (D2)' },
+  { key: 'intx_density_ac', label: 'Intersection Density (D3)' },
+  { key: 'sidewalk_cov',    label: 'Sidewalk Coverage (D3)' },
+  { key: 'bikelane_cov',    label: 'Bike Lane Coverage (D3)' },
+  { key: 'transit_phr',     label: 'Transit Freq. Peak Hr (D4)' },
+  { key: 'n_bus_mbta',      label: 'Bus Route Diversity (D4)' },
+  { key: 'park_spaces',     label: 'Park-and-Ride Spaces (D4)' },
+  { key: 'income',          label: 'Median Income (Control)' },
+  { key: 'pct_young_adult', label: '% Young Adults 18\u201334 (Control)' },
+  { key: 'pct_working_age', label: '% Working Age 35\u201364 (Control)' },
+  { key: 'pct_senior',      label: '% Seniors 65+ (Control)' },
+  { key: 'pct_transit',     label: 'Transit Mode Share (Control)' }
+];
+
+let _scatterDropdownsBuilt = false;
+
+function initScatterDropdowns() {
+  if (_scatterDropdownsBuilt) return;
+  _scatterDropdownsBuilt = true;
+  const selY = document.getElementById('scatter-y');
+  const selX = document.getElementById('scatter-x');
+  SCATTER_VARS.forEach(v => {
+    selY.appendChild(Object.assign(document.createElement('option'), { value: v.key, textContent: v.label }));
+    selX.appendChild(Object.assign(document.createElement('option'), { value: v.key, textContent: v.label }));
+  });
+  selY.value = 'vmt_pc';
+  selX.value = 'hu_den';
+  selY.addEventListener('change', buildScatter);
+  selX.addEventListener('change', buildScatter);
+}
+
+function pearsonR(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return 0;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0, sdx = 0, sdy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx, dy = ys[i] - my;
+    num += dx * dy; sdx += dx * dx; sdy += dy * dy;
+  }
+  const den = Math.sqrt(sdx * sdy);
+  return den === 0 ? 0 : num / den;
+}
+
+function rStars(r, n) {
+  const t = r * Math.sqrt(n - 2) / Math.sqrt(1 - r * r);
+  const absT = Math.abs(t);
+  // Approximate p-value from |t| with df = n-2 using Wilson-Hilferty normal approximation
+  const df = n - 2;
+  const x = absT / Math.sqrt(df / (df - 2 + absT * absT / df));
+  // Two-tailed p ~ 2*(1 - Phi(|t| * sqrt(2/(df+1))))  rough approx
+  // Use simple threshold on |t| for star assignment
+  if (absT > 3.291) return '***';   // p < 0.001 approx
+  if (absT > 1.960) return '**';    // p < 0.05 approx
+  if (absT > 1.645) return '*';     // p < 0.10 approx
+  return '';
+}
+
+function olsCIBand(xs, ys, xGrid) {
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let Sxx = 0, Sxy = 0;
+  for (let i = 0; i < n; i++) { Sxx += (xs[i]-mx)**2; Sxy += (xs[i]-mx)*(ys[i]-my); }
+  const b1 = Sxy / Sxx;
+  const b0 = my - b1 * mx;
+  const yhat = xs.map(x => b0 + b1 * x);
+  const SSres = ys.reduce((s, y, i) => s + (y - yhat[i])**2, 0);
+  const MSE = SSres / (n - 2);
+  const tCrit = 1.96; // 95% CI, large n
+  const upper = [], lower = [], fit = [];
+  xGrid.forEach(x => {
+    const y = b0 + b1 * x;
+    const se = Math.sqrt(MSE * (1/n + (x - mx)**2 / Sxx));
+    fit.push(y);
+    upper.push(y + tCrit * se);
+    lower.push(y - tCrit * se);
+  });
+  return { fit, upper, lower, b0, b1 };
+}
+
+function buildScatter() {
+  if (!dataReady || !STATIONS.length) return;
+  const xKey = document.getElementById('scatter-x').value;
+  const yKey = document.getElementById('scatter-y').value;
+  const xLabel = SCATTER_VARS.find(v => v.key === xKey)?.label || xKey;
+  const yLabel = SCATTER_VARS.find(v => v.key === yKey)?.label || yKey;
+
+  // Collect valid rows
+  const rows = STATIONS.filter(s => s[xKey] != null && s[yKey] != null &&
+    !isNaN(+s[xKey]) && !isNaN(+s[yKey]));
+  const xs = rows.map(s => +s[xKey]);
+  const ys = rows.map(s => +s[yKey]);
+
+  const r = pearsonR(xs, ys);
+  const stars = rStars(r, xs.length);
+
+  // x grid for OLS line
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const xPad = (xMax - xMin) * 0.04;
+  const xGrid = Array.from({ length: 80 }, (_, i) => xMin - xPad + i * (xMax - xMin + 2*xPad) / 79);
+  const { fit, upper, lower } = olsCIBand(xs, ys, xGrid);
+
+  // Group dots by cluster
+  const byCluster = {};
+  rows.forEach(s => {
+    const c = s.cluster;
+    if (!byCluster[c]) byCluster[c] = [];
+    byCluster[c].push(s);
+  });
+
+  const dotTraces = Object.entries(byCluster).map(([c, stns]) => ({
+    type: 'scatter', mode: 'markers',
+    name: `${c}: ${CLUSTER_META[+c].name}`,
+    x: stns.map(s => +s[xKey]),
+    y: stns.map(s => +s[yKey]),
+    text: stns.map(s => `<b>${s.name}</b><br>Cluster ${c}: ${CLUSTER_META[+c].name}<br>${xLabel}: ${s[xKey]}<br>${yLabel}: ${s[yKey]}`),
+    hoverinfo: 'text',
+    marker: {
+      color: CLUSTER_META[+c].color,
+      size: 7,
+      opacity: 0.82,
+      line: { width: 0.5, color: 'rgba(255,255,255,0.15)' }
+    },
+    showlegend: true
+  }));
+
+  const ciTrace = {
+    type: 'scatter', mode: 'lines', name: '95% CI',
+    x: [...xGrid, ...xGrid.slice().reverse()],
+    y: [...upper, ...lower.slice().reverse()],
+    fill: 'toself',
+    fillcolor: 'rgba(255,255,255,0.07)',
+    line: { color: 'transparent' },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const olsTrace = {
+    type: 'scatter', mode: 'lines', name: 'OLS',
+    x: xGrid, y: fit,
+    line: { color: '#ffffff', width: 1.8 },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const axStyle = {
+    gridcolor: 'rgba(255,255,255,0.05)',
+    zerolinecolor: 'rgba(255,255,255,0.08)',
+    tickfont: { color: '#505050', size: 9, family: 'DM Mono, monospace' },
+    title: { font: { size: 10, color: '#606060', family: 'DM Mono, monospace' } }
+  };
+
+  const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: { l: 56, r: 24, t: 20, b: 52 },
+    showlegend: true,
+    legend: {
+      font: { size: 9, color: '#606060', family: 'DM Mono, monospace' },
+      bgcolor: 'rgba(0,0,0,0)',
+      bordercolor: 'rgba(255,255,255,0.08)',
+      borderwidth: 1,
+      x: 1, xanchor: 'right', y: 1
+    },
+    xaxis: { ...axStyle, title: { ...axStyle.title, text: xLabel } },
+    yaxis: { ...axStyle, title: { ...axStyle.title, text: yLabel } },
+    annotations: [{
+      x: 0.02, y: 0.97, xref: 'paper', yref: 'paper',
+      text: `r = ${r.toFixed(2)}${stars}`,
+      showarrow: false,
+      font: { size: 12, color: '#a8dadc', family: 'DM Mono, monospace' },
+      align: 'left'
+    }],
+    font: { family: 'DM Mono, monospace', size: 10, color: '#8a8880' }
+  };
+
+  Plotly.react('plot-scatter', [ciTrace, ...dotTraces, olsTrace], layout, {
+    displayModeBar: false, responsive: true
+  });
+}
 
 // ─────────────────────────────────────────────
 // LEGEND FILTER
