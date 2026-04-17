@@ -333,20 +333,36 @@
         <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
 
         <div class="panel-section">
-          <div class="panel-section-title">VMT per capita / yr  (mi)</div>
-          <div id="strip-vmt"></div>
-        </div>
-        <div class="panel-section">
           <div class="panel-section-title">Housing units / acre</div>
           <div id="strip-density"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">Peak trains / hr</div>
+          <div id="strip-freq"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">Job density / acre</div>
+          <div id="strip-jobden"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">Job to population ratio</div>
+          <div id="strip-jobmix"></div>
         </div>
         <div class="panel-section">
           <div class="panel-section-title">Land use entropy</div>
           <div id="strip-entropy"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Peak trains / hr</div>
-          <div id="strip-freq"></div>
+          <div class="panel-section-title">Intersection density / acre</div>
+          <div id="strip-intx"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">Bike lane coverage</div>
+          <div id="strip-bike"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title">Median household income</div>
+          <div id="strip-income"></div>
         </div>
 
         <div class="panel-section">
@@ -511,10 +527,14 @@ Promise.all([
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
-  buildStrip('strip-vmt',     s => +s.vmt_pc,      v => Number(v).toLocaleString(), 'mi');
-  buildStrip('strip-density', s => +s.hu_den,       v => v.toFixed(1),               '/ac');
-  buildStrip('strip-entropy', s => +s.lu_entropy,   v => v.toFixed(2),               '');
-  buildStrip('strip-freq',    s => +s.transit_phr,  v => v.toFixed(1),               '/hr');
+  buildStrip('strip-density', s => +s.hu_den,          v => v.toFixed(1),                      '/ac');
+  buildStrip('strip-freq',    s => +s.transit_phr,     v => v.toFixed(1),                      '/hr');
+  buildStrip('strip-jobden',  s => +s.job_den,         v => v.toFixed(1),                      '/ac');
+  buildStrip('strip-jobmix',  s => +s.job_mix,         v => v.toFixed(2),                      '');
+  buildStrip('strip-entropy', s => +s.lu_entropy,      v => v.toFixed(2),                      '');
+  buildStrip('strip-intx',    s => +s.intx_density_ac, v => v.toFixed(3),                      '/ac');
+  buildStrip('strip-bike',    s => +s.bikelane_cov,    v => (v*100).toFixed(0) + '%',          '');
+  buildStrip('strip-income',  s => +s.income,          v => '$' + Math.round(v/1000) + 'k',   '');
 }).catch(err => {
   console.error('Data load failed:', err);
   document.getElementById('map-loading').innerHTML =
@@ -690,10 +710,14 @@ function onStationClick(e) {
   document.getElementById('panel-station-name').textContent = props.name;
   document.getElementById('panel-cluster-label').textContent =
     `Cluster ${props.cluster} · ${meta.name}`;
-  if (props.vmt_pc     != null) updateStrip('strip-vmt',     +props.vmt_pc,     v => Number(v).toLocaleString(), meta.color);
-  if (props.hu_den     != null) updateStrip('strip-density',  +props.hu_den,     v => v.toFixed(1),               meta.color);
-  if (props.lu_entropy != null) updateStrip('strip-entropy',  +props.lu_entropy, v => v.toFixed(2),               meta.color);
-  if (props.transit_phr!= null) updateStrip('strip-freq',     +props.transit_phr,v => v.toFixed(1),               meta.color);
+  if (props.hu_den          != null) updateStrip('strip-density', +props.hu_den,          v => v.toFixed(1),                      meta.color);
+  if (props.transit_phr     != null) updateStrip('strip-freq',    +props.transit_phr,     v => v.toFixed(1),                      meta.color);
+  if (props.job_den         != null) updateStrip('strip-jobden',  +props.job_den,         v => v.toFixed(1),                      meta.color);
+  if (props.job_mix         != null) updateStrip('strip-jobmix',  +props.job_mix,         v => v.toFixed(2),                      meta.color);
+  if (props.lu_entropy      != null) updateStrip('strip-entropy', +props.lu_entropy,      v => v.toFixed(2),                      meta.color);
+  if (props.intx_density_ac != null) updateStrip('strip-intx',   +props.intx_density_ac, v => v.toFixed(3),                      meta.color);
+  if (props.bikelane_cov    != null) updateStrip('strip-bike',    +props.bikelane_cov,    v => (v*100).toFixed(0) + '%',          meta.color);
+  if (props.income          != null) updateStrip('strip-income',  +props.income,          v => '$' + Math.round(v/1000) + 'k',   meta.color);
 
   const svImg = document.getElementById('sv-img');
   const svPh  = document.getElementById('sv-placeholder');
