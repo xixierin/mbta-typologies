@@ -149,7 +149,7 @@
   #panel-station-name { font-size: 18px; font-weight: 500; line-height: 1.2; margin-bottom: 4px; }
   #panel-cluster-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 24px; font-family: 'DM Mono', monospace; }
   .panel-section { margin-bottom: 24px; }
-  .panel-section-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  .panel-section-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px; font-family: 'DM Mono', monospace; }
   .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .stat-card { background: var(--bg-card); border-radius: 6px; padding: 12px; border: 1px solid var(--border); }
   .stat-card .val { font-size: 20px; font-weight: 500; color: var(--text-primary); line-height: 1; }
@@ -774,7 +774,7 @@ function buildStrip(wrapId, valFn, fmtFn, unit) {
   const ml = document.createElementNS(NS, 'text');
   ml.setAttribute('class', 'strip-label');
   ml.setAttribute('y', P.t - 5);
-  ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', '9');
+  ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', '11');
   ml.setAttribute('font-weight', 'bold'); ml.setAttribute('fill', '#fff');
   ml.setAttribute('font-family', 'DM Mono, monospace'); ml.setAttribute('display', 'none');
   svg.appendChild(ml);
