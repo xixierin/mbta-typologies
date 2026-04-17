@@ -454,7 +454,6 @@
       <div id="cluster-detail-panel">
         <h3 id="cd-name" style="color:var(--text-primary);">Click a point</h3>
         <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
-        <div id="cd-cluster-tag"></div>
         <button id="cd-goto-map">View on map ↗</button>
         <div id="scatter-panel-section">
           <div id="scatter-controls">
@@ -565,17 +564,17 @@ const STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-streets-v12';
 // ─────────────────────────────────────────────
 const CLUSTER_META = {
   1: { name: "Urban Employment Node",         color: "#0cb2af",
-       desc: "High activity intensity, job-dominant land use, high transit frequency. Dense urban employment destinations with strong rapid transit access." },
+       desc: "High activity intensity, job-dominant land use, high transit frequency." },
   2: { name: "Urban Residential Node",        color: "#a1c65d",
-       desc: "High activity intensity, predominantly residential land use, high transit frequency. Dense urban neighborhoods well-served by rapid transit." },
+       desc: "High activity intensity, predominantly residential land use, high transit frequency." },
   3: { name: "Suburban Employment Node",      color: "#fac723",
-       desc: "Low-moderate activity, high job mix, transit-served. Employment-dominant station areas with moderate transit access." },
+       desc: "Low-moderate activity, high job mix, transit-served." },
   4: { name: "Transitional Mixed-Use Area",   color: "#f29222",
-       desc: "High activity intensity, diverse land uses, low transit frequency. Dense urban areas served primarily by commuter rail." },
+       desc: "High activity intensity, diverse land uses, low transit frequency." },
   5: { name: "Suburban Residential Area",     color: "#e95e50",
-       desc: "Low-moderate activity, residential-dominant, low transit frequency. Suburban neighborhoods with limited transit access." },
+       desc: "Low-moderate activity, residential-dominant, low transit frequency." },
   6: { name: "Exurban Fringe",                color: "#5b6abf",
-       desc: "Lowest activity intensity, job-dominant, minimal transit service. Auto-dependent outer station areas." }
+       desc: "Lowest activity intensity, job-dominant, minimal transit service." }
 };
 
 // ─────────────────────────────────────────────
@@ -1170,21 +1169,18 @@ function cdSelectStation(station) {
   const meta = CLUSTER_META[station.cluster];
   const nameEl    = document.getElementById('cd-name');
   const descEl    = document.getElementById('cd-desc');
-  const tagEl     = document.getElementById('cd-cluster-tag');
   const btn       = document.getElementById('cd-goto-map');
-  nameEl.textContent = station.name;
-  nameEl.style.color = meta.color;
+  nameEl.innerHTML = `${station.name}<span style="font-size:11px;font-weight:400;color:${meta.color};opacity:0.85;"> · ${meta.name}</span>`;
+  nameEl.style.color = 'var(--text-primary)';
   descEl.textContent = meta.desc;
-  tagEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.06em;padding:5px 10px;border-radius:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:${meta.color};"><span style="width:8px;height:8px;border-radius:50%;background:${meta.color};flex-shrink:0;"></span>Cluster ${station.cluster} &middot; ${meta.name}</span>`;
   btn.style.display = 'block';
   btn._station = station;
 }
 
 function cdClear() {
-  document.getElementById('cd-name').textContent = 'Click a point';
+  document.getElementById('cd-name').innerHTML = 'Click a point';
   document.getElementById('cd-name').style.color = 'var(--text-primary)';
   document.getElementById('cd-desc').textContent = 'Select a station in the plot to see cluster-level characteristics here.';
-  document.getElementById('cd-cluster-tag').innerHTML = '';
   document.getElementById('cd-goto-map').style.display = 'none';
 }
 
@@ -1285,9 +1281,12 @@ function buildPlot() {
   });
 
   // Deselect when clicking empty space in the 3D plot
+  // Use setTimeout so plotly_click (which fires after native click) can set the flag first
   document.getElementById('plot-3d').addEventListener('click', function() {
-    if (!_lastClickWasPoint) cdClear();
-    _lastClickWasPoint = false;
+    setTimeout(() => {
+      if (!_lastClickWasPoint) cdClear();
+      _lastClickWasPoint = false;
+    }, 50);
   });
 }
 
