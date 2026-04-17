@@ -208,7 +208,7 @@
   #scatter-container { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 0 24px 12px; }
   #scatter-controls { display: flex; gap: 20px; padding: 14px 0 12px; align-items: flex-end; flex-shrink: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; max-width: 600px; }
   .scatter-ctrl-group label { display: block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
-  .scatter-ctrl-group select { background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 3px; cursor: pointer; min-width: 200px; appearance: none; -webkit-appearance: none; }
+  .scatter-ctrl-group select { background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 3px; cursor: pointer; min-width: 200px; max-height: 200px; overflow-y: auto; appearance: auto; -webkit-appearance: auto; }
   .scatter-ctrl-group select:focus { outline: none; border-color: var(--accent); }
   #plot-scatter { width: 100%; max-width: 600px; aspect-ratio: 4/3; flex: none; }
 
@@ -1431,7 +1431,8 @@ function buildScatter() {
     name: `${c}: ${CLUSTER_META[+c].name}`,
     x: stns.map(s => +s[xKey]),
     y: stns.map(s => +s[yKey]),
-    text: stns.map(s => `<b>${s.name}</b><br>Cluster ${c}: ${CLUSTER_META[+c].name}<br>${xLabel}: ${s[xKey]}<br>${yLabel}: ${s[yKey]}`),
+    text: stns.map(s => s.name),
+    hovertemplate: '<span style="font-size:10px">%{text}</span><extra></extra>',
     hoverinfo: 'text',
     marker: {
       color: CLUSTER_META[+c].color,
