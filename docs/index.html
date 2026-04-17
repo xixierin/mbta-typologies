@@ -24,12 +24,12 @@
     --nav-w: 220px;
     --panel-w: 340px;
 
-    --c1: #E87B4A; --c1-bg: rgba(232,123,74,0.15);
-    --c2: #4EC9A0; --c2-bg: rgba(78,201,160,0.15);
-    --c3: #F5C842; --c3-bg: rgba(245,200,66,0.15);
-    --c4: #9B8FE8; --c4-bg: rgba(155,143,232,0.15);
-    --c5: #E87B9E; --c5-bg: rgba(232,123,158,0.15);
-    --c6: #5BAEE8; --c6-bg: rgba(91,174,232,0.15);
+    --c1: #0cb2af; --c1-bg: rgba(12,178,175,0.15);
+    --c2: #a1c65d; --c2-bg: rgba(161,198,93,0.15);
+    --c3: #fac723; --c3-bg: rgba(250,199,35,0.15);
+    --c4: #f29222; --c4-bg: rgba(242,146,34,0.15);
+    --c5: #e95e50; --c5-bg: rgba(233,94,80,0.15);
+    --c6: #5b6abf; --c6-bg: rgba(91,106,191,0.15);
   }
 
   html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; }
@@ -75,6 +75,45 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; }
+
+  /* ── STATION SEARCH ── */
+  #station-search-wrap {
+    position: absolute; top: 60px; left: 16px; z-index: 10; width: 240px;
+  }
+  #station-search-row { display: flex; gap: 6px; }
+  #station-search {
+    flex: 1; height: 32px; padding: 0 12px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 11px; border-radius: 4px; outline: none;
+    transition: border-color 0.15s;
+  }
+  #station-search::placeholder { color: var(--text-muted); }
+  #station-search:focus { border-color: var(--accent); }
+  #btn-reset-view {
+    height: 32px; width: 32px; flex-shrink: 0;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-secondary); border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #btn-reset-view:hover { color: var(--accent); border-color: var(--accent); }
+  #search-results {
+    margin-top: 4px; background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 4px; overflow: hidden; display: none;
+  }
+  .search-result-item {
+    padding: 8px 12px; font-size: 11px; color: var(--text-secondary);
+    cursor: pointer; transition: background 0.1s, color 0.1s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .search-result-item:hover, .search-result-item.active {
+    background: var(--accent-dim); color: var(--text-primary);
+  }
+  .search-result-cluster {
+    font-size: 9px; font-family: 'DM Mono', monospace;
+    color: var(--text-muted); margin-left: 6px;
+  }
   .map-btn {
     height: 32px; padding: 0 14px;
     background: var(--bg-panel); border: 1px solid var(--border-mid);
@@ -135,6 +174,8 @@
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); padding: 3px 0; cursor: pointer; transition: color 0.15s; }
   .legend-item:hover { color: var(--text-primary); }
   .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-item.legend-dimmed { opacity: 0.3; }
+  .legend-item.legend-dimmed:hover { opacity: 0.6; color: var(--text-secondary); }
 
   /* ── CLUSTERS PAGE ── */
   #page-clusters { flex-direction: column; overflow: hidden; }
@@ -153,6 +194,15 @@
   .cluster-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
   .cluster-stat-row .k { color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 10px; }
   .cluster-stat-row .v { color: var(--text-primary); font-weight: 500; }
+  #cd-goto-map {
+    display: none; width: 100%; margin-top: 12px;
+    padding: 9px 14px; font-size: 11px; font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em; cursor: pointer; border-radius: 4px;
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    color: var(--accent); transition: background 0.15s, color 0.15s;
+    text-align: center;
+  }
+  #cd-goto-map:hover { background: var(--accent); color: var(--bg); }
 
   /* ── METHODOLOGY PAGE ── */
   #page-methodology { overflow-y: auto; }
@@ -248,26 +298,39 @@
       <button class="map-btn" id="btn-satellite">Satellite</button>
     </div>
 
+    <div id="station-search-wrap">
+      <div id="station-search-row">
+        <input id="station-search" type="text" placeholder="Search station…" autocomplete="off" />
+        <button id="btn-reset-view" title="Reset view">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 8a6 6 0 1 0 1.5-3.9"/><polyline points="2 3.5 2 8 6.5 8"/>
+          </svg>
+        </button>
+      </div>
+      <div id="search-results"></div>
+    </div>
+
     <div id="map-legend">
       <div class="legend-title">Station typology</div>
       <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Employment Node</div>
-      <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Urban Mixed-Use Area</div>
-      <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Urban Residential Node</div>
-      <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Suburban Residential Area</div>
-      <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Suburban Employment Node</div>
-      <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Exurban Employment Area</div>
+      <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Urban Residential Node</div>
+      <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Suburban Employment Node</div>
+      <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Transitional Mixed-Use Area</div>
+      <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Suburban Residential Area</div>
+      <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Exurban Fringe</div>
       <div style="border-top:1px solid rgba(255,255,255,0.07);margin:8px 0;"></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:3px 0;">
         <div style="width:20px;height:2px;border-top:2px dashed #a8dadc;flex-shrink:0;"></div>MBTA Communities
       </div>
     </div>
 
-    <div id="side-panel">
+    <div id="side-panel" class="open">
       <button id="panel-close">&#x2715;</button>
       <div id="panel-content">
         <div id="panel-cluster-bar"></div>
-        <div id="panel-station-name">Station Name</div>
-        <div id="panel-cluster-label">Cluster label</div>
+        <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;" id="panel-selected-label">Selected station</div>
+        <div id="panel-station-name" style="font-size:18px;font-weight:500;line-height:1.2;margin-bottom:4px;">Click a point</div>
+        <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
 
         <div class="panel-section">
           <div class="panel-section-title">Key indicators</div>
@@ -315,10 +378,11 @@
     <div id="clusters-body">
       <div id="plot-3d"></div>
       <div id="cluster-detail-panel">
-        <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
+        <div style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
         <h3 id="cd-name">Click a point</h3>
         <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
         <div id="cd-stats"></div>
+        <button id="cd-goto-map">View on map ↗</button>
       </div>
     </div>
   </div>
@@ -414,18 +478,18 @@ const STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-streets-v12';
 // CLUSTER METADATA  (matches Ward 4var k=6 model)
 // ─────────────────────────────────────────────
 const CLUSTER_META = {
-  1: { name: "Urban Employment Node",         color: "#E87B4A",
-       desc: "High activity intensity, mixed land uses, predominantly rapid transit. Highest transit frequency and strong walkability." },
-  2: { name: "Urban Mixed-Use Area",          color: "#4EC9A0",
-       desc: "Moderate activity with diverse land uses. Served exclusively by commuter rail with low peak frequency." },
-  3: { name: "Urban Residential Node",        color: "#F5C842",
-       desc: "Moderate activity, predominantly residential land use, low job mix. All stations served by rapid transit." },
-  4: { name: "Suburban Residential Area",     color: "#9B8FE8",
-       desc: "Low activity intensity, sparse land use mix, minimal transit access. Largest cluster (n=66); highest VMT." },
-  5: { name: "Suburban Employment Node",      color: "#E87B9E",
-       desc: "Moderate activity with notably high job mix (employment-dominant). Mix of rapid transit and commuter rail." },
-  6: { name: "Exurban Employment Area",       color: "#5BAEE8",
-       desc: "Low activity, commuter rail only, varied land use entropy. Typically auto-dependent outer stations." }
+  1: { name: "Urban Employment Node",         color: "#0cb2af",
+       desc: "High activity intensity, job-dominant land use, high transit frequency. Dense urban employment destinations with strong rapid transit access." },
+  2: { name: "Urban Residential Node",        color: "#a1c65d",
+       desc: "High activity intensity, predominantly residential land use, high transit frequency. Dense urban neighborhoods well-served by rapid transit." },
+  3: { name: "Suburban Employment Node",      color: "#fac723",
+       desc: "Low-moderate activity, high job mix, transit-served. Employment-dominant station areas with moderate transit access." },
+  4: { name: "Transitional Mixed-Use Area",   color: "#f29222",
+       desc: "High activity intensity, diverse land uses, low transit frequency. Dense urban areas served primarily by commuter rail." },
+  5: { name: "Suburban Residential Area",     color: "#e95e50",
+       desc: "Low-moderate activity, residential-dominant, low transit frequency. Suburban neighborhoods with limited transit access." },
+  6: { name: "Exurban Fringe",                color: "#5b6abf",
+       desc: "Lowest activity intensity, job-dominant, minimal transit service. Auto-dependent outer station areas." }
 };
 
 // ─────────────────────────────────────────────
@@ -436,6 +500,7 @@ let mapReady  = false;
 let dataReady = false;
 let currentStyle = 'minimal';
 let map;
+let legendSelectedClusters = new Set();
 
 // ─────────────────────────────────────────────
 // DATA LOADING
@@ -596,6 +661,26 @@ function addDataToMap() {
   map.on('click', 'station-dots', onStationClick);
   map.on('mouseenter', 'station-dots', () => { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'station-dots', () => { map.getCanvas().style.cursor = ''; });
+
+  // Re-apply legend filter after style swap re-creates layers
+  applyLegendFilter();
+}
+
+function applyLegendFilter() {
+  if (!map) return;
+  const filterLayers = ['station-dots', 'buffer-fill', 'buffer-outline', 'station-labels'];
+  const items = document.querySelectorAll('.legend-item');
+  if (legendSelectedClusters.size === 0) {
+    items.forEach(el => el.classList.remove('legend-dimmed'));
+    filterLayers.forEach(id => { try { map.setFilter(id, null); } catch(e) {} });
+  } else {
+    items.forEach(el => {
+      el.classList.toggle('legend-dimmed', !legendSelectedClusters.has(el.dataset.cluster));
+    });
+    const active = Array.from(legendSelectedClusters);
+    const expr = ['in', ['get', 'cluster'], ['literal', active]];
+    filterLayers.forEach(id => { try { map.setFilter(id, expr); } catch(e) {} });
+  }
 }
 
 function onStationClick(e) {
@@ -638,20 +723,106 @@ document.getElementById('panel-close').addEventListener('click', () => {
   document.getElementById('side-panel').classList.remove('open');
 });
 
+// ─────────────────────────────────────────────
+// STATION SEARCH
+// ─────────────────────────────────────────────
+(function() {
+  const input   = document.getElementById('station-search');
+  const results = document.getElementById('search-results');
+  let activeIdx = -1;
+
+  function showResults(matches) {
+    if (!matches.length) { results.style.display = 'none'; return; }
+    results.innerHTML = matches.slice(0, 8).map((s, i) =>
+      `<div class="search-result-item" data-idx="${i}" data-name="${s.name}">
+        ${s.name}<span class="search-result-cluster">${CLUSTER_META[s.cluster].name}</span>
+      </div>`
+    ).join('');
+    results.style.display = 'block';
+    activeIdx = -1;
+    results.querySelectorAll('.search-result-item').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        selectStation(matches[+el.dataset.idx]);
+      });
+    });
+  }
+
+  function selectStation(s) {
+    input.value = s.name;
+    results.style.display = 'none';
+    // Show side panel immediately
+    const feat = { properties: { ...s } };
+    onStationClick({ features: [feat] });
+    if (!map) return;
+    map.flyTo({ center: [s.lng, s.lat], zoom: 14, duration: 800 });
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q || !STATIONS.length) { results.style.display = 'none'; return; }
+    const matches = STATIONS.filter(s => s.name.toLowerCase().includes(q));
+    showResults(matches);
+  });
+
+  input.addEventListener('keydown', e => {
+    const items = results.querySelectorAll('.search-result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(activeIdx + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(activeIdx - 1, 0);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const target = activeIdx >= 0 ? items[activeIdx] : items[0];
+      if (target) target.dispatchEvent(new MouseEvent('mousedown'));
+      return;
+    } else if (e.key === 'Escape') {
+      results.style.display = 'none'; return;
+    } else { return; }
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => { results.style.display = 'none'; }, 150);
+  });
+
+  document.getElementById('btn-reset-view').addEventListener('click', () => {
+    input.value = '';
+    results.style.display = 'none';
+    if (map) map.flyTo({ center: [-71.1, 42.35], zoom: 9.5, duration: 800 });
+  });
+})();
+
 // Satellite adjustments: lighter + 25% less saturated
 function applySatelliteAdjustments() {
   const style = map.getStyle();
   if (!style) return;
+  const roadPattern = /road|highway|tunnel|bridge|street|path|motorway|trunk|primary|secondary|tertiary|link|service|pedestrian|footway|track/i;
   style.layers.forEach(layer => {
     if (layer.type === 'raster') {
       try {
-        map.setPaintProperty(layer.id, 'raster-brightness-min', -0.35);
-        map.setPaintProperty(layer.id, 'raster-saturation', -0.25);
+        map.setPaintProperty(layer.id, 'raster-brightness-min', -0.9);
+        map.setPaintProperty(layer.id, 'raster-saturation', -0.95);
+        map.setPaintProperty(layer.id, 'raster-contrast', -0.25);
       } catch(e) {}
+    }
+    // Neutralize road line colors to white/grey
+    if (layer.type === 'line' && roadPattern.test(layer.id)) {
+      try {
+        map.setPaintProperty(layer.id, 'line-color', 'rgba(255,255,255,0.5)');
+        map.setPaintProperty(layer.id, 'line-width', 0.5);
+      } catch(e) {}
+    }
+    // Neutralize road case/fill colors
+    if (layer.type === 'fill' && roadPattern.test(layer.id)) {
+      try { map.setPaintProperty(layer.id, 'fill-color', 'rgba(255,255,255,0.5)'); } catch(e) {}
     }
   });
   try {
-    map.setPaintProperty('buffer-fill', 'fill-opacity', 0.05);
+    map.setPaintProperty('buffer-fill', 'fill-opacity', 0);
     map.setPaintProperty('buffer-outline', 'line-width', 2);
     map.setPaintProperty('buffer-outline', 'line-opacity', 1);
   } catch(e) {}
@@ -704,26 +875,40 @@ function buildPlot() {
     return new Set(indices.slice(0, Math.max(1, Math.round(n * frac))));
   }
 
-  const traces = Object.entries(byCluster).map(([c, stations]) => {
-    const meta = CLUSTER_META[+c];
-    const labeled = sampleIndices(stations.length, 0.3);
-    return {
-      type: 'scatter3d', mode: 'markers+text',
-      name: `${c}: ${meta.name}`,
-      x: stations.map(s => s.pc1),
-      y: stations.map(s => s.pc2),
-      z: stations.map(s => s.pc3),
-      text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
-      textposition: 'top center',
-      textfont: { size: 11, color: meta.color, family: 'DM Mono, monospace' },
-      hovertext: stations.map(s =>
-        `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
-      hoverinfo: 'text',
-      customdata: stations.map(s => s.name),
-      marker: { size: 5, color: meta.color, opacity: 0.85,
-                line: { width: 0.5, color: 'rgba(255,255,255,0.2)' } }
-    };
-  });
+  // Build shared cluster data so shadow + main traces use the same sampled labels
+  const clusterData = Object.entries(byCluster).map(([c, stations]) => ({
+    c, stations, meta: CLUSTER_META[+c], labeled: sampleIndices(stations.length, 0.2)
+  }));
+
+  // Shadow traces (white, slightly larger) rendered first to create outline effect
+  const shadowTraces = clusterData.map(({ c, stations, meta, labeled }) => ({
+    type: 'scatter3d', mode: 'text',
+    showlegend: false, hoverinfo: 'skip',
+    x: stations.map(s => s.pc1),
+    y: stations.map(s => s.pc2),
+    z: stations.map(s => s.pc3),
+    text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
+    textposition: 'top center',
+    textfont: { size: 13, color: 'rgba(255,255,255,0.7)', family: 'DM Mono, monospace' }
+  }));
+
+  // Main traces (markers + cluster-colored labels on top)
+  const traces = clusterData.map(({ c, stations, meta, labeled }) => ({
+    type: 'scatter3d', mode: 'markers+text',
+    name: `${c}: ${meta.name}`,
+    x: stations.map(s => s.pc1),
+    y: stations.map(s => s.pc2),
+    z: stations.map(s => s.pc3),
+    text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
+    textposition: 'top center',
+    textfont: { size: 11, color: meta.color, family: 'DM Mono, monospace' },
+    hovertext: stations.map(s =>
+      `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
+    hoverinfo: 'text',
+    customdata: stations.map(s => s.name),
+    marker: { size: 5, color: meta.color, opacity: 0.85,
+              line: { width: 0.5, color: 'rgba(255,255,255,0.2)' } }
+  }));
 
   const axStyle = { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#505050', size: 9 } };
   const layout = {
@@ -759,8 +944,53 @@ function buildPlot() {
       <div class="cluster-stat-row"><span class="k">Job mix</span><span class="v">${station.job_mix}</span></div>
       <div class="cluster-stat-row"><span class="k">Transit type</span><span class="v">${station.type}</span></div>
     `;
+    // Show and wire the button for this station
+    const btn = document.getElementById('cd-goto-map');
+    btn.style.display = 'block';
+    btn._station = station;
   });
 }
+
+document.getElementById('cd-goto-map').addEventListener('click', function() {
+  const station = this._station;
+  if (!station) return;
+  // Switch to map tab
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector('.nav-item[data-page="map"]').classList.add('active');
+  document.getElementById('page-map').classList.add('active');
+  // Switch to satellite if not already
+  if (map && currentStyle !== 'satellite') {
+    currentStyle = 'satellite';
+    document.getElementById('btn-satellite').classList.add('active');
+    document.getElementById('btn-minimal').classList.remove('active');
+    map.setStyle(STYLE_SATELLITE);
+    restoreLayersAfterStyleSwap();
+  }
+  // Resize, fly, open side panel
+  if (map) {
+    map.resize();
+    setTimeout(() => {
+      map.flyTo({ center: [station.lng, station.lat], zoom: 14, duration: 800 });
+      onStationClick({ features: [{ properties: { ...station } }] });
+    }, 80);
+  }
+});
+
+// ─────────────────────────────────────────────
+// LEGEND FILTER
+// ─────────────────────────────────────────────
+document.querySelectorAll('.legend-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const c = el.dataset.cluster;
+    if (legendSelectedClusters.has(c)) {
+      legendSelectedClusters.delete(c);
+    } else {
+      legendSelectedClusters.add(c);
+    }
+    applyLegendFilter();
+  });
+});
 
 // ─────────────────────────────────────────────
 // INIT
