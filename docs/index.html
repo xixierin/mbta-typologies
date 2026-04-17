@@ -350,7 +350,7 @@
         <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
 
         <div class="panel-section">
-          <div class="panel-section-title" style="color:var(--text-primary);">VMT per capita / year</div>
+          <div class="panel-section-title">VMT per capita / year</div>
           <div id="strip-vmt"></div>
         </div>
         <div class="panel-section">
@@ -576,7 +576,7 @@ Promise.all([
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
-  buildStrip('strip-vmt',     s => +s.vmt_pc,          v => Math.round(v).toLocaleString(),     'mi/yr', true);
+  buildStrip('strip-vmt',     s => +s.vmt_pc,          v => Math.round(v).toLocaleString(),     'mi/yr');
   buildStrip('strip-density', s => +s.hu_den,          v => v.toFixed(1),                      '/ac');
   buildStrip('strip-freq',    s => +s.transit_phr,     v => v.toFixed(1),                      '/hr');
   buildStrip('strip-jobden',  s => +s.job_den,         v => v.toFixed(1),                      '/ac');
@@ -764,7 +764,7 @@ function onStationClick(e) {
   document.getElementById('panel-station-name').textContent = props.name;
   document.getElementById('panel-cluster-label').textContent =
     `Cluster ${props.cluster} · ${meta.name}`;
-  if (props.vmt_pc          != null) updateStrip('strip-vmt',     +props.vmt_pc,          v => Math.round(v).toLocaleString(),     '#ffffff', true);
+  if (props.vmt_pc          != null) updateStrip('strip-vmt',     +props.vmt_pc,          v => Math.round(v).toLocaleString(),     meta.color);
   if (props.hu_den          != null) updateStrip('strip-density', +props.hu_den,          v => v.toFixed(1),                      meta.color);
   if (props.transit_phr     != null) updateStrip('strip-freq',    +props.transit_phr,     v => v.toFixed(1),                      meta.color);
   if (props.job_den         != null) updateStrip('strip-jobden',  +props.job_den,         v => v.toFixed(1),                      meta.color);
