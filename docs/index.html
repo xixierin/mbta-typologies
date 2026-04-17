@@ -235,6 +235,23 @@
   .mapboxgl-ctrl-group button:hover { background: rgba(255,255,255,0.05) !important; }
   .mapboxgl-ctrl-group .mapboxgl-ctrl-icon { filter: invert(1) opacity(0.5); }
 
+  /* Age distribution bar */
+  .age-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+  .age-seg { height: 100%; }
+  .age-legend { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+  .age-leg-item { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+  .age-leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Bus route badges */
+  .route-badges { display: flex; flex-wrap: wrap; gap: 4px; }
+  .route-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-family: 'DM Mono', monospace; border: 1px solid rgba(168,218,220,0.3); color: #a8dadc; background: rgba(168,218,220,0.07); }
+  .route-badge.rta { border-color: rgba(255,255,255,0.12); color: var(--text-secondary); background: transparent; }
+
+  /* Inline stat pair */
+  .stat-pair { display: flex; gap: 32px; }
+  .stat-mini .val { font-size: 18px; font-weight: 500; color: var(--text-primary); line-height: 1.2; }
+  .stat-mini .lbl { font-size: 9px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
@@ -363,6 +380,32 @@
         <div class="panel-section">
           <div class="panel-section-title">Median household income</div>
           <div id="strip-income"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title">Age distribution</div>
+          <div id="panel-age-bar">
+            <div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div>
+            <div class="age-legend"><span style="color:var(--text-muted);font-size:9px;font-family:'DM Mono',monospace;">Select a station</span></div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title">Bus routes in area</div>
+          <div id="panel-bus-routes"><span style="color:var(--text-muted);font-size:10px;font-family:'DM Mono',monospace;">Select a station</span></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="stat-pair">
+            <div>
+              <div class="panel-section-title">Parking spaces</div>
+              <div id="panel-parking" class="stat-mini"><div class="val">—</div><div class="lbl">total spaces</div></div>
+            </div>
+            <div>
+              <div class="panel-section-title">Bluebike stations</div>
+              <div id="panel-bluebike" class="stat-mini"><div class="val">—</div><div class="lbl">within ½ mi</div></div>
+            </div>
+          </div>
         </div>
 
         <div class="panel-section">
@@ -519,11 +562,13 @@ let legendSelectedClusters = new Set();
 Promise.all([
   fetch('data/stations.json').then(r => r.json()),
   fetch('data/buffers.geojson').then(r => r.json()),
-  fetch('data/mbta_communities.geojson').then(r => r.json())
-]).then(([stations, buffers, communities]) => {
+  fetch('data/mbta_communities.geojson').then(r => r.json()),
+  fetch('data/bus_routes.json').then(r => r.json())
+]).then(([stations, buffers, communities, busRoutes]) => {
   STATIONS  = stations;
   window._buffers = buffers;
   window._communities = communities;
+  window._busRoutes = busRoutes;
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
@@ -719,6 +764,22 @@ function onStationClick(e) {
   if (props.bikelane_cov    != null) updateStrip('strip-bike',    +props.bikelane_cov,    v => (v*100).toFixed(0) + '%',          meta.color);
   if (props.income          != null) updateStrip('strip-income',  +props.income,          v => '$' + Math.round(v/1000) + 'k',   meta.color);
 
+  // Age distribution bar
+  updateAgeBar(+props.pct_young_adult || 0, +props.pct_working_age || 0, +props.pct_senior || 0);
+
+  // Bus routes
+  updateBusRoutes(props.name);
+
+  // Parking spaces
+  const parkEl = document.getElementById('panel-parking');
+  if (parkEl) parkEl.innerHTML = props.park_spaces > 0
+    ? `<div class="val">${(+props.park_spaces).toLocaleString()}</div><div class="lbl">total spaces</div>`
+    : `<div class="val" style="color:var(--text-muted)">None</div><div class="lbl">no parking data</div>`;
+
+  // Bluebike stations
+  const bbEl = document.getElementById('panel-bluebike');
+  if (bbEl) bbEl.innerHTML = `<div class="val">${+props.n_bluebike || 0}</div><div class="lbl">stations within ½ mi</div>`;
+
   const svImg = document.getElementById('sv-img');
   const svPh  = document.getElementById('sv-placeholder');
   if (GOOGLE_SV_KEY) {
@@ -736,6 +797,54 @@ function onStationClick(e) {
   document.getElementById('sv-link').textContent = `Open ${props.name} in Street View ↗`;
 
   document.getElementById('side-panel').classList.add('open');
+}
+
+// ─────────────────────────────────────────────
+// AGE BAR
+// ─────────────────────────────────────────────
+function updateAgeBar(ya, wa, sr) {
+  const tot = (ya || 0) + (wa || 0) + (sr || 0);
+  const el = document.getElementById('panel-age-bar');
+  if (!el) return;
+  if (!tot) {
+    el.innerHTML = '<div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div>';
+    return;
+  }
+  const pY = (ya / tot * 100).toFixed(1);
+  const pW = (wa / tot * 100).toFixed(1);
+  const pS = (sr / tot * 100).toFixed(1);
+  el.innerHTML = `
+    <div class="age-bar">
+      <div class="age-seg" style="width:${pY}%;background:#a8dadc;"></div>
+      <div class="age-seg" style="width:${pW}%;background:rgba(168,218,220,0.42);"></div>
+      <div class="age-seg" style="width:${pS}%;background:rgba(168,218,220,0.18);"></div>
+    </div>
+    <div class="age-legend">
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:#a8dadc;"></div>18–34: ${(ya*100).toFixed(0)}%</div>
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:rgba(168,218,220,0.42);"></div>35–64: ${(wa*100).toFixed(0)}%</div>
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:rgba(168,218,220,0.18);"></div>65+: ${(sr*100).toFixed(0)}%</div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// BUS ROUTES
+// ─────────────────────────────────────────────
+function updateBusRoutes(stationName) {
+  const el = document.getElementById('panel-bus-routes');
+  if (!el) return;
+  const data = window._busRoutes && window._busRoutes[stationName];
+  if (!data) {
+    el.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">No data</span>';
+    return;
+  }
+  const badges = [];
+  (data.mbta || []).forEach(r => badges.push(`<span class="route-badge">${r}</span>`));
+  (data.rta  || []).forEach(a => badges.push(`<span class="route-badge rta">${a}</span>`));
+  if (!badges.length) {
+    el.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">No bus routes in area</span>';
+  } else {
+    el.innerHTML = `<div class="route-badges">${badges.join('')}</div>`;
+  }
 }
 
 // ─────────────────────────────────────────────
