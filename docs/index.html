@@ -729,31 +729,19 @@ function onStationClick(e) {
 // ─────────────────────────────────────────────
 // VMT HISTOGRAM
 // ─────────────────────────────────────────────
-const _HIST = { bins: [], min: 0, step: 1, nBins: 14, bw: 0,
-  W: 292, H: 110, P: { l: 32, r: 8, t: 20, b: 28 } };
+const _HIST = { min: 0, range: 1, W: 292, H: 72, P: { l: 32, r: 8, t: 22, b: 24 } };
 
 function buildVmtHistogram() {
   const wrap = document.getElementById('vmt-hist-wrap');
   if (!wrap || !STATIONS.length) return;
 
   const vmts = STATIONS.map(s => +s.vmt_pc).filter(v => isFinite(v));
-  _HIST.min  = Math.min(...vmts);
-  const max  = Math.max(...vmts);
-  _HIST.step = (max - _HIST.min) / _HIST.nBins;
-  _HIST.bins = Array.from({ length: _HIST.nBins }, () => ({ stations: [] }));
+  _HIST.min   = Math.min(...vmts);
+  _HIST.range = Math.max(...vmts) - _HIST.min;
 
-  STATIONS.forEach(s => {
-    const v = +s.vmt_pc;
-    if (!isFinite(v)) return;
-    const i = Math.min(Math.floor((v - _HIST.min) / _HIST.step), _HIST.nBins - 1);
-    _HIST.bins[i].stations.push(s);
-  });
-
-  const { W, H, P, nBins } = _HIST;
+  const { W, H, P } = _HIST;
   const pw = W - P.l - P.r;
   const ph = H - P.t - P.b;
-  _HIST.bw = pw / nBins;
-  const maxCount = Math.max(..._HIST.bins.map(b => b.stations.length));
 
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
@@ -761,27 +749,20 @@ function buildVmtHistogram() {
   svg.setAttribute('id', 'vmt-hist-svg');
   svg.style.cssText = 'display:block;overflow:visible;';
 
-  // Stacked bars
-  _HIST.bins.forEach((bin, i) => {
-    const g = document.createElementNS(NS, 'g');
-    g.setAttribute('class', 'hist-bin'); g.setAttribute('data-bin', i);
-    const byCluster = {};
-    bin.stations.forEach(s => { byCluster[s.cluster] = (byCluster[s.cluster] || 0) + 1; });
-    let yOff = 0;
-    Object.entries(byCluster).sort().forEach(([c, cnt]) => {
-      const h = (cnt / maxCount) * ph;
-      const r = document.createElementNS(NS, 'rect');
-      r.setAttribute('class', 'hist-rect');
-      r.setAttribute('x',      P.l + i * _HIST.bw + 1);
-      r.setAttribute('y',      P.t + ph - yOff - h);
-      r.setAttribute('width',  _HIST.bw - 2);
-      r.setAttribute('height', h);
-      r.setAttribute('fill',   CLUSTER_META[+c] ? CLUSTER_META[+c].color : '#888');
-      r.setAttribute('opacity', '0.85');
-      yOff += h;
-      g.appendChild(r);
-    });
-    svg.appendChild(g);
+  // One vertical line per station
+  STATIONS.forEach(s => {
+    const v = +s.vmt_pc;
+    if (!isFinite(v)) return;
+    const x = P.l + ((v - _HIST.min) / _HIST.range) * pw;
+    const ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('class', 'strip-line');
+    ln.setAttribute('data-name', s.name);
+    ln.setAttribute('x1', x); ln.setAttribute('x2', x);
+    ln.setAttribute('y1', P.t); ln.setAttribute('y2', P.t + ph);
+    ln.setAttribute('stroke', CLUSTER_META[+s.cluster] ? CLUSTER_META[+s.cluster].color : '#888');
+    ln.setAttribute('stroke-width', '1.5');
+    ln.setAttribute('opacity', '0.45');
+    svg.appendChild(ln);
   });
 
   // Axis line
@@ -792,10 +773,10 @@ function buildVmtHistogram() {
   svg.appendChild(ax);
 
   // Tick labels: min, mid, max
-  [0, Math.round(nBins / 2), nBins].forEach(bi => {
-    const v = _HIST.min + bi * _HIST.step;
+  [0, 0.5, 1].forEach(frac => {
+    const v = _HIST.min + frac * _HIST.range;
     const t = document.createElementNS(NS, 'text');
-    t.setAttribute('x', P.l + bi * _HIST.bw);
+    t.setAttribute('x', P.l + frac * pw);
     t.setAttribute('y', P.t + ph + 11);
     t.setAttribute('text-anchor', 'middle');
     t.setAttribute('font-size', '8'); t.setAttribute('fill', 'rgba(255,255,255,0.3)');
@@ -806,23 +787,16 @@ function buildVmtHistogram() {
 
   // Axis label
   const xl = document.createElementNS(NS, 'text');
-  xl.setAttribute('x', P.l + pw / 2); xl.setAttribute('y', P.t + ph + 24);
+  xl.setAttribute('x', P.l + pw / 2); xl.setAttribute('y', P.t + ph + 22);
   xl.setAttribute('text-anchor', 'middle'); xl.setAttribute('font-size', '8');
   xl.setAttribute('fill', 'rgba(255,255,255,0.22)');
   xl.setAttribute('font-family', 'DM Mono, monospace');
   xl.textContent = 'VMT per capita / yr  (mi)';
   svg.appendChild(xl);
 
-  // Marker line (hidden until station selected)
-  const mk = document.createElementNS(NS, 'line');
-  mk.setAttribute('id', 'vmt-mk'); mk.setAttribute('y1', P.t - 2); mk.setAttribute('y2', P.t + ph);
-  mk.setAttribute('stroke', '#fff'); mk.setAttribute('stroke-width', '1.5');
-  mk.setAttribute('stroke-dasharray', '3,2'); mk.setAttribute('display', 'none');
-  svg.appendChild(mk);
-
-  // Marker label
+  // Selected station label (hidden until click)
   const ml = document.createElementNS(NS, 'text');
-  ml.setAttribute('id', 'vmt-ml'); ml.setAttribute('y', P.t - 5);
+  ml.setAttribute('id', 'vmt-ml'); ml.setAttribute('y', P.t - 6);
   ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', '9');
   ml.setAttribute('font-weight', 'bold'); ml.setAttribute('fill', '#fff');
   ml.setAttribute('font-family', 'DM Mono, monospace'); ml.setAttribute('display', 'none');
@@ -835,28 +809,22 @@ function buildVmtHistogram() {
 function updateVmtHistogram(vmt) {
   const svg = document.getElementById('vmt-hist-svg');
   if (!svg) return;
-  const { min, step, nBins, bw, P, W, H } = _HIST;
+  const { min, range, W, H, P } = _HIST;
   const pw = W - P.l - P.r;
   const ph = H - P.t - P.b;
-  const activeBin = Math.min(Math.floor((vmt - min) / step), nBins - 1);
-  const xExact = P.l + ((vmt - min) / (step * nBins)) * pw;
+  const xSel = P.l + ((vmt - min) / range) * pw;
 
-  // Dim/highlight bins
-  svg.querySelectorAll('.hist-bin').forEach(g => {
-    const isActive = +g.getAttribute('data-bin') === activeBin;
-    g.querySelectorAll('.hist-rect').forEach(r => {
-      r.setAttribute('opacity', isActive ? '1' : '0.12');
-    });
+  // Dim all lines, then highlight the matching one
+  svg.querySelectorAll('.strip-line').forEach(ln => {
+    const x = +ln.getAttribute('x1');
+    const isMatch = Math.abs(x - xSel) < 1;
+    ln.setAttribute('opacity', isMatch ? '1' : '0.1');
+    ln.setAttribute('stroke-width', isMatch ? '2.5' : '1.5');
   });
 
-  // Position marker
-  const mk = document.getElementById('vmt-mk');
-  mk.setAttribute('x1', xExact); mk.setAttribute('x2', xExact);
-  mk.setAttribute('display', 'block');
-
+  // Value label
   const ml = document.getElementById('vmt-ml');
-  // Keep label within SVG bounds
-  const clampedX = Math.max(P.l + 10, Math.min(xExact, W - P.r - 10));
+  const clampedX = Math.max(P.l + 12, Math.min(xSel, W - P.r - 12));
   ml.setAttribute('x', clampedX);
   ml.textContent = Number(vmt).toLocaleString();
   ml.setAttribute('display', 'block');
