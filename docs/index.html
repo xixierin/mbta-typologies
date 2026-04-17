@@ -181,11 +181,16 @@
   #page-clusters { flex-direction: column; overflow: hidden; }
   #clusters-header { padding: 28px 32px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   #clusters-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
-  #clusters-header p { font-size: 12px; color: var(--text-secondary); margin-bottom: 20px; max-width: 560px; line-height: 1.6; }
   #clusters-tabs { display: flex; gap: 0; }
   .cluster-tab { padding: 8px 18px; font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Mono', monospace; transition: color 0.15s, border-color 0.15s; }
   .cluster-tab:hover { color: var(--text-secondary); }
   .cluster-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  #clusters-body { flex: 1; overflow: hidden; display: flex; position: relative; }
+  #clusters-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; max-width: 560px; line-height: 1.6; padding: 14px 32px 0; flex-shrink: 0; }
+  #pca-legend { position: absolute; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 10; }
+  .pca-legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 2px; }
+  .pca-legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-secondary); font-family: 'DM Mono', monospace; }
+  .pca-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   #clusters-body { flex: 1; overflow: hidden; display: flex; }
   #plot-3d { flex: 1; height: 100%; }
   #cluster-detail-panel { width: 320px; border-left: 1px solid var(--border); background: var(--bg-panel); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
@@ -436,18 +441,20 @@
   <div class="page" id="page-clusters">
     <div id="clusters-header">
       <h1>Station area typologies</h1>
-      <p>Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
       <div id="clusters-tabs">
         <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
       </div>
     </div>
     <div id="clusters-body">
-      <div id="plot-3d"></div>
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;">
+        <p id="clusters-desc">Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
+        <div id="plot-3d" style="flex:1;"></div>
+        <div id="pca-legend"></div>
+      </div>
       <div id="cluster-detail-panel">
-        <div style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
-        <h3 id="cd-name">Click a point</h3>
+        <h3 id="cd-name" style="color:var(--text-primary);">Click a point</h3>
         <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
-        <div id="cd-stats"></div>
+        <div id="cd-cluster-tag"></div>
         <button id="cd-goto-map">View on map ↗</button>
         <div id="scatter-panel-section">
           <div id="scatter-controls">
@@ -1157,6 +1164,40 @@ document.getElementById('btn-satellite').addEventListener('click', () => {
 });
 
 // ─────────────────────────────────────────────
+// CLUSTER DETAIL PANEL HELPERS
+// ─────────────────────────────────────────────
+function cdSelectStation(station) {
+  const meta = CLUSTER_META[station.cluster];
+  const nameEl    = document.getElementById('cd-name');
+  const descEl    = document.getElementById('cd-desc');
+  const tagEl     = document.getElementById('cd-cluster-tag');
+  const btn       = document.getElementById('cd-goto-map');
+  nameEl.textContent = station.name;
+  nameEl.style.color = meta.color;
+  descEl.textContent = meta.desc;
+  tagEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.06em;padding:5px 10px;border-radius:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:${meta.color};"><span style="width:8px;height:8px;border-radius:50%;background:${meta.color};flex-shrink:0;"></span>Cluster ${station.cluster} &middot; ${meta.name}</span>`;
+  btn.style.display = 'block';
+  btn._station = station;
+}
+
+function cdClear() {
+  document.getElementById('cd-name').textContent = 'Click a point';
+  document.getElementById('cd-name').style.color = 'var(--text-primary)';
+  document.getElementById('cd-desc').textContent = 'Select a station in the plot to see cluster-level characteristics here.';
+  document.getElementById('cd-cluster-tag').innerHTML = '';
+  document.getElementById('cd-goto-map').style.display = 'none';
+}
+
+function buildPcaLegend() {
+  const el = document.getElementById('pca-legend');
+  if (!el) return;
+  el.innerHTML = '<div class="pca-legend-title">Station Typology</div>' +
+    Object.entries(CLUSTER_META).map(([c, m]) =>
+      `<div class="pca-legend-item"><span class="pca-legend-dot" style="background:${m.color};"></span>${m.name}</div>`
+    ).join('');
+}
+
+// ─────────────────────────────────────────────
 // 3D CLUSTER PLOT
 // ─────────────────────────────────────────────
 function buildPlot() {
@@ -1228,32 +1269,25 @@ function buildPlot() {
 
   Plotly.newPlot('plot-3d', traces, layout, { displayModeBar: false, responsive: true });
 
-  // Build scatter in the detail panel now that data is ready
+  // Build legend, scatter, and reset detail panel
+  buildPcaLegend();
+  cdClear();
   initScatterDropdowns();
   buildScatter();
 
+  let _lastClickWasPoint = false;
   document.getElementById('plot-3d').on('plotly_click', function(data) {
+    _lastClickWasPoint = true;
     const pt = data.points[0];
     const station = STATIONS.find(s => s.name === pt.customdata);
     if (!station) return;
-    const meta = CLUSTER_META[station.cluster];
-    document.getElementById('cd-name').textContent = station.name;
-    document.getElementById('cd-name').style.color = meta.color;
-    document.getElementById('cd-desc').textContent = meta.desc;
-    document.getElementById('cd-stats').innerHTML = `
-      <div class="cluster-stat-row"><span class="k">Cluster</span><span class="v" style="color:${meta.color}">${station.cluster} · ${meta.name}</span></div>
-      <div class="cluster-stat-row"><span class="k">VMT / capita / yr</span><span class="v">${Number(station.vmt_pc).toLocaleString()}</span></div>
-      <div class="cluster-stat-row"><span class="k">Housing density</span><span class="v">${station.hu_den} /ac</span></div>
-      <div class="cluster-stat-row"><span class="k">Land use entropy</span><span class="v">${station.lu_entropy}</span></div>
-      <div class="cluster-stat-row"><span class="k">Peak trains / hr</span><span class="v">${station.transit_phr}</span></div>
-      <div class="cluster-stat-row"><span class="k">Activity intensity</span><span class="v">${station.activity_intensity}</span></div>
-      <div class="cluster-stat-row"><span class="k">Job mix</span><span class="v">${station.job_mix}</span></div>
-      <div class="cluster-stat-row"><span class="k">Transit type</span><span class="v">${station.type}</span></div>
-    `;
-    // Show and wire the button for this station
-    const btn = document.getElementById('cd-goto-map');
-    btn.style.display = 'block';
-    btn._station = station;
+    cdSelectStation(station);
+  });
+
+  // Deselect when clicking empty space in the 3D plot
+  document.getElementById('plot-3d').addEventListener('click', function() {
+    if (!_lastClickWasPoint) cdClear();
+    _lastClickWasPoint = false;
   });
 }
 
