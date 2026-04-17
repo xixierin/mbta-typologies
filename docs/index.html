@@ -796,58 +796,31 @@ document.getElementById('panel-close').addEventListener('click', () => {
   });
 })();
 
-// Build a world-minus-buffers mask polygon so satellite color shows only inside station areas
-function createOutsideMask(buffers) {
-  // Outer ring: CCW (counter-clockwise) per GeoJSON right-hand rule = filled region
-  const worldRing = [
-    [-180, -85.0511], [180, -85.0511], [180, 85.0511], [-180, 85.0511], [-180, -85.0511]
-  ];
-  const holes = [];
-  buffers.features.forEach(f => {
-    const geom = f.geometry;
-    if (geom.type === 'Polygon') {
-      // Reverse outer ring → CW → becomes a hole (interior ring)
-      holes.push([...geom.coordinates[0]].reverse());
-    } else if (geom.type === 'MultiPolygon') {
-      geom.coordinates.forEach(poly => holes.push([...poly[0]].reverse()));
-    }
-  });
-  return {
-    type: 'FeatureCollection',
-    features: [{ type: 'Feature', geometry: { type: 'Polygon', coordinates: [worldRing, ...holes] } }]
-  };
-}
-
-// Satellite adjustments: colored inside station buffers, dark mask outside
+// Satellite adjustments: lighter + 25% less saturated
 function applySatelliteAdjustments() {
   const style = map.getStyle();
   if (!style) return;
   const roadPattern = /road|highway|tunnel|bridge|street|path|motorway|trunk|primary|secondary|tertiary|link|service|pedestrian|footway|track/i;
   style.layers.forEach(layer => {
-    // Neutralize road vector overlays so they don't clash with satellite
+    if (layer.type === 'raster') {
+      try {
+        map.setPaintProperty(layer.id, 'raster-brightness-min', -0.9);
+        map.setPaintProperty(layer.id, 'raster-saturation', -0.95);
+        map.setPaintProperty(layer.id, 'raster-contrast', -0.25);
+      } catch(e) {}
+    }
+    // Neutralize road line colors to white/grey
     if (layer.type === 'line' && roadPattern.test(layer.id)) {
       try {
-        map.setPaintProperty(layer.id, 'line-color', 'rgba(255,255,255,0.4)');
+        map.setPaintProperty(layer.id, 'line-color', 'rgba(255,255,255,0.5)');
         map.setPaintProperty(layer.id, 'line-width', 0.5);
       } catch(e) {}
     }
+    // Neutralize road case/fill colors
     if (layer.type === 'fill' && roadPattern.test(layer.id)) {
-      try { map.setPaintProperty(layer.id, 'fill-color', 'rgba(255,255,255,0.3)'); } catch(e) {}
+      try { map.setPaintProperty(layer.id, 'fill-color', 'rgba(255,255,255,0.5)'); } catch(e) {}
     }
   });
-
-  // Add dark mask covering everything outside station buffer areas
-  if (window._buffers && !map.getSource('satellite-mask')) {
-    const maskData = createOutsideMask(window._buffers);
-    map.addSource('satellite-mask', { type: 'geojson', data: maskData });
-    map.addLayer({
-      id: 'satellite-mask-fill',
-      type: 'fill',
-      source: 'satellite-mask',
-      paint: { 'fill-color': '#06080a', 'fill-opacity': 0.78 }
-    }, 'community-outline'); // insert below our data layers
-  }
-
   try {
     map.setPaintProperty('buffer-fill', 'fill-opacity', 0);
     map.setPaintProperty('buffer-outline', 'line-width', 2);
