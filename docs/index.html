@@ -690,10 +690,10 @@ function onStationClick(e) {
   document.getElementById('panel-station-name').textContent = props.name;
   document.getElementById('panel-cluster-label').textContent =
     `Cluster ${props.cluster} · ${meta.name}`;
-  if (props.vmt_pc     != null) updateStrip('strip-vmt',     +props.vmt_pc,     v => Number(v).toLocaleString());
-  if (props.hu_den     != null) updateStrip('strip-density',  +props.hu_den,     v => v.toFixed(1));
-  if (props.lu_entropy != null) updateStrip('strip-entropy',  +props.lu_entropy, v => v.toFixed(2));
-  if (props.transit_phr!= null) updateStrip('strip-freq',     +props.transit_phr,v => v.toFixed(1));
+  if (props.vmt_pc     != null) updateStrip('strip-vmt',     +props.vmt_pc,     v => Number(v).toLocaleString(), meta.color);
+  if (props.hu_den     != null) updateStrip('strip-density',  +props.hu_den,     v => v.toFixed(1),               meta.color);
+  if (props.lu_entropy != null) updateStrip('strip-entropy',  +props.lu_entropy, v => v.toFixed(2),               meta.color);
+  if (props.transit_phr!= null) updateStrip('strip-freq',     +props.transit_phr,v => v.toFixed(1),               meta.color);
 
   const svImg = document.getElementById('sv-img');
   const svPh  = document.getElementById('sv-placeholder');
@@ -783,13 +783,13 @@ function buildStrip(wrapId, valFn, fmtFn, unit) {
   wrap.appendChild(svg);
 }
 
-function updateStrip(wrapId, val, fmtFn) {
+function updateStrip(wrapId, val, fmtFn, color) {
   const wrap = document.getElementById(wrapId);
   if (!wrap) return;
   const svg = wrap.querySelector('svg');
   if (!svg) return;
   const st = _STRIPS[wrapId];
-  const { W, H, P } = _SP;
+  const { W, P } = _SP;
   const pw = W - P.l - P.r;
   const xSel = P.l + ((val - st.min) / st.range) * pw;
 
@@ -798,11 +798,13 @@ function updateStrip(wrapId, val, fmtFn) {
     const hit = Math.abs(x - xSel) < 1.5;
     ln.setAttribute('opacity', hit ? '1' : '0.1');
     ln.setAttribute('stroke-width', hit ? '2.5' : '1.5');
+    if (hit && color) ln.setAttribute('stroke', color);
   });
 
   const ml = svg.querySelector('.strip-label');
   const clampedX = Math.max(P.l + 14, Math.min(xSel, W - P.r - 14));
   ml.setAttribute('x', clampedX);
+  ml.setAttribute('fill', color || '#fff');
   ml.textContent = fmtFn(val) + (st.unit ? ' ' + st.unit : '');
   ml.setAttribute('display', 'block');
 }
