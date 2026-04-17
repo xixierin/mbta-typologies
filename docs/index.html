@@ -350,40 +350,44 @@
         <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
 
         <div class="panel-section">
-          <div class="panel-section-title">Housing units / acre</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">VMT per capita / year</div>
+          <div id="strip-vmt"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Housing units / acre</div>
           <div id="strip-density"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Peak trains / hr</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Peak trains / hr</div>
           <div id="strip-freq"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Job density / acre</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Job density / acre</div>
           <div id="strip-jobden"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Job to population ratio</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Job to population ratio</div>
           <div id="strip-jobmix"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Land use entropy</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Land use entropy</div>
           <div id="strip-entropy"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Intersection density / acre</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Intersection density / acre</div>
           <div id="strip-intx"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Bike lane coverage</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Bike lane coverage</div>
           <div id="strip-bike"></div>
         </div>
         <div class="panel-section">
-          <div class="panel-section-title">Median household income</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Median household income</div>
           <div id="strip-income"></div>
         </div>
 
         <div class="panel-section">
-          <div class="panel-section-title">Age distribution</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Age distribution</div>
           <div id="panel-age-bar">
             <div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div>
             <div class="age-legend"><span style="color:var(--text-muted);font-size:9px;font-family:'DM Mono',monospace;">Select a station</span></div>
@@ -391,25 +395,25 @@
         </div>
 
         <div class="panel-section">
-          <div class="panel-section-title">Bus routes in area</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Bus routes in area</div>
           <div id="panel-bus-routes"><span style="color:var(--text-muted);font-size:10px;font-family:'DM Mono',monospace;">Select a station</span></div>
         </div>
 
         <div class="panel-section">
           <div class="stat-pair">
             <div>
-              <div class="panel-section-title">Parking spaces</div>
+              <div class="panel-section-title" style="color:var(--text-primary);">Parking spaces</div>
               <div id="panel-parking" class="stat-mini"><div class="val">—</div><div class="lbl">total spaces</div></div>
             </div>
             <div>
-              <div class="panel-section-title">Bluebike stations</div>
-              <div id="panel-bluebike" class="stat-mini"><div class="val">—</div><div class="lbl">within ½ mi</div></div>
+              <div class="panel-section-title" style="color:var(--text-primary);">Bluebike stations</div>
+              <div id="panel-bluebike" class="stat-mini"><div class="val">—</div><div class="lbl">within 0.5 mi</div></div>
             </div>
           </div>
         </div>
 
         <div class="panel-section">
-          <div class="panel-section-title">Street view</div>
+          <div class="panel-section-title" style="color:var(--text-primary);">Street view</div>
           <div id="sv-container">
             <span id="sv-placeholder">Add a Google Street View Static API key to enable image previews.</span>
             <img id="sv-img" alt="Street View" />
@@ -572,6 +576,7 @@ Promise.all([
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
+  buildStrip('strip-vmt',     s => +s.vmt_pc,          v => Math.round(v).toLocaleString(),     'mi/yr', true);
   buildStrip('strip-density', s => +s.hu_den,          v => v.toFixed(1),                      '/ac');
   buildStrip('strip-freq',    s => +s.transit_phr,     v => v.toFixed(1),                      '/hr');
   buildStrip('strip-jobden',  s => +s.job_den,         v => v.toFixed(1),                      '/ac');
@@ -723,6 +728,10 @@ function addDataToMap() {
   });
 
   map.on('click', 'station-dots', onStationClick);
+  map.on('click', (e) => {
+    const hits = map.queryRenderedFeatures(e.point, { layers: ['station-dots', 'buffer-fill'] });
+    if (!hits.length) clearPanel();
+  });
   map.on('mouseenter', 'station-dots', () => { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'station-dots', () => { map.getCanvas().style.cursor = ''; });
 
@@ -755,6 +764,7 @@ function onStationClick(e) {
   document.getElementById('panel-station-name').textContent = props.name;
   document.getElementById('panel-cluster-label').textContent =
     `Cluster ${props.cluster} · ${meta.name}`;
+  if (props.vmt_pc          != null) updateStrip('strip-vmt',     +props.vmt_pc,          v => Math.round(v).toLocaleString(),     '#ffffff', true);
   if (props.hu_den          != null) updateStrip('strip-density', +props.hu_den,          v => v.toFixed(1),                      meta.color);
   if (props.transit_phr     != null) updateStrip('strip-freq',    +props.transit_phr,     v => v.toFixed(1),                      meta.color);
   if (props.job_den         != null) updateStrip('strip-jobden',  +props.job_den,         v => v.toFixed(1),                      meta.color);
@@ -853,7 +863,7 @@ function updateBusRoutes(stationName) {
 const _STRIPS = {};  // keyed by wrapId, stores { min, range }
 const _SP = { W: 292, H: 52, P: { l: 8, r: 8, t: 18, b: 16 } };
 
-function buildStrip(wrapId, valFn, fmtFn, unit) {
+function buildStrip(wrapId, valFn, fmtFn, unit, bold) {
   const wrap = document.getElementById(wrapId);
   if (!wrap || !STATIONS.length) return;
 
@@ -907,16 +917,17 @@ function buildStrip(wrapId, valFn, fmtFn, unit) {
   const ml = document.createElementNS(NS, 'text');
   ml.setAttribute('class', 'strip-label');
   ml.setAttribute('y', P.t - 5);
-  ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', '11');
-  ml.setAttribute('font-weight', 'bold'); ml.setAttribute('fill', '#fff');
+  ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', bold ? '13' : '11');
+  ml.setAttribute('font-weight', 'bold'); ml.setAttribute('fill', bold ? '#ffffff' : '#fff');
   ml.setAttribute('font-family', 'DM Mono, monospace'); ml.setAttribute('display', 'none');
+  if (bold) ml.setAttribute('letter-spacing', '0.02em');
   svg.appendChild(ml);
 
   wrap.innerHTML = '';
   wrap.appendChild(svg);
 }
 
-function updateStrip(wrapId, val, fmtFn, color) {
+function updateStrip(wrapId, val, fmtFn, color, bold) {
   const wrap = document.getElementById(wrapId);
   if (!wrap) return;
   const svg = wrap.querySelector('svg');
@@ -937,9 +948,51 @@ function updateStrip(wrapId, val, fmtFn, color) {
   const ml = svg.querySelector('.strip-label');
   const clampedX = Math.max(P.l + 14, Math.min(xSel, W - P.r - 14));
   ml.setAttribute('x', clampedX);
-  ml.setAttribute('fill', color || '#fff');
+  ml.setAttribute('fill', bold ? '#ffffff' : (color || '#fff'));
+  ml.setAttribute('font-size', bold ? '13' : '11');
   ml.textContent = fmtFn(val) + (st.unit ? ' ' + st.unit : '');
   ml.setAttribute('display', 'block');
+}
+
+function clearPanel() {
+  document.getElementById('panel-cluster-bar').style.background = '';
+  document.getElementById('panel-station-name').textContent = 'Click a point';
+  document.getElementById('panel-cluster-label').textContent = 'Select a station on the map';
+
+  // Reset all strips to dimmed/no-selection state
+  ['strip-vmt','strip-density','strip-freq','strip-jobden','strip-jobmix','strip-entropy','strip-intx','strip-bike','strip-income'].forEach(id => {
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    wrap.querySelectorAll('.strip-line').forEach(ln => {
+      ln.setAttribute('opacity', '0.1');
+      ln.setAttribute('stroke-width', '1.5');
+      ln.setAttribute('stroke', '#666');
+    });
+    const ml = wrap.querySelector('.strip-label');
+    if (ml) ml.setAttribute('display', 'none');
+  });
+
+  // Reset age bar
+  const ageEl = document.getElementById('panel-age-bar');
+  if (ageEl) ageEl.innerHTML = '<div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div><div class="age-legend"><span style="color:var(--text-muted);font-size:9px;font-family:\'DM Mono\',monospace;">Select a station</span></div>';
+
+  // Reset bus routes
+  const busEl = document.getElementById('panel-bus-routes');
+  if (busEl) busEl.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">Select a station</span>';
+
+  // Reset parking / bluebike
+  const parkEl = document.getElementById('panel-parking');
+  if (parkEl) parkEl.innerHTML = '<div class="val">—</div><div class="lbl">total spaces</div>';
+  const bbEl = document.getElementById('panel-bluebike');
+  if (bbEl) bbEl.innerHTML = '<div class="val">—</div><div class="lbl">within 0.5 mi</div>';
+
+  // Reset street view
+  const svImg = document.getElementById('sv-img');
+  const svPh  = document.getElementById('sv-placeholder');
+  if (svImg) { svImg.src = ''; svImg.style.display = 'none'; }
+  if (svPh)  { svPh.style.display = 'block'; }
+  const svLink = document.getElementById('sv-link');
+  if (svLink) { svLink.href = '#'; svLink.textContent = 'Open in Google Maps ↗'; }
 }
 
 document.getElementById('panel-close').addEventListener('click', () => {
