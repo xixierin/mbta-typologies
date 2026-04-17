@@ -250,12 +250,12 @@
 
     <div id="map-legend">
       <div class="legend-title">Station typology</div>
-      <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Mixed-Use Rapid Transit</div>
-      <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Inner Commuter Rail Hub</div>
-      <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Rapid Transit Residential</div>
-      <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Auto-Oriented Suburban</div>
-      <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Employment Hub</div>
-      <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Outer Commuter Fringe</div>
+      <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Employment Node</div>
+      <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Urban Mixed-Use Area</div>
+      <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Urban Residential Node</div>
+      <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Suburban Residential Area</div>
+      <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Suburban Employment Node</div>
+      <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Exurban Employment Area</div>
       <div style="border-top:1px solid rgba(255,255,255,0.07);margin:8px 0;"></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:3px 0;">
         <div style="width:20px;height:2px;border-top:2px dashed #a8dadc;flex-shrink:0;"></div>MBTA Communities
@@ -694,17 +694,28 @@ function buildPlot() {
     byCluster[s.cluster].push(s);
   });
 
+  // Randomly sample ~30% of stations per cluster for label display
+  function sampleIndices(n, frac) {
+    const indices = Array.from({length: n}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return new Set(indices.slice(0, Math.max(1, Math.round(n * frac))));
+  }
+
   const traces = Object.entries(byCluster).map(([c, stations]) => {
     const meta = CLUSTER_META[+c];
+    const labeled = sampleIndices(stations.length, 0.3);
     return {
       type: 'scatter3d', mode: 'markers+text',
       name: `${c}: ${meta.name}`,
       x: stations.map(s => s.pc1),
       y: stations.map(s => s.pc2),
       z: stations.map(s => s.pc3),
-      text: stations.map(s => s.name),
+      text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
       textposition: 'top center',
-      textfont: { size: 16, color: 'rgba(220,220,220,0.75)', family: 'DM Mono, monospace' },
+      textfont: { size: 11, color: meta.color, family: 'DM Mono, monospace' },
       hovertext: stations.map(s =>
         `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
       hoverinfo: 'text',
