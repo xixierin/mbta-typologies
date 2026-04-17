@@ -188,7 +188,7 @@
   .cluster-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
   #clusters-body { flex: 1; overflow: hidden; display: flex; }
   #plot-3d { flex: 1; height: 100%; }
-  #cluster-detail-panel { width: 280px; border-left: 1px solid var(--border); background: var(--bg-panel); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  #cluster-detail-panel { width: 320px; border-left: 1px solid var(--border); background: var(--bg-panel); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
   #cluster-detail-panel h3 { font-size: 13px; font-weight: 500; }
   #cluster-detail-panel p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
   .cluster-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
@@ -204,13 +204,13 @@
   }
   #cd-goto-map:hover { background: var(--accent); color: var(--bg); }
 
-  /* ── SCATTER TAB ── */
-  #scatter-container { flex: 1; display: none; flex-direction: column; overflow-y: auto; padding: 0 24px 12px; }
-  #scatter-controls { display: flex; gap: 20px; padding: 14px 0 12px; align-items: flex-end; flex-shrink: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; max-width: 600px; }
-  .scatter-ctrl-group label { display: block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
-  .scatter-ctrl-group select { background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 6px 10px; border-radius: 3px; cursor: pointer; min-width: 200px; max-height: 200px; overflow-y: auto; appearance: auto; -webkit-appearance: auto; }
+  /* ── SCATTER IN DETAIL PANEL ── */
+  #scatter-panel-section { margin-top: 4px; border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  #scatter-controls { display: flex; flex-direction: column; gap: 8px; }
+  .scatter-ctrl-group label { display: block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+  .scatter-ctrl-group select { width: 100%; background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 8px; border-radius: 3px; cursor: pointer; appearance: auto; -webkit-appearance: auto; }
   .scatter-ctrl-group select:focus { outline: none; border-color: var(--accent); }
-  #plot-scatter { width: 100%; max-width: 600px; aspect-ratio: 4/3; flex: none; }
+  #plot-scatter { width: 100%; aspect-ratio: 4/3; flex: none; }
 
   /* ── METHODOLOGY PAGE ── */
   #page-methodology { overflow-y: auto; }
@@ -439,30 +439,29 @@
       <p>Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
       <div id="clusters-tabs">
         <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
-        <div class="cluster-tab" data-ctab="scatter">Scatter plot</div>
       </div>
     </div>
     <div id="clusters-body">
       <div id="plot-3d"></div>
-      <div id="scatter-container">
-        <div id="scatter-controls">
-          <div class="scatter-ctrl-group">
-            <label>Y axis</label>
-            <select id="scatter-y"></select>
-          </div>
-          <div class="scatter-ctrl-group">
-            <label>X axis</label>
-            <select id="scatter-x"></select>
-          </div>
-        </div>
-        <div id="plot-scatter"></div>
-      </div>
       <div id="cluster-detail-panel">
         <div style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;">Selected station</div>
         <h3 id="cd-name">Click a point</h3>
         <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
         <div id="cd-stats"></div>
         <button id="cd-goto-map">View on map ↗</button>
+        <div id="scatter-panel-section">
+          <div id="scatter-controls">
+            <div class="scatter-ctrl-group">
+              <label>Y axis</label>
+              <select id="scatter-y"></select>
+            </div>
+            <div class="scatter-ctrl-group">
+              <label>X axis</label>
+              <select id="scatter-x"></select>
+            </div>
+          </div>
+          <div id="plot-scatter"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -629,33 +628,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.add('active');
     document.getElementById('page-' + target).classList.add('active');
     if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
-    if (target === 'clusters') initScatterDropdowns();
     if (target === 'map' && map) setTimeout(() => map.resize(), 50);
-  });
-});
-
-// ─────────────────────────────────────────────
-// CLUSTER TAB SWITCHING
-// ─────────────────────────────────────────────
-document.querySelectorAll('.cluster-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.cluster-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const ctab = tab.dataset.ctab;
-    const plot3d      = document.getElementById('plot-3d');
-    const scatterCont = document.getElementById('scatter-container');
-    const detailPanel = document.getElementById('cluster-detail-panel');
-    if (ctab === '3d') {
-      plot3d.style.display      = '';
-      scatterCont.style.display = 'none';
-      detailPanel.style.display = '';
-      if (!window._plotBuilt && dataReady) buildPlot();
-    } else {
-      plot3d.style.display      = 'none';
-      scatterCont.style.display = 'flex';
-      detailPanel.style.display = 'none';
-      if (dataReady) buildScatter();
-    }
   });
 });
 
@@ -1254,6 +1227,10 @@ function buildPlot() {
   };
 
   Plotly.newPlot('plot-3d', traces, layout, { displayModeBar: false, responsive: true });
+
+  // Build scatter in the detail panel now that data is ready
+  initScatterDropdowns();
+  buildScatter();
 
   document.getElementById('plot-3d').on('plotly_click', function(data) {
     const pt = data.points[0];
