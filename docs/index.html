@@ -18,7 +18,7 @@
     --border-mid: rgba(255,255,255,0.12);
     --text-primary: #f0ede8;
     --text-secondary: #8a8880;
-    --text-muted: #505050;
+    --text-muted: #999999;
     --accent: #a8dadc;
     --accent-dim: rgba(168,218,220,0.12);
     --nav-w: 220px;
@@ -281,11 +281,59 @@
 
   /* ── DATA PAGE ── */
   #page-data { flex-direction: column; overflow: hidden; }
-  #data-header { padding: 28px 32px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #data-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   #data-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
   #data-header p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
-  #data-body { flex: 1; overflow-y: auto; padding: 32px; }
-  #datawrapper-embed { max-width: 900px; margin: 0 auto; }
+  #data-body { flex: 1; overflow: hidden; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+  /* Controls */
+  #dt-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-shrink: 0; }
+  #dt-search { height: 30px; padding: 0 10px; background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 11px; border-radius: 4px; outline: none; min-width: 200px; }
+  #dt-search::placeholder { color: var(--text-muted); }
+  #dt-search:focus { border-color: var(--accent); }
+  #dt-cluster-filters { display: flex; flex-wrap: wrap; gap: 5px; }
+  .dt-filter-btn { height: 26px; padding: 0 8px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 10px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: color 0.15s, border-color 0.15s, background 0.15s; white-space: nowrap; }
+  .dt-filter-btn:hover { color: var(--text-primary); border-color: var(--border-mid); }
+  .dt-filter-btn.active { background: var(--bg-card); border-color: var(--border-mid); color: var(--text-primary); }
+  .dt-filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  /* Table */
+  #dt-wrap { flex: 1; overflow: auto; border: 1px solid var(--border); border-radius: 6px; min-height: 0; }
+  table.dt { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+  table.dt thead { position: sticky; top: 0; z-index: 2; background: var(--bg-panel); }
+  table.dt th { padding: 7px 8px; text-align: left; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-primary); font-family: 'DM Mono', monospace; font-weight: 500; border-bottom: 1px solid var(--border-mid); user-select: none; }
+  table.dt th.dt-sort { cursor: pointer; }
+  table.dt th.dt-sort:hover { color: var(--accent); }
+  table.dt th.dt-sort-asc::after { content: ' ↑'; opacity: 0.7; }
+  table.dt th.dt-sort-desc::after { content: ' ↓'; opacity: 0.7; }
+  table.dt td { padding: 5px 8px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  table.dt tr:last-child td { border-bottom: none; }
+  table.dt tr:hover td { background: rgba(255,255,255,0.025); cursor: pointer; }
+  table.dt td.dt-num { font-family: 'DM Mono', monospace; font-size: 10px; text-align: right; color: var(--text-muted); }
+  table.dt th.dt-num { text-align: right; }
+  table.dt td.dt-lu { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  table.dt .dt-grp-header th { background: var(--bg-card); color: var(--accent); font-size: 8px; letter-spacing: 0.14em; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  .dt-station-name { font-weight: 500; font-size: 11px; }
+  /* Group dividers — vertical accent lines (right-edge of last col in each group) */
+  table.dt tr.dt-grp-header th:not(:last-child) { border-right: 1px solid rgba(168,218,220,0.45); }
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(4),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(11),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(16),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(19),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(23),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(26),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(30) { border-right: 1px solid rgba(168,218,220,0.45); }
+  table.dt tbody td:nth-child(4),
+  table.dt tbody td:nth-child(11),
+  table.dt tbody td:nth-child(16),
+  table.dt tbody td:nth-child(19),
+  table.dt tbody td:nth-child(23),
+  table.dt tbody td:nth-child(26),
+  table.dt tbody td:nth-child(30) { border-right: 1px solid rgba(168,218,220,0.45); }
+  /* Frozen first column */
+  table.dt thead tr th:first-child { position: sticky; left: 0; z-index: 5; background: var(--bg-panel); }
+  table.dt tbody td:first-child { position: sticky; left: 0; z-index: 1; background: var(--bg-panel); }
+  table.dt tr:hover td:first-child { background: var(--bg-card); }
+  /* Every 5th row — subtle reading guide */
+  table.dt tbody tr:nth-child(5n) td { border-bottom: 1px solid rgba(255,255,255,0.14); }
 
   /* Mapbox overrides */
   .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { display: none; }
@@ -324,7 +372,7 @@
   <div id="nav-logo">
     <div class="title">MBTA Communities<br>Station Area Typologies</div>
     <div class="sub" style="color:var(--text-primary);">Beyond Density · VMT-Informed<br>Implementation of the<br>MBTA Communities Act</div>
-    <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;">Thesis · 2026</div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"> Erin Chen · Thesis · 2026</div>
   </div>
   <div id="nav-links">
     <div class="nav-item active" data-page="map">
@@ -337,7 +385,7 @@
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
       </svg>
-      Clusters
+      3D Clusters
     </div>
     <div class="nav-item" data-page="methodology">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -349,7 +397,7 @@
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <rect x="2" y="10" width="3" height="4" rx="1"/><rect x="6.5" y="6" width="3" height="8" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/>
       </svg>
-      Data
+      Data Explorer
     </div>
   </div>
   <div id="nav-legend">
@@ -605,12 +653,59 @@
   <div class="page" id="page-data">
     <div id="data-header">
       <h1>Station data explorer</h1>
-      <p>Search and filter VMT, land use, and cluster data across all MBTA Communities station areas.</p>
+      <p>Search and filter VMT, land use, and cluster data across all MBTA Communities station areas. Click a row to view on the map.</p>
     </div>
     <div id="data-body">
-      <div id="datawrapper-embed">
-        <iframe title="Station Cluster Lookup" aria-label="Table" id="datawrapper-chart-HLE1J" src="https://datawrapper.dwcdn.net/HLE1J/11/?dark=true" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="1142" data-external="1"></iframe>
-        <script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}}})</script>
+      <!-- Controls -->
+      <div id="dt-controls">
+        <input id="dt-search" type="text" placeholder="Search stations…" autocomplete="off" />
+        <div id="dt-cluster-filters">
+          <button class="dt-filter-btn active" data-cluster="0">All</button>
+        </div>
+      </div>
+      <!-- Table -->
+      <div id="dt-wrap">
+        <table class="dt" id="dt-table">
+          <thead>
+            <tr class="dt-grp-header"><th colspan="4"></th><th colspan="7" class="dt-num">Land Use &amp; Density</th><th colspan="5" class="dt-num">Infrastructure</th><th colspan="3" class="dt-num">Access &amp; POI</th><th colspan="4" class="dt-num">Mode Share</th><th colspan="3" class="dt-num">Demographics: Age</th><th colspan="4" class="dt-num">Demographics: Race</th><th colspan="3" class="dt-num">Demographics: Other</th></tr>
+            <tr>
+              <th class="dt-sort" data-col="name">Station</th>
+              <th data-col="type">Type</th>
+              <th class="dt-sort dt-num" data-col="vmt_pc">VMT/cap</th>
+              <th data-col="dominant_lu">Dom. LU</th>
+              <th class="dt-sort dt-num" data-col="hu_den">HU/ac</th>
+              <th class="dt-sort dt-num" data-col="job_den">Jobs/ac</th>
+              <th class="dt-sort dt-num" data-col="job_mix">Job:pop</th>
+              <th class="dt-sort dt-num" data-col="lu_entropy">LU entr</th>
+              <th class="dt-sort dt-num" data-col="intx_density_ac">Intx/ac</th>
+              <th class="dt-sort dt-num" data-col="sidewalk_cov">Sidewalk</th>
+              <th class="dt-sort dt-num" data-col="bikelane_cov">Bikelane</th>
+              <th class="dt-sort dt-num" data-col="transit_phr">Transit/hr</th>
+              <th class="dt-sort dt-num" data-col="n_bus_mbta">MBTA bus</th>
+              <th class="dt-sort dt-num" data-col="n_rta">RTA</th>
+              <th class="dt-sort dt-num" data-col="park_spaces">Parking</th>
+              <th class="dt-sort dt-num" data-col="n_bluebike">Bluebike</th>
+              <th class="dt-sort dt-num" data-col="food_score">Food</th>
+              <th class="dt-sort dt-num" data-col="inst_score">Inst</th>
+              <th class="dt-sort dt-num" data-col="leis_score">Leisure</th>
+              <th class="dt-sort dt-num" data-col="pct_transit">Transit</th>
+              <th class="dt-sort dt-num" data-col="pct_car">Car</th>
+              <th class="dt-sort dt-num" data-col="pct_walk">Walk</th>
+              <th class="dt-sort dt-num" data-col="pct_bike">Bike</th>
+              <th class="dt-sort dt-num" data-col="pct_young_adult">Young</th>
+              <th class="dt-sort dt-num" data-col="pct_working_age">Work</th>
+              <th class="dt-sort dt-num" data-col="pct_senior">Senior</th>
+              <th class="dt-sort dt-num" data-col="pct_white">White</th>
+              <th class="dt-sort dt-num" data-col="pct_black">Black</th>
+              <th class="dt-sort dt-num" data-col="pct_asian">Asian</th>
+              <th class="dt-sort dt-num" data-col="pct_other">Other</th>
+              <th class="dt-sort dt-num" data-col="vehicle_per_unit">Veh/unit</th>
+              <th class="dt-sort dt-num" data-col="income">Income</th>
+              <th class="dt-sort dt-num" data-col="pct_bachelors">Bach+</th>
+            </tr>
+          </thead>
+          <tbody id="dt-body"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -717,6 +812,7 @@ Promise.all([
   buildStrip('strip-intx',    s => +s.intx_density_ac, v => v.toFixed(3),                      '/ac');
   buildStrip('strip-bike',    s => +s.bikelane_cov,    v => (v*100).toFixed(0) + '%',          '');
   buildStrip('strip-income',  s => +s.income,          v => '$' + Math.round(v/1000) + 'k',   '');
+  if (document.getElementById('page-data').classList.contains('active')) buildDataTable();
 }).catch(err => {
   console.error('Data load failed:', err);
   document.getElementById('map-loading').innerHTML =
@@ -749,9 +845,10 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     item.classList.add('active');
     document.getElementById('page-' + target).classList.add('active');
-    // Show legend only on map page
-    document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map');
+    // Show legend on map and data pages
+    document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map' && target !== 'data');
     if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
+    if (target === 'data' && dataReady) buildDataTable();
     if (target === 'map' && map) setTimeout(() => map.resize(), 50);
   });
 });
@@ -1528,6 +1625,146 @@ document.getElementById('cd-goto-map').addEventListener('click', function() {
     }, 80);
   }
 });
+
+// ─────────────────────────────────────────────
+// DATA TABLE
+// ─────────────────────────────────────────────
+let dtSortCol = 'cluster';
+let dtSortAsc = true;
+let dtFilterCluster = 0;
+let dtSearch = '';
+
+function pct(v) { return v == null ? '—' : (v * 100).toFixed(0) + '%'; }
+function num1(v) { return v == null ? '—' : (+v).toFixed(1); }
+function num2(v) { return v == null ? '—' : (+v).toFixed(2); }
+function num3(v) { return v == null ? '—' : (+v).toFixed(3); }
+
+function buildDataTable() {
+  if (window._dtBuilt) return;
+  window._dtBuilt = true;
+
+  // Build cluster filter buttons
+  const filterRow = document.getElementById('dt-cluster-filters');
+  Object.entries(CLUSTER_META).forEach(([c, meta]) => {
+    const btn = document.createElement('button');
+    btn.className = 'dt-filter-btn';
+    btn.dataset.cluster = c;
+    btn.innerHTML = `<span class="dt-filter-dot" style="background:${meta.color}"></span>${meta.name}`;
+    filterRow.appendChild(btn);
+  });
+
+  filterRow.querySelectorAll('.dt-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterRow.querySelectorAll('.dt-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      dtFilterCluster = +btn.dataset.cluster;
+      renderDataTable();
+    });
+  });
+
+  document.getElementById('dt-search').addEventListener('input', e => {
+    dtSearch = e.target.value.toLowerCase();
+    renderDataTable();
+  });
+
+  document.querySelectorAll('#dt-table th.dt-sort').forEach(th => {
+    th.addEventListener('click', () => {
+      if (dtSortCol === th.dataset.col) {
+        dtSortAsc = !dtSortAsc;
+      } else {
+        dtSortCol = th.dataset.col;
+        dtSortAsc = !th.classList.contains('dt-num');
+      }
+      renderDataTable();
+    });
+  });
+
+  renderDataTable();
+}
+
+function renderDataTable() {
+  let rows = STATIONS.slice();
+
+  if (dtFilterCluster > 0) {
+    rows = rows.filter(s => +s.cluster === dtFilterCluster);
+  }
+  if (dtSearch) {
+    rows = rows.filter(s => s.name.toLowerCase().includes(dtSearch));
+  }
+
+  rows.sort((a, b) => {
+    let av = a[dtSortCol], bv = b[dtSortCol];
+    if (typeof av === 'string' || av == null) {
+      av = av || ''; bv = bv || '';
+      return dtSortAsc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    }
+    av = +av; bv = +bv;
+    if (isNaN(av)) av = 0; if (isNaN(bv)) bv = 0;
+    return dtSortAsc ? av - bv : bv - av;
+  });
+
+  const tbody = document.getElementById('dt-body');
+  tbody.innerHTML = '';
+  rows.forEach(s => {
+    const meta = CLUSTER_META[+s.cluster] || { name: '—', color: '#888' };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="dt-station-name" style="color:${meta.color}">${s.name}</span></td>
+      <td class="dt-lu">${s.type || '—'}</td>
+      <td class="dt-num">${s.vmt_pc != null ? Math.round(+s.vmt_pc).toLocaleString() : '—'}</td>
+      <td class="dt-lu">${s.dominant_lu || '—'}</td>
+      <td class="dt-num">${num1(s.hu_den)}</td>
+      <td class="dt-num">${num1(s.job_den)}</td>
+      <td class="dt-num">${num2(s.job_mix)}</td>
+      <td class="dt-num">${num2(s.lu_entropy)}</td>
+      <td class="dt-num">${num3(s.intx_density_ac)}</td>
+      <td class="dt-num">${pct(s.sidewalk_cov)}</td>
+      <td class="dt-num">${pct(s.bikelane_cov)}</td>
+      <td class="dt-num">${num1(s.transit_phr)}</td>
+      <td class="dt-num">${s.n_bus_mbta != null ? s.n_bus_mbta : '—'}</td>
+      <td class="dt-num">${s.n_rta != null ? s.n_rta : '—'}</td>
+      <td class="dt-num">${s.park_spaces != null ? (+s.park_spaces).toLocaleString() : '—'}</td>
+      <td class="dt-num">${s.n_bluebike != null ? s.n_bluebike : '—'}</td>
+      <td class="dt-num">${num1(s.food_score)}</td>
+      <td class="dt-num">${num1(s.inst_score)}</td>
+      <td class="dt-num">${num1(s.leis_score)}</td>
+      <td class="dt-num">${pct(s.pct_transit)}</td>
+      <td class="dt-num">${pct(s.pct_car)}</td>
+      <td class="dt-num">${pct(s.pct_walk)}</td>
+      <td class="dt-num">${pct(s.pct_bike)}</td>
+      <td class="dt-num">${pct(s.pct_young_adult)}</td>
+      <td class="dt-num">${pct(s.pct_working_age)}</td>
+      <td class="dt-num">${pct(s.pct_senior)}</td>
+      <td class="dt-num">${pct(s.pct_white)}</td>
+      <td class="dt-num">${pct(s.pct_black)}</td>
+      <td class="dt-num">${pct(s.pct_asian)}</td>
+      <td class="dt-num">${pct(s.pct_other)}</td>
+      <td class="dt-num">${num2(s.vehicle_per_unit)}</td>
+      <td class="dt-num">${s.income != null ? '$' + Math.round(+s.income / 1000) + 'k' : '—'}</td>
+      <td class="dt-num">${pct(s.pct_bachelors)}</td>
+    `;
+    tr.addEventListener('click', () => {
+      document.querySelector('.nav-item[data-page="map"]').click();
+      setTimeout(() => {
+        if (map) {
+          map.resize();
+          setTimeout(() => {
+            map.flyTo({ center: [+s.lng, +s.lat], zoom: 14, duration: 800 });
+            onStationClick({ features: [{ properties: { ...s } }] });
+          }, 80);
+        }
+      }, 300);
+    });
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('#dt-table th').forEach(th => {
+    th.classList.remove('dt-sort-asc', 'dt-sort-desc');
+    if (th.dataset.col === dtSortCol) {
+      th.classList.add(dtSortAsc ? 'dt-sort-asc' : 'dt-sort-desc');
+    }
+  });
+}
 
 // ─────────────────────────────────────────────
 // SCATTER PLOT
