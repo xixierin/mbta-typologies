@@ -845,8 +845,8 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     item.classList.add('active');
     document.getElementById('page-' + target).classList.add('active');
-    // Show legend on map and data pages
-    document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map' && target !== 'data');
+    // Show legend on map page only
+    document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map');
     if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
     if (target === 'data' && dataReady) buildDataTable();
     if (target === 'map' && map) setTimeout(() => map.resize(), 50);
