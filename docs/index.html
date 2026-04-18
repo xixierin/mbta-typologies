@@ -754,6 +754,7 @@ let currentStyle = 'minimal';
 let map;
 let legendSelectedClusters = new Set();
 let luLayerVisible = false;
+let _clickedStation = null;  // last station pinned by click
 let luDataReady = false;
 
 // ─────────────────────────────────────────────
@@ -974,13 +975,26 @@ function addDataToMap() {
     }
   });
 
-  map.on('click', 'station-dots', onStationClick);
+  map.on('click', 'station-dots', e => {
+    _clickedStation = e.features[0].properties;
+    onStationClick(e);
+  });
   map.on('click', (e) => {
     const hits = map.queryRenderedFeatures(e.point, { layers: ['station-dots', 'buffer-fill'] });
-    if (!hits.length) clearPanel();
+    if (!hits.length) { _clickedStation = null; clearPanel(); }
   });
-  map.on('mouseenter', 'station-dots', () => { map.getCanvas().style.cursor = 'pointer'; });
-  map.on('mouseleave', 'station-dots', () => { map.getCanvas().style.cursor = ''; });
+  map.on('mouseenter', 'station-dots', e => {
+    map.getCanvas().style.cursor = 'pointer';
+    onStationClick(e);
+  });
+  map.on('mouseleave', 'station-dots', () => {
+    map.getCanvas().style.cursor = '';
+    if (_clickedStation) {
+      onStationClick({ features: [{ properties: _clickedStation }] });
+    } else {
+      clearPanel();
+    }
+  });
 
   // Re-apply legend filter after style swap re-creates layers
   applyLegendFilter();
@@ -1621,6 +1635,7 @@ document.getElementById('cd-goto-map').addEventListener('click', function() {
     map.resize();
     setTimeout(() => {
       map.flyTo({ center: [station.lng, station.lat], zoom: 14, duration: 800 });
+      _clickedStation = { ...station };
       onStationClick({ features: [{ properties: { ...station } }] });
     }, 80);
   }
@@ -1750,6 +1765,7 @@ function renderDataTable() {
           map.resize();
           setTimeout(() => {
             map.flyTo({ center: [+s.lng, +s.lat], zoom: 14, duration: 800 });
+            _clickedStation = { ...s };
             onStationClick({ features: [{ properties: { ...s } }] });
           }, 80);
         }
