@@ -74,7 +74,20 @@
   .spinner { width: 24px; height: 24px; border: 2px solid var(--border-mid); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; }
+  #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; align-items: center; }
+  .map-btn-sep { width: 1px; background: var(--border-mid); align-self: stretch; margin: 0 2px; }
+
+  /* ── LAND USE LEGEND ── */
+  #lu-legend {
+    position: absolute; bottom: 32px; left: 16px; z-index: 10;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 6px; padding: 10px 12px; display: none;
+    min-width: 210px;
+  }
+  #lu-legend.visible { display: block; }
+  .lu-legend-title { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+  .lu-legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-secondary); padding: 2px 0; }
+  .lu-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; opacity: 0.9; }
 
   /* ── STATION SEARCH ── */
   #station-search-wrap {
@@ -295,7 +308,7 @@
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <path d="M3 4h10M3 8h7M3 12h4"/>
       </svg>
-      Methodology
+      Research Design
     </div>
     <div class="nav-item" data-page="data">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -326,6 +339,8 @@
     <div id="map-controls">
       <button class="map-btn active" id="btn-minimal">Minimal</button>
       <button class="map-btn" id="btn-satellite">Satellite</button>
+      <div class="map-btn-sep"></div>
+      <button class="map-btn" id="btn-landuse">Land Use</button>
     </div>
 
     <div id="station-search-wrap">
@@ -352,6 +367,22 @@
       <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);padding:3px 0;">
         <div style="width:20px;height:2px;border-top:2px dashed #a8dadc;flex-shrink:0;"></div>MBTA Communities
       </div>
+    </div>
+
+    <div id="lu-legend">
+      <div class="lu-legend-title">Land Use</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFFFA8;border:1px solid rgba(0,0,0,0.15)"></div>Residential 1–2 Family</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFAA00"></div>Residential Multifamily</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFD48A;border:1px solid rgba(0,0,0,0.1)"></div>Residential Other</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#C8A052"></div>Mixed Use</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#E84B22"></div>Commercial / Office</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#734C00"></div>Industrial / Manufacturing</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#BEBEBE;border:1px solid rgba(0,0,0,0.1)"></div>Transportation / Utility</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#C29ED7"></div>Public Facilities</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#73DF80"></div>Open Space</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#9C9C9C"></div>Parking Facilities</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#CCCCCC;border:1px solid rgba(0,0,0,0.1)"></div>Vacant Land</div>
+      <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
     </div>
 
     <div id="side-panel" class="open">
@@ -475,7 +506,7 @@
   <!-- METHODOLOGY PAGE -->
   <div class="page" id="page-methodology">
     <div id="methodology-inner">
-      <h1>Methodology</h1>
+      <h1>Research Design</h1>
       <p class="lead">This analysis links land use configuration at MBTA station areas to vehicle miles traveled per capita, using cross-sectional OLS regression, Ward hierarchical clustering, and longitudinal long-difference regression. The goal is to identify whether variation in station-area typology — not density alone — predicts VMT, and whether that variation has policy implications for differentiated implementation of the MBTA Communities Act.</p>
 
       <div class="method-section">
@@ -586,6 +617,34 @@ let dataReady = false;
 let currentStyle = 'minimal';
 let map;
 let legendSelectedClusters = new Set();
+let luLayerVisible = false;
+let luDataReady = false;
+
+// ─────────────────────────────────────────────
+// LAND USE COLORS (MassGIS palette)
+// ─────────────────────────────────────────────
+const LU_COLORS = {
+  'Residential 1-2 Family':   '#FFFFA8',
+  'Residential Multifamily':  '#FFAA00',
+  'Residential Other':        '#FFD48A',
+  'Mixed Use':                '#C8A052',
+  'Commercial/Office':        '#E84B22',
+  'Industrial/Manufacturing': '#734C00',
+  'Transportation/Utility':   '#BEBEBE',
+  'Public Facilities':        '#C29ED7',
+  'Open Space':               '#73DF80',
+  'Parking Facilities':       '#9C9C9C',
+  'Vacant Land':              '#CCCCCC',
+  'Other':                    '#727272'
+};
+
+function luColorExpr() {
+  const entries = Object.entries(LU_COLORS);
+  return ['match', ['get', 'lu_cat'],
+    ...entries.flatMap(([k, v]) => [k, v]),
+    '#727272'
+  ];
+}
 
 // ─────────────────────────────────────────────
 // DATA LOADING
@@ -622,6 +681,22 @@ Promise.all([
   document.getElementById('map-loading').innerHTML =
     '<span style="color:#E87B4A">Failed to load station data.<br>Check the console for details.</span>';
 });
+
+// Land use parcel data — loaded lazily when first toggled
+function ensureLuData(cb) {
+  if (luDataReady) { cb(); return; }
+  fetch('data/tod_parcels.geojson')
+    .then(r => r.json())
+    .then(data => {
+      window._parcelData = data;
+      luDataReady = true;
+      cb();
+    })
+    .catch(err => {
+      console.error('Land use data failed to load:', err);
+      document.getElementById('btn-landuse').textContent = 'Land Use';
+    });
+}
 
 // ─────────────────────────────────────────────
 // NAVIGATION
@@ -769,6 +844,39 @@ function addDataToMap() {
 
   // Re-apply legend filter after style swap re-creates layers
   applyLegendFilter();
+
+  // Re-add parcel layer if it was visible before style swap
+  if (luLayerVisible && luDataReady) addLandUseLayer();
+}
+
+// ─────────────────────────────────────────────
+// LAND USE LAYER
+// ─────────────────────────────────────────────
+function addLandUseLayer() {
+  if (!map || !window._parcelData) return;
+  // Remove existing source/layer if present (after style swap they're gone)
+  if (!map.getSource('parcels')) {
+    map.addSource('parcels', { type: 'geojson', data: window._parcelData });
+  }
+  if (!map.getLayer('parcels-fill')) {
+    // Insert below buffer layers so TOD boundaries remain visible on top
+    const beforeLayer = map.getLayer('community-outline') ? 'community-outline' : undefined;
+    map.addLayer({
+      id: 'parcels-fill',
+      type: 'fill',
+      source: 'parcels',
+      paint: {
+        'fill-color': luColorExpr(),
+        'fill-opacity': 0.65
+      }
+    }, beforeLayer);
+  }
+  map.setLayoutProperty('parcels-fill', 'visibility', 'visible');
+}
+
+function removeLandUseLayer() {
+  if (!map) return;
+  try { map.setLayoutProperty('parcels-fill', 'visibility', 'none'); } catch(e) {}
 }
 
 function applyLegendFilter() {
@@ -1160,6 +1268,30 @@ document.getElementById('btn-satellite').addEventListener('click', () => {
   document.getElementById('btn-minimal').classList.remove('active');
   map.setStyle(STYLE_SATELLITE);
   restoreLayersAfterStyleSwap();
+});
+
+document.getElementById('btn-landuse').addEventListener('click', () => {
+  if (!map) return;
+  luLayerVisible = !luLayerVisible;
+  const btn = document.getElementById('btn-landuse');
+  const leg = document.getElementById('lu-legend');
+  if (luLayerVisible) {
+    btn.classList.add('active');
+    leg.classList.add('visible');
+    if (!luDataReady) {
+      btn.textContent = 'Loading…';
+      ensureLuData(() => {
+        btn.textContent = 'Land Use';
+        if (mapReady) addLandUseLayer();
+      });
+    } else if (mapReady) {
+      addLandUseLayer();
+    }
+  } else {
+    btn.classList.remove('active');
+    leg.classList.remove('visible');
+    removeLandUseLayer();
+  }
 });
 
 // ─────────────────────────────────────────────
