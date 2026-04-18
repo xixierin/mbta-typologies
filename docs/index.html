@@ -75,23 +75,52 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; align-items: center; }
-  .map-btn-sep { width: 1px; background: var(--border-mid); align-self: stretch; margin: 0 2px; }
 
-  /* ── LAND USE LEGEND ── */
-  #lu-legend {
-    position: absolute; bottom: 32px; left: 16px; z-index: 10;
-    background: var(--bg-panel); border: 1px solid var(--border-mid);
-    border-radius: 6px; padding: 10px 12px; display: none;
-    min-width: 210px;
+  /* ── OVERLAY PANEL ── */
+  #overlay-panel {
+    background: var(--bg-panel); border: 1px solid var(--border);
+    border-radius: 6px; width: 240px;
   }
-  #lu-legend.visible { display: block; }
-  .lu-legend-title { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 8px; }
-  .lu-legend-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--text-secondary); padding: 2px 0; }
-  .lu-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; opacity: 0.9; }
+  #overlay-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px 10px; cursor: pointer; user-select: none;
+  }
+  #overlay-panel-header:hover .overlay-panel-title { color: var(--text-primary); }
+  .overlay-panel-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+  .overlay-chevron { width: 10px; height: 10px; flex-shrink: 0; color: var(--text-muted); transition: transform 0.2s; }
+  #overlay-panel.collapsed .overlay-chevron { transform: rotate(-90deg); }
+  #overlay-panel-body { padding: 0 14px 12px; }
+  #overlay-panel.collapsed #overlay-panel-body { display: none; }
+  .overlay-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 0; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .overlay-row:last-child { border-bottom: none; }
+  .overlay-row:hover .overlay-row-label { color: var(--text-primary); }
+  .overlay-row.disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+  .overlay-toggle {
+    width: 26px; height: 14px; border-radius: 7px; flex-shrink: 0;
+    background: var(--border-mid); position: relative;
+    transition: background 0.2s;
+  }
+  .overlay-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--text-muted); transition: transform 0.2s, background 0.2s;
+  }
+  .overlay-row.active .overlay-toggle { background: var(--accent); }
+  .overlay-row.active .overlay-toggle::after { transform: translateX(12px); background: #fff; }
+  .overlay-row-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
+  /* land use sub-legend */
+  #lu-sub-legend { padding: 6px 0 2px 35px; display: none; }
+  .overlay-row.active + #lu-sub-legend { display: block; }
+  .lu-legend-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); padding: 1px 0; }
+  .lu-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; opacity: 0.9; }
 
   /* ── STATION SEARCH ── */
   #station-search-wrap {
-    position: absolute; top: 60px; left: 16px; z-index: 10; width: 240px;
+    position: absolute; top: 60px; left: 16px; z-index: 20; width: 240px;
   }
   #station-search-row { display: flex; gap: 6px; }
   #station-search {
@@ -177,11 +206,14 @@
   #sv-link { display: block; text-align: center; margin-top: 8px; font-size: 11px; color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; transition: opacity 0.15s; }
   #sv-link:hover { opacity: 0.7; }
 
-  /* Map legend */
+  /* Map legend + overlay column */
+  #left-col {
+    position: absolute; top: 108px; left: 16px; z-index: 10;
+    width: 240px; display: flex; flex-direction: column; gap: 8px;
+  }
   #map-legend {
-    position: absolute; bottom: 24px; left: 16px;
     background: var(--bg-panel); border: 1px solid var(--border);
-    border-radius: 6px; padding: 14px 16px; z-index: 10; min-width: 220px;
+    border-radius: 6px; padding: 14px 16px;
   }
   #map-legend .legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); padding: 3px 0; cursor: pointer; transition: color 0.15s; }
@@ -339,8 +371,6 @@
     <div id="map-controls">
       <button class="map-btn active" id="btn-minimal">Minimal</button>
       <button class="map-btn" id="btn-satellite">Satellite</button>
-      <div class="map-btn-sep"></div>
-      <button class="map-btn" id="btn-landuse">Land Use</button>
     </div>
 
     <div id="station-search-wrap">
@@ -355,6 +385,7 @@
       <div id="search-results"></div>
     </div>
 
+    <div id="left-col">
     <div id="map-legend">
       <div class="legend-title">Station typology</div>
       <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Employment Node</div>
@@ -369,21 +400,64 @@
       </div>
     </div>
 
-    <div id="lu-legend">
-      <div class="lu-legend-title">Land Use</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFFFA8;border:1px solid rgba(0,0,0,0.15)"></div>Residential 1–2 Family</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFAA00"></div>Residential Multifamily</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFD48A;border:1px solid rgba(0,0,0,0.1)"></div>Residential Other</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#C8A052"></div>Mixed Use</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#E84B22"></div>Commercial / Office</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#734C00"></div>Industrial / Manufacturing</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#BEBEBE;border:1px solid rgba(0,0,0,0.1)"></div>Transportation / Utility</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#C29ED7"></div>Public Facilities</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#73DF80"></div>Open Space</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#9C9C9C"></div>Parking Facilities</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#CCCCCC;border:1px solid rgba(0,0,0,0.1)"></div>Vacant Land</div>
-      <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
+    <div id="overlay-panel">
+      <div id="overlay-panel-header">
+        <span class="overlay-panel-title">Map Overlays</span>
+        <svg class="overlay-chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polyline points="2,3.5 5,6.5 8,3.5"/>
+        </svg>
+      </div>
+      <div id="overlay-panel-body">
+
+        <!-- Land Use (functional) -->
+        <div class="overlay-row" id="overlay-landuse">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Land Use</span>
+        </div>
+        <div id="lu-sub-legend">
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFFFA8;border:1px solid rgba(0,0,0,0.2)"></div>Residential 1–2 Family</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFAA00"></div>Residential Multifamily</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFD48A;border:1px solid rgba(0,0,0,0.1)"></div>Residential Other</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#C8A052"></div>Mixed Use</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#E84B22"></div>Commercial / Office</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#C29ED7"></div>Industrial / Mfg.</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#BEBEBE;border:1px solid rgba(0,0,0,0.1)"></div>Transportation / Utility</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#b7d5f0"></div>Public Facilities</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#73DF80"></div>Open Space</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#9C9C9C"></div>Parking Facilities</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#CCCCCC;border:1px solid rgba(0,0,0,0.1)"></div>Vacant Land</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
+        </div>
+
+        <!-- Dummies -->
+        <div class="overlay-row disabled" id="overlay-hudensity">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Housing Density</span>
+        </div>
+        <div class="overlay-row disabled" id="overlay-jobdensity">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Job Density</span>
+        </div>
+        <div class="overlay-row disabled" id="overlay-income">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Median Household Income</span>
+        </div>
+        <div class="overlay-row disabled" id="overlay-landvalue">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Land Value</span>
+        </div>
+        <div class="overlay-row disabled" id="overlay-flood">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Flood Risk</span>
+        </div>
+        <div class="overlay-row disabled" id="overlay-publicland">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Public Land</span>
+        </div>
+
+      </div>
     </div>
+    </div><!-- /#left-col -->
 
     <div id="side-panel" class="open">
       <button id="panel-close">&#x2715;</button>
@@ -629,9 +703,9 @@ const LU_COLORS = {
   'Residential Other':        '#FFD48A',
   'Mixed Use':                '#C8A052',
   'Commercial/Office':        '#E84B22',
-  'Industrial/Manufacturing': '#734C00',
+  'Industrial/Manufacturing': '#C29ED7',
   'Transportation/Utility':   '#BEBEBE',
-  'Public Facilities':        '#C29ED7',
+  'Public Facilities':        '#b7d5f0',
   'Open Space':               '#73DF80',
   'Parking Facilities':       '#9C9C9C',
   'Vacant Land':              '#CCCCCC',
@@ -1270,26 +1344,32 @@ document.getElementById('btn-satellite').addEventListener('click', () => {
   restoreLayersAfterStyleSwap();
 });
 
-document.getElementById('btn-landuse').addEventListener('click', () => {
+// ── Overlay panel header: collapse/expand ──
+document.getElementById('overlay-panel-header').addEventListener('click', () => {
+  document.getElementById('overlay-panel').classList.toggle('collapsed');
+});
+
+// ── Land use toggle ──
+document.getElementById('overlay-landuse').addEventListener('click', () => {
   if (!map) return;
   luLayerVisible = !luLayerVisible;
-  const btn = document.getElementById('btn-landuse');
-  const leg = document.getElementById('lu-legend');
+  const row = document.getElementById('overlay-landuse');
+  const sub = document.getElementById('lu-sub-legend');
   if (luLayerVisible) {
-    btn.classList.add('active');
-    leg.classList.add('visible');
+    row.classList.add('active');
+    sub.style.display = 'block';
     if (!luDataReady) {
-      btn.textContent = 'Loading…';
+      row.querySelector('.overlay-row-label').textContent = 'Land Use (loading…)';
       ensureLuData(() => {
-        btn.textContent = 'Land Use';
+        row.querySelector('.overlay-row-label').textContent = 'Land Use';
         if (mapReady) addLandUseLayer();
       });
     } else if (mapReady) {
       addLandUseLayer();
     }
   } else {
-    btn.classList.remove('active');
-    leg.classList.remove('visible');
+    row.classList.remove('active');
+    sub.style.display = 'none';
     removeLandUseLayer();
   }
 });
