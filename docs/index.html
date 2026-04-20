@@ -419,8 +419,8 @@
     /* Hamburger button */
     #mobile-menu-btn { display: flex; }
 
-    /* App: full width (no left margin for nav) */
-    #app { margin-left: 0; }
+    /* App: full width (no left margin for nav); pad top to clear fixed title bar */
+    #app { margin-left: 0; padding-top: 44px; }
 
     /* Search bar: shifted right to clear hamburger */
     #station-search-wrap { top: 12px; left: 56px; width: calc(100% - 68px); }
@@ -481,8 +481,8 @@
       max-height: 90px;
       transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
     }
-    #cluster-detail-panel.cd-expanded { max-height: 60vh; }
-    #scatter-panel-section { overflow: hidden; }
+    #cluster-detail-panel.cd-expanded { max-height: 60vh; overflow-y: auto; }
+    #scatter-panel-section { overflow: visible; }
     #cd-expand-btn {
       position: absolute; top: 8px; right: 10px;
       width: 28px; height: 28px; border-radius: 50%;
