@@ -499,12 +499,9 @@
     /* Mobile page title top-right */
     #mobile-title {
       display: block;
-      position: fixed; top: 0; left: 56px; right: 0;
-      height: 44px; line-height: 44px;
-      padding: 0 12px;
-      font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
-      color: var(--accent); font-family: 'DM Sans', sans-serif;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 44px;
+      background: var(--bg);
       z-index: 250; pointer-events: none;
     }
 
@@ -527,7 +524,7 @@
     <line x1="2" y1="4.5" x2="14" y2="4.5"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="11.5" x2="14" y2="11.5"/>
   </svg>
 </button>
-<div id="mobile-title">Station Area Typologies</div>
+<div id="mobile-title"></div>
 
 <!-- ── NAV ── -->
 <nav id="nav">
