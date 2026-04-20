@@ -363,9 +363,123 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+  /* ── Mobile-only elements (hidden on desktop) ── */
+  #mobile-menu-btn {
+    display: none;
+    position: fixed; top: 12px; left: 12px; z-index: 300;
+    width: 36px; height: 36px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 4px; color: var(--text-secondary); cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #mobile-menu-btn:hover { color: var(--text-primary); border-color: var(--accent); }
+  #nav-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 350; }
+  #sheet-handle {
+    display: none; width: 36px; height: 4px;
+    background: var(--border-mid); border-radius: 2px;
+    margin: 12px auto 4px; flex-shrink: 0;
+  }
+  #mobile-legend-strip {
+    display: none; position: absolute;
+    bottom: 16px; left: 8px; right: 8px;
+    z-index: 50; flex-wrap: wrap; gap: 4px;
+    transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+  }
+  .mobile-legend-item {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(19,20,26,0.88); backdrop-filter: blur(6px);
+    border: 1px solid var(--border-mid); border-radius: 20px;
+    padding: 4px 8px 4px 6px;
+    font-size: 10px; color: var(--text-secondary);
+    font-family: 'DM Mono', monospace;
+    cursor: pointer; white-space: nowrap; pointer-events: auto;
+    transition: color 0.15s;
+  }
+  .mobile-legend-item:hover { color: var(--text-primary); }
+  .mobile-legend-item.legend-dimmed { opacity: 0.3; }
+  .mobile-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 640px) {
+    /* Nav becomes a hidden side drawer */
+    #nav {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 400;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    }
+    #nav.mobile-open { transform: translateX(0); }
+    #nav-backdrop.visible { display: block; }
+
+    /* Hamburger button */
+    #mobile-menu-btn { display: flex; }
+
+    /* App: full width (no left margin for nav) */
+    #app { margin-left: 0; }
+
+    /* Search bar: shifted right to clear hamburger */
+    #station-search-wrap { top: 12px; left: 56px; width: calc(100% - 68px); }
+
+    /* Map style toggle buttons: below the top bar */
+    #map-controls { top: 56px; left: 12px; }
+
+    /* Mapbox nav control */
+    .mapboxgl-ctrl-top-right { top: 56px; right: 8px; }
+
+    /* Side panel → bottom sheet */
+    #side-panel {
+      position: fixed;
+      width: 100%; height: 75vh;
+      top: auto; bottom: 0; left: 0; right: 0;
+      border-left: none; border-top: 1px solid var(--border-mid);
+      border-radius: 12px 12px 0 0;
+      transform: translateY(100%);
+      overflow-y: auto;
+      z-index: 200;
+    }
+    #side-panel.open { transform: translateY(0); }
+
+    /* Show drag handle and floating legend strip */
+    #sheet-handle { display: block; }
+    #mobile-legend-strip { display: flex; }
+    #mobile-legend-strip.sheet-open { bottom: calc(75vh + 8px); }
+
+    /* Close button: smaller offset on sheet */
+    #panel-close { top: 12px; right: 12px; }
+
+    /* Clusters page: stack vertically */
+    #clusters-body { flex-direction: column; }
+    #cluster-detail-panel {
+      width: 100%; max-height: 45vh;
+      border-left: none; border-top: 1px solid var(--border);
+      overflow-y: auto;
+    }
+    #plot-3d { height: 40vh; flex: none; }
+    #clusters-header { padding: 16px 16px 0; }
+    #clusters-desc { padding: 10px 16px 0; }
+
+    /* Methodology page: narrower padding */
+    #methodology-inner { padding: 32px 16px 60px; }
+
+    /* Data page: tighter padding */
+    #data-header { padding: 16px 16px 12px; }
+    #data-body { padding: 8px 10px 12px; }
+    #dt-search { min-width: 100px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- Mobile nav backdrop and hamburger button -->
+<div id="nav-backdrop"></div>
+<button id="mobile-menu-btn" aria-label="Open menu">
+  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+    <line x1="2" y1="4.5" x2="14" y2="4.5"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="11.5" x2="14" y2="11.5"/>
+  </svg>
+</button>
 
 <!-- ── NAV ── -->
 <nav id="nav">
@@ -435,11 +549,9 @@
           <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
         </div>
         <div class="overlay-row disabled" id="overlay-hudensity"><div class="overlay-toggle"></div><span class="overlay-row-label">Housing Density</span></div>
-        <div class="overlay-row disabled" id="overlay-jobdensity"><div class="overlay-toggle"></div><span class="overlay-row-label">Job Density</span></div>
-        <div class="overlay-row disabled" id="overlay-income"><div class="overlay-toggle"></div><span class="overlay-row-label">Median Household Income</span></div>
         <div class="overlay-row disabled" id="overlay-landvalue"><div class="overlay-toggle"></div><span class="overlay-row-label">Land Value</span></div>
         <div class="overlay-row disabled" id="overlay-flood"><div class="overlay-toggle"></div><span class="overlay-row-label">Flood Risk</span></div>
-        <div class="overlay-row disabled" id="overlay-publicland"><div class="overlay-toggle"></div><span class="overlay-row-label">Public Land</span></div>
+        <div class="overlay-row disabled" id="overlay-publicland"><div class="overlay-toggle"></div><span class="overlay-row-label">Vacant Land</span></div>
       </div>
     </div>
   </div>
@@ -475,6 +587,7 @@
     </div>
 
     <div id="side-panel" class="open">
+      <div id="sheet-handle"></div>
       <button id="panel-close">&#x2715;</button>
       <div id="panel-content">
         <div id="panel-cluster-bar"></div>
@@ -554,6 +667,16 @@
           <a id="sv-link" href="#" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
         </div>
       </div>
+    </div>
+
+    <!-- Mobile floating legend strip -->
+    <div id="mobile-legend-strip">
+      <div class="mobile-legend-item" data-cluster="1"><div class="mobile-legend-dot" style="background:var(--c1)"></div>Urban Employment</div>
+      <div class="mobile-legend-item" data-cluster="2"><div class="mobile-legend-dot" style="background:var(--c2)"></div>Urban Residential</div>
+      <div class="mobile-legend-item" data-cluster="3"><div class="mobile-legend-dot" style="background:var(--c3)"></div>Suburban Employment</div>
+      <div class="mobile-legend-item" data-cluster="4"><div class="mobile-legend-dot" style="background:var(--c4)"></div>Transitional Mixed-Use</div>
+      <div class="mobile-legend-item" data-cluster="5"><div class="mobile-legend-dot" style="background:var(--c5)"></div>Suburban Residential</div>
+      <div class="mobile-legend-item" data-cluster="6"><div class="mobile-legend-dot" style="background:var(--c6)"></div>Exurban Fringe</div>
     </div>
   </div>
 
@@ -981,7 +1104,11 @@ function addDataToMap() {
   });
   map.on('click', (e) => {
     const hits = map.queryRenderedFeatures(e.point, { layers: ['station-dots', 'buffer-fill'] });
-    if (!hits.length) { _clickedStation = null; clearPanel(); }
+    if (!hits.length) {
+      _clickedStation = null; clearPanel();
+      const mls = document.getElementById('mobile-legend-strip');
+      if (mls) mls.classList.remove('sheet-open');
+    }
   });
   map.on('mouseenter', 'station-dots', e => {
     map.getCanvas().style.cursor = 'pointer';
@@ -1036,7 +1163,7 @@ function removeLandUseLayer() {
 function applyLegendFilter() {
   if (!map) return;
   const filterLayers = ['station-dots', 'buffer-fill', 'buffer-outline', 'station-labels'];
-  const items = document.querySelectorAll('.legend-item');
+  const items = document.querySelectorAll('.legend-item, .mobile-legend-item');
   if (legendSelectedClusters.size === 0) {
     items.forEach(el => el.classList.remove('legend-dimmed'));
     filterLayers.forEach(id => { try { map.setFilter(id, null); } catch(e) {} });
@@ -1101,6 +1228,8 @@ function onStationClick(e) {
   document.getElementById('sv-link').textContent = `Open ${props.name} in Street View ↗`;
 
   document.getElementById('side-panel').classList.add('open');
+  const mls = document.getElementById('mobile-legend-strip');
+  if (mls) mls.classList.add('sheet-open');
 }
 
 // ─────────────────────────────────────────────
@@ -1291,6 +1420,8 @@ function clearPanel() {
 
 document.getElementById('panel-close').addEventListener('click', () => {
   document.getElementById('side-panel').classList.remove('open');
+  const mls = document.getElementById('mobile-legend-strip');
+  if (mls) mls.classList.remove('sheet-open');
 });
 
 // ─────────────────────────────────────────────
@@ -1997,6 +2128,47 @@ document.querySelectorAll('.legend-item').forEach(el => {
 // INIT
 // ─────────────────────────────────────────────
 initMap();
+
+// ─────────────────────────────────────────────
+// MOBILE NAV + LEGEND
+// ─────────────────────────────────────────────
+(function() {
+  const btn      = document.getElementById('mobile-menu-btn');
+  const nav      = document.getElementById('nav');
+  const backdrop = document.getElementById('nav-backdrop');
+  function openNav()  {
+    nav.classList.add('mobile-open');
+    backdrop.classList.add('visible');
+    if (map) setTimeout(() => map.resize(), 320);
+  }
+  function closeNav() {
+    nav.classList.remove('mobile-open');
+    backdrop.classList.remove('visible');
+    if (map) setTimeout(() => map.resize(), 320);
+  }
+  btn.addEventListener('click', openNav);
+  backdrop.addEventListener('click', closeNav);
+  // Close nav when a page link is tapped on mobile
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 640px)').matches) closeNav();
+    });
+  });
+  // On mobile, start with side panel closed
+  if (window.matchMedia('(max-width: 640px)').matches) {
+    document.getElementById('side-panel').classList.remove('open');
+  }
+})();
+
+// Mobile legend strip: mirror the nav legend filter behaviour
+document.querySelectorAll('.mobile-legend-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const c = el.dataset.cluster;
+    if (legendSelectedClusters.has(c)) legendSelectedClusters.delete(c);
+    else legendSelectedClusters.add(c);
+    applyLegendFilter();
+  });
+});
 </script>
 </body>
 </html>
