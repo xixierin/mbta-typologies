@@ -376,6 +376,8 @@
   }
   #mobile-menu-btn:hover { color: var(--text-primary); border-color: var(--accent); }
   #nav-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 350; }
+  #mobile-title { display: none; }
+  #cd-expand-btn { display: none; }
   #sheet-handle {
     display: none; width: 36px; height: 4px;
     background: var(--border-mid); border-radius: 2px;
@@ -473,6 +475,38 @@
     }
     .pca-legend-title { width: 100%; margin-bottom: 2px; }
     .pca-legend-item { font-size: 10px; }
+    /* Cluster detail panel: collapsed = name+desc only, expanded = full */
+    #cluster-detail-panel {
+      position: relative;
+      max-height: 90px;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #cluster-detail-panel.cd-expanded { max-height: 60vh; }
+    #scatter-panel-section { overflow: hidden; }
+    #cd-expand-btn {
+      position: absolute; top: 8px; right: 10px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg-card); border: 1px solid var(--border-mid);
+      color: var(--text-secondary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      z-index: 5;
+    }
+    #cd-expand-btn:hover { color: var(--accent); }
+    /* When expanded, give the PCA plot less height so panel can fit */
+    #cluster-detail-panel.cd-expanded ~ * { flex-shrink: 1; }
+    #page-clusters.panel-expanded #plot-3d { height: 20vh; }
+    /* Mobile page title top-right */
+    #mobile-title {
+      display: block;
+      position: fixed; top: 0; left: 56px; right: 0;
+      height: 44px; line-height: 44px;
+      padding: 0 12px;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+      color: var(--accent); font-family: 'DM Sans', sans-serif;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      z-index: 250; pointer-events: none;
+    }
 
     /* Methodology page: narrower padding */
     #methodology-inner { padding: 32px 16px 60px; }
@@ -493,6 +527,7 @@
     <line x1="2" y1="4.5" x2="14" y2="4.5"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="11.5" x2="14" y2="11.5"/>
   </svg>
 </button>
+<div id="mobile-title">Station Area Typologies</div>
 
 <!-- ── NAV ── -->
 <nav id="nav">
@@ -708,6 +743,9 @@
         <div id="pca-legend"></div>
       </div>
       <div id="cluster-detail-panel">
+        <button id="cd-expand-btn" aria-label="Expand panel">
+          <svg id="cd-expand-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,10 8,6 12,10"/></svg>
+        </button>
         <h3 id="cd-name" style="color:var(--text-primary);">Click a point</h3>
         <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
         <div id="scatter-panel-section">
@@ -2182,6 +2220,32 @@ document.querySelectorAll('.mobile-legend-item').forEach(el => {
     applyLegendFilter();
   });
 });
+
+// ─────────────────────────────────────────────
+// MOBILE CLUSTER PANEL EXPAND
+// ─────────────────────────────────────────────
+(function() {
+  const btn   = document.getElementById('cd-expand-btn');
+  const icon  = document.getElementById('cd-expand-icon');
+  const panel = document.getElementById('cluster-detail-panel');
+  const page  = document.getElementById('page-clusters');
+  if (!btn) return;
+  let expanded = false;
+  btn.addEventListener('click', () => {
+    expanded = !expanded;
+    panel.classList.toggle('cd-expanded', expanded);
+    page.classList.toggle('panel-expanded', expanded);
+    // Rotate arrow: up = collapse, down = expand
+    icon.setAttribute('points', expanded ? '4,6 8,10 12,6' : '4,10 8,6 12,10');
+    // Trigger Plotly resize after transition
+    setTimeout(() => {
+      const p3 = document.getElementById('plot-3d');
+      if (p3 && p3.layout) Plotly.relayout('plot-3d', { autosize: true });
+      const ps = document.getElementById('plot-scatter');
+      if (ps && ps.layout) Plotly.relayout('plot-scatter', { autosize: true });
+    }, 360);
+  });
+})();
 </script>
 </body>
 </html>
