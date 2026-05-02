@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Station Area Typologies — MBTA Communities</title>
+<title>Atlas of MBTA Transit Adjacent Communities</title>
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
 <style>
@@ -31,6 +31,46 @@
     --c5: #e95e50; --c5-bg: rgba(233,94,80,0.15);
     --c6: #5b6abf; --c6-bg: rgba(91,106,191,0.15);
   }
+
+  html[data-theme="light"] {
+    --bg: #f5f5f2;
+    --bg-panel: #ffffff;
+    --bg-card: #edecea;
+    --bg-card-hover: #e3e1dd;
+    --border: rgba(0,0,0,0.07);
+    --border-mid: rgba(0,0,0,0.14);
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-muted: #888888;
+    --accent: #0cb2af;
+    --accent-dim: rgba(12,178,175,0.10);
+  }
+
+  /* Light-mode overrides for hard-coded dark rgba values */
+  html[data-theme="light"] .nav-item:hover { background: rgba(0,0,0,0.04); }
+  html[data-theme="light"] .overlay-row { border-bottom-color: rgba(0,0,0,0.05); }
+  html[data-theme="light"] table.dt tr:hover td { background: rgba(0,0,0,0.03) !important; }
+  html[data-theme="light"] .mapboxgl-ctrl-group button:hover { background: rgba(0,0,0,0.06); }
+  html[data-theme="light"] .mapboxgl-ctrl-group .mapboxgl-ctrl-icon { filter: none; }
+  html[data-theme="light"] .mobile-legend-item { background: rgba(255,255,255,0.92); }
+  html[data-theme="light"] #mobile-title { background: var(--bg); }
+
+  /* Theme toggle button — fixed lower-right corner */
+  #theme-toggle {
+    position: fixed; bottom: 16px; right: 16px; z-index: 300;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 12px 7px 10px; cursor: pointer;
+    font-size: 11px; color: var(--text-secondary);
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    user-select: none;
+    transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #theme-toggle:hover { color: var(--text-primary); border-color: var(--accent); box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+  #theme-toggle-icon { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.7; }
+  #theme-toggle:hover #theme-toggle-icon { opacity: 1; }
 
   html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; }
 
@@ -517,6 +557,18 @@
 </head>
 <body>
 
+<!-- Theme toggle button (fixed lower-right) -->
+<button id="theme-toggle" aria-label="Toggle light/dark theme">
+  <svg id="theme-toggle-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+    <circle cx="8" cy="8" r="3.5"/>
+    <line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/>
+    <line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/>
+    <line x1="3.05" y1="3.05" x2="4.11" y2="4.11"/><line x1="11.89" y1="11.89" x2="12.95" y2="12.95"/>
+    <line x1="12.95" y1="3.05" x2="11.89" y2="4.11"/><line x1="4.11" y1="11.89" x2="3.05" y2="12.95"/>
+  </svg>
+  Light mode
+</button>
+
 <!-- Mobile nav backdrop and hamburger button -->
 <div id="nav-backdrop"></div>
 <button id="mobile-menu-btn" aria-label="Open menu">
@@ -529,7 +581,7 @@
 <!-- ── NAV ── -->
 <nav id="nav">
   <div id="nav-logo">
-    <div class="title">MBTA Communities<br>Station Area Typologies</div>
+    <div class="title">Atlas of MBTA Transit Adjacent Communities<br></div>
     <div class="sub" style="color:var(--text-primary);">Beyond Density · VMT-Informed<br>Implementation of the<br>MBTA Communities Act</div>
     <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"> Erin Chen · Thesis · 2026</div>
   </div>
@@ -971,21 +1023,48 @@ function luColorExpr() {
 // ─────────────────────────────────────────────
 // DATA LOADING
 // ─────────────────────────────────────────────
+
+// Municipalities classified as Rapid Transit or Commuter Rail under MBTA Communities Act
+const RT_CR_COMMUNITIES = new Set([
+  // Rapid Transit
+  'Braintree','Brookline','Cambridge','Chelsea','Everett','Malden','Medford',
+  'Milton','Newton','Quincy','Revere','Somerville',
+  // Commuter Rail
+  'Abington','Acton','Andover','Ashland','Attleboro','Ayer','Belmont','Beverly',
+  'Billerica','Bridgewater','Brockton','Canton','Cohasset','Concord','Dedham',
+  'Fall River','Fitchburg','Framingham','Franklin','Freetown','Gloucester',
+  'Halifax','Hamilton','Hanson','Haverhill','Hingham','Holbrook','Ipswich',
+  'Kingston','Lawrence','Leominster','Lincoln','Littleton','Lowell','Lynn',
+  'Manchester','Mansfield','Melrose','Middleborough','Natick','Needham',
+  'New Bedford','Newburyport','Norfolk','Norwood','Randolph','Reading','Rockport','Rowley',
+  'Salem','Scituate','Sharon','Shirley','Southborough','Stoughton','Swampscott',
+  'Taunton','Wakefield','Walpole','Waltham','Wellesley','Wenham','Weston',
+  'Westborough','Westwood','Weymouth','Whitman','Wilmington','Winchester',
+  'Woburn','Worcester'
+]);
+
 Promise.all([
   fetch('data/stations.json').then(r => r.json()),
   fetch('data/buffers.geojson').then(r => r.json()),
   fetch('data/mbta_communities.geojson').then(r => r.json()),
   fetch('data/bus_routes.json').then(r => r.json()),
-  fetch('data/cluster_meta.json').then(r => r.json()).catch(() => ({}))
-]).then(([stations, buffers, communities, busRoutes, clusterMeta]) => {
+  fetch('data/cluster_meta.json').then(r => r.json()).catch(() => ({})),
+  fetch('data/rapid_transit.geojson').then(r => r.json()),
+  fetch('data/commuter_rail_new.geojson').then(r => r.json())
+]).then(([stations, buffers, communities, busRoutes, clusterMeta, rapidTransit, commuterRail]) => {
   // Patch cluster names from data file
   Object.entries(clusterMeta).forEach(([c, name]) => {
     if (CLUSTER_META[+c]) CLUSTER_META[+c].name = name;
   });
   STATIONS  = stations;
   window._buffers = buffers;
-  window._communities = communities;
+  window._communities = {
+    ...communities,
+    features: communities.features.filter(f => RT_CR_COMMUNITIES.has(f.properties.municipal))
+  };
   window._busRoutes = busRoutes;
+  window._rapidTransit = rapidTransit;
+  window._commuterRail = commuterRail;
   dataReady = true;
   document.getElementById('map-loading').style.display = 'none';
   if (mapReady) addDataToMap();
@@ -1082,13 +1161,56 @@ function addDataToMap() {
   // ── MBTA Communities municipality boundaries ──────────────────────
   map.addSource('communities', { type: 'geojson', data: window._communities });
   map.addLayer({
+    id: 'community-hatch',
+    type: 'fill',
+    source: 'communities',
+    paint: {
+      'fill-color': isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+      'fill-opacity': 1
+    }
+  });
+  map.addLayer({
     id: 'community-outline',
     type: 'line',
     source: 'communities',
     paint: {
-      'line-color': '#a8dadc',
-      'line-width': 1.2,
-      'line-opacity': 0.6
+      'line-color': '#7d7d7d',
+      'line-width': 0.5,
+      'line-opacity': 0
+    }
+  });
+
+  // ── Commuter Rail lines (always visible, fades in on zoom) ────────
+  map.addSource('commuter-rail', { type: 'geojson', data: window._commuterRail });
+  map.addLayer({
+    id: 'commuter-rail-line',
+    type: 'line',
+    source: 'commuter-rail',
+    paint: {
+      'line-color': isDark ? '#ad7eed' : '#6c489c',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.2, 12, 2.5],
+      'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.55, 10, 0.75]
+    }
+  });
+
+  // ── Rapid Transit lines ───────────────────────────────────────────
+  map.addSource('rapid-transit', { type: 'geojson', data: window._rapidTransit });
+  map.addLayer({
+    id: 'rapid-transit-line',
+    type: 'line',
+    source: 'rapid-transit',
+    paint: {
+      'line-color': [
+        'match', ['get', 'LINE'],
+        'RED',    '#DA291C',
+        'ORANGE', '#ED8B00',
+        'GREEN',  '#00843D',
+        'BLUE',   '#003DA5',
+        'SILVER', '#7C878E',
+        '#888888'
+      ],
+      'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.5, 12, 3.5],
+      'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.7, 10, 0.9]
     }
   });
 
@@ -1100,7 +1222,7 @@ function addDataToMap() {
     source: 'buffers',
     paint: {
       'fill-color': clusterColorExpr(),
-      'fill-opacity': 0.05
+      'fill-opacity': isDark ? 0.05 : 0.20
     }
   });
   map.addLayer({
@@ -1110,7 +1232,7 @@ function addDataToMap() {
     paint: {
       'line-color': clusterColorExpr(),
       'line-width': 0.8,
-      'line-opacity': 0.5
+      'line-opacity': isDark ? 0.5 : 0.70
     }
   });
 
@@ -1132,8 +1254,8 @@ function addDataToMap() {
       'circle-radius': 5,
       'circle-color': clusterColorExpr(),
       'circle-stroke-width': 1.5,
-      'circle-stroke-color': 'rgba(255,255,255,0.3)',
-      'circle-opacity': 0.95
+      'circle-stroke-color': isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)',
+      'circle-opacity': isDark ? 0.95 : 0.5
     }
   });
 
@@ -1153,8 +1275,8 @@ function addDataToMap() {
       'text-ignore-placement': false
     },
     paint: {
-      'text-color': '#f0ede8',
-      'text-halo-color': 'rgba(14,15,17,0.85)',
+      'text-color': isDark ? '#f0ede8' : '#1a1a1a',
+      'text-halo-color': isDark ? 'rgba(14,15,17,0.85)' : 'rgba(245,245,242,0.85)',
       'text-halo-width': 1.5,
       'text-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0, 12, 1]
     }
@@ -1730,7 +1852,10 @@ function buildPlot() {
     c, stations, meta: CLUSTER_META[+c], labeled: sampleIndices(stations.length, 0.2)
   }));
 
-  // Shadow traces (white, slightly larger) rendered first to create outline effect
+  const shadowColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.35)';
+  const markerStroke = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+
+  // Shadow traces rendered first to create outline effect
   const shadowTraces = clusterData.map(({ c, stations, meta, labeled }) => ({
     type: 'scatter3d', mode: 'text',
     showlegend: false, hoverinfo: 'skip',
@@ -1739,7 +1864,7 @@ function buildPlot() {
     z: stations.map(s => s.pc3),
     text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
     textposition: 'top center',
-    textfont: { size: 13, color: 'rgba(255,255,255,0.7)', family: 'DM Mono, monospace' }
+    textfont: { size: 13, color: shadowColor, family: 'DM Mono, monospace' }
   }));
 
   // Main traces (markers + cluster-colored labels on top)
@@ -1757,10 +1882,14 @@ function buildPlot() {
     hoverinfo: 'text',
     customdata: stations.map(s => s.name),
     marker: { size: 5, color: meta.color, opacity: 0.85,
-              line: { width: 0.5, color: 'rgba(255,255,255,0.2)' } }
+              line: { width: 0.5, color: markerStroke } }
   }));
 
-  const axStyle = { gridcolor: 'rgba(255,255,255,0.05)', zerolinecolor: 'rgba(255,255,255,0.1)', tickfont: { color: '#505050', size: 9 } };
+  const _axGrid  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.14)';
+  const _axZero  = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.22)';
+  const _axTick  = isDark ? '#606060' : '#888888';
+  const _axTitle = isDark ? '#606060' : '#777777';
+  const axStyle  = { gridcolor: _axGrid, zerolinecolor: _axZero, tickfont: { color: _axTick, size: 9 } };
 
   // Compute full-data ranges to keep axes fixed when toggling clusters
   const allPc1 = STATIONS.map(s => +s.pc1), allPc2 = STATIONS.map(s => +s.pc2), allPc3 = STATIONS.map(s => +s.pc3);
@@ -1772,12 +1901,12 @@ function buildPlot() {
     margin: { l: 0, r: 0, t: 0, b: 0 }, showlegend: false,
     scene: {
       bgcolor: 'rgba(0,0,0,0)',
-      xaxis: { ...axStyle, range: r1, title: { text: 'PC1 · Activity & Transit (43%)', font: { size: 10, color: '#505050' } } },
-      yaxis: { ...axStyle, range: r2, title: { text: 'PC2 · Land Use Diversity (37%)', font: { size: 10, color: '#505050' } } },
-      zaxis: { ...axStyle, range: r3, title: { text: 'PC3 · Job–Residential Balance (13%)', font: { size: 10, color: '#505050' } } },
+      xaxis: { ...axStyle, range: r1, title: { text: 'PC1 · Activity & Transit (43%)', font: { size: 10, color: _axTitle } } },
+      yaxis: { ...axStyle, range: r2, title: { text: 'PC2 · Land Use Diversity (37%)', font: { size: 10, color: _axTitle } } },
+      zaxis: { ...axStyle, range: r3, title: { text: 'PC3 · Job–Residential Balance (13%)', font: { size: 10, color: _axTitle } } },
       camera: { eye: { x: 1.5, y: 1.5, z: 0.8 } }
     },
-    font: { family: 'DM Mono, monospace', size: 10, color: '#8a8880' }
+    font: { family: 'DM Mono, monospace', size: 10, color: isDark ? '#8a8880' : '#666666' }
   };
 
   Plotly.newPlot('plot-3d', traces, layout, { displayModeBar: false, responsive: true });
@@ -2107,7 +2236,7 @@ function buildScatter() {
       color: CLUSTER_META[+c].color,
       size: 7,
       opacity: 0.82,
-      line: { width: 0.5, color: 'rgba(255,255,255,0.15)' }
+      line: { width: 0.5, color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' }
     },
     showlegend: true
   }));
@@ -2117,7 +2246,7 @@ function buildScatter() {
     x: [...xGrid, ...xGrid.slice().reverse()],
     y: [...upper, ...lower.slice().reverse()],
     fill: 'toself',
-    fillcolor: 'rgba(255,255,255,0.07)',
+    fillcolor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)',
     line: { color: 'transparent' },
     hoverinfo: 'skip',
     showlegend: false
@@ -2126,16 +2255,16 @@ function buildScatter() {
   const olsTrace = {
     type: 'scatter', mode: 'lines', name: 'OLS',
     x: xGrid, y: fit,
-    line: { color: '#ffffff', width: 1.8 },
+    line: { color: isDark ? '#ffffff' : '#333333', width: 1.8 },
     hoverinfo: 'skip',
     showlegend: false
   };
 
   const axStyle = {
-    gridcolor: 'rgba(255,255,255,0.05)',
-    zerolinecolor: 'rgba(255,255,255,0.08)',
-    tickfont: { color: '#505050', size: 9, family: 'DM Mono, monospace' },
-    title: { font: { size: 10, color: '#606060', family: 'DM Mono, monospace' } }
+    gridcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)',
+    zerolinecolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.15)',
+    tickfont: { color: isDark ? '#505050' : '#888888', size: 9, family: 'DM Mono, monospace' },
+    title: { font: { size: 10, color: isDark ? '#606060' : '#777777', family: 'DM Mono, monospace' } }
   };
 
   const layout = {
@@ -2146,7 +2275,7 @@ function buildScatter() {
     margin: { l: 0, r: 0, t: 30, b: 20 },
     showlegend: true,
     legend: {
-      font: { size: 9, color: '#606060', family: 'DM Mono, monospace' },
+      font: { size: 9, color: isDark ? '#606060' : '#777777', family: 'DM Mono, monospace' },
       bgcolor: 'rgba(0,0,0,0)',
       bordercolor: 'transparent',
       borderwidth: 0,
@@ -2160,10 +2289,10 @@ function buildScatter() {
       x: 0.5, y: 1.12, xref: 'paper', yref: 'paper',
       text: `r = ${r.toFixed(2)}${stars}`,
       showarrow: false,
-      font: { size: 11, color: '#a8dadc', family: 'DM Mono, monospace' },
+      font: { size: 11, color: isDark ? '#a8dadc' : '#0cb2af', family: 'DM Mono, monospace' },
       align: 'center'
     }],
-    font: { family: 'DM Mono, monospace', size: 10, color: '#8a8880' }
+    font: { family: 'DM Mono, monospace', size: 10, color: isDark ? '#8a8880' : '#888888' }
   };
 
   Plotly.react('plot-scatter', [ciTrace, ...dotTraces, olsTrace], layout, {
@@ -2185,6 +2314,75 @@ document.querySelectorAll('.legend-item').forEach(el => {
     applyLegendFilter();
   });
 });
+
+// ─────────────────────────────────────────────
+// THEME TOGGLE
+// ─────────────────────────────────────────────
+let isDark = true;
+const STYLE_MINIMAL_LIGHT = 'mapbox://styles/mapbox/light-v11';
+
+function applyTheme(dark) {
+  isDark = dark;
+  const html = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-toggle-icon');
+
+  if (dark) {
+    html.removeAttribute('data-theme');
+    btn.innerHTML = `${icon.outerHTML} Light mode`;
+  } else {
+    html.setAttribute('data-theme', 'light');
+    btn.innerHTML = `${icon.outerHTML} Dark mode`;
+  }
+  // Re-attach after innerHTML swap
+  document.getElementById('theme-toggle-icon').setAttribute('stroke', 'currentColor');
+
+  // Swap Mapbox style only if map is loaded and we're not in satellite mode
+  if (map && currentStyle !== 'satellite') {
+    const newStyle = dark ? STYLE_MINIMAL : STYLE_MINIMAL_LIGHT;
+    map.setStyle(newStyle);
+    restoreLayersAfterStyleSwap();
+  }
+
+  // Relayout Plotly charts with new axis colors
+  // Rebuild 3D plot to pick up all theme-sensitive colors (traces + axes)
+  if (window._plotBuilt) {
+    window._plotBuilt = false;
+    buildPlot();
+  }
+
+  const ps = document.getElementById('plot-scatter');
+  if (ps && ps.layout) {
+    buildScatter();
+  }
+
+  // When in satellite mode the style is NOT being swapped, so update map layers directly.
+  // In minimal mode the style swap triggers addDataToMap() which already uses isDark.
+  if (map && currentStyle === 'satellite') {
+    if (map.getLayer('station-labels')) {
+      map.setPaintProperty('station-labels', 'text-color', dark ? '#f0ede8' : '#1a1a1a');
+      map.setPaintProperty('station-labels', 'text-halo-color', dark ? 'rgba(14,15,17,0.85)' : 'rgba(245,245,242,0.85)');
+    }
+    if (map.getLayer('station-dots')) {
+      map.setPaintProperty('station-dots', 'circle-stroke-color', dark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)');
+      map.setPaintProperty('station-dots', 'circle-opacity', dark ? 0.95 : 0.25);
+    }
+    if (map.getLayer('buffer-fill')) {
+      map.setPaintProperty('buffer-fill', 'fill-opacity', dark ? 0.05 : 0.20);
+    }
+    if (map.getLayer('buffer-outline')) {
+      map.setPaintProperty('buffer-outline', 'line-opacity', dark ? 0.50 : 0.70);
+    }
+    if (map.getLayer('commuter-rail-line')) {
+      map.setPaintProperty('commuter-rail-line', 'line-color', dark ? '#c4a86b' : '#8b6f3a');
+    }
+    if (map.getLayer('community-hatch')) {
+      map.setPaintProperty('community-hatch', 'fill-color', dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)');
+    }
+  }
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => applyTheme(!isDark));
 
 // ─────────────────────────────────────────────
 // INIT
