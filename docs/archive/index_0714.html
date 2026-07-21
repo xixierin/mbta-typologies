@@ -305,188 +305,69 @@
   #plot-scatter { width: 100%; flex: none; }
 
   /* ── METHODOLOGY PAGE ── */
-  #page-methodology, #page-insights, #page-recommendations { overflow-y: auto; }
+  #page-methodology, #page-insights { overflow-y: auto; }
 
   /* ── INSIGHTS: findings ── */
   .finding { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
-  .finding:first-of-type { border-top: 1px solid var(--border); margin-top: 26px; }
-  .finding-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 40px; flex-shrink: 0; padding-top: 1px; }
+  .finding-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 24px; padding-top: 1px; }
   .finding-body h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
   .finding-body p { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
   .finding-body strong { color: var(--text-primary); font-weight: 500; }
-  .finding-clusters { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 40px; flex-shrink: 0; padding-top: 1px; }
-  .finding-cluster-tag { display: inline-flex; align-items: center; gap: 4px; font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); background: var(--bg-card); border-radius: 3px; padding: 2px 6px 2px 5px; }
-  .finding-cluster-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .finding-badge { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); background: var(--bg-card); padding: 2px 6px; border-radius: 3px; margin-left: 7px; vertical-align: middle; }
 
-  /* ── INSIGHTS: regression table ── */
-  .reg-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; margin: 16px 0 8px; max-width: 100%; min-width: 0; }
-  table.reg-table { border-collapse: collapse; font-family: 'DM Mono', monospace; font-size: 10px; width: max-content; min-width: 100%; }
-  table.reg-table th { background: var(--bg-card); color: var(--text-primary); font-weight: 500; font-size: 8.5px; letter-spacing: 0.04em; text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--border-mid); line-height: 1.35; white-space: nowrap; vertical-align: bottom; }
-  table.reg-table td { padding: 3px 8px; text-align: right; color: var(--text-secondary); white-space: nowrap; }
-  table.reg-table .reg-rowhead { text-align: left; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 11px; white-space: nowrap; position: sticky; left: 0; background: var(--bg-panel); }
-  table.reg-table th.reg-rowhead { background: var(--bg-card); }
-  table.reg-table tr.reg-se td { color: var(--text-muted); font-size: 9px; padding-top: 0; padding-bottom: 6px; }
-  table.reg-table tr.reg-stat-first td { border-top: 1px solid var(--border-mid); padding-top: 7px; }
-  .reg-dag { color: var(--accent); }
-  .reg-note { font-size: 10.5px !important; color: var(--text-muted) !important; line-height: 1.6; margin-top: 6px; }
-
-  /* ── INSIGHTS: attenuation plot ── */
-  .sub-heading { font-size: 13px; font-weight: 500; color: var(--text-primary); margin: 26px 0 6px; }
-  .atten-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 14px 12px 6px; margin: 14px 0 4px; }
-  #atten-svg { width: 100%; height: auto; display: block; }
-  .atten-grid { stroke: var(--border); stroke-width: 1; }
-  .atten-zero { stroke: var(--text-muted); stroke-width: 1.2; stroke-dasharray: 5,4; }
-  .atten-bar { fill: var(--accent); opacity: 0.75; }
-  .atten-item:hover .atten-bar { opacity: 1; }
-  .atten-ci { stroke: var(--text-secondary); stroke-width: 1.1; }
-  .atten-tick { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--text-muted); }
-  .atten-pct { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--text-primary); font-weight: 500; }
-  .atten-xlabel { font-family: 'DM Mono', monospace; font-size: 8.5px; fill: var(--text-muted); }
-  .atten-axis-title { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.05em; fill: var(--text-muted); }
-
-  /* ── INSIGHTS: LMG heatmap ── */
-  .lmg-wrap { overflow-x: auto; margin: 14px 0 4px; min-width: 0; max-width: 100%; }
-  .lmg-grid { display: grid; grid-template-columns: minmax(140px, 1.6fr) repeat(5, minmax(52px, 1fr)); gap: 2px; min-width: 400px; }
-  .lmg-corner { }
-  .lmg-colhead { font-family: 'DM Mono', monospace; font-size: 9.5px; color: var(--text-muted); text-align: center; padding: 4px 0; }
-  .lmg-rowhead { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; text-align: right; line-height: 1.3; }
-  .lmg-cell { background: color-mix(in srgb, var(--accent) calc(var(--lmg-op) * 100%), transparent); border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 9.5px; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 9px 2px; }
-  .lmg-cell.lmg-dark { color: var(--bg); font-weight: 500; }
-  .lmg-empty { background: transparent; }
-
-  /* ── INSIGHTS: cluster box plots ── */
-  .box-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 4px; }
-  .box-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; padding: 8px 6px 4px; min-width: 0; }
-  .box-title { font-size: 10.5px; color: var(--text-primary); font-weight: 500; padding: 0 4px 2px; line-height: 1.3; }
-  .box-svg { width: 100%; height: auto; display: block; }
-  .box-grid-line { stroke: var(--border); stroke-width: 1; }
-  .box-tick { font-family: 'DM Mono', monospace; font-size: 8px; fill: var(--text-muted); }
-  .box-xlabel { font-family: 'DM Mono', monospace; font-size: 8px; fill: var(--text-muted); }
-  .box-rect { opacity: 0.75; stroke: var(--text-muted); stroke-width: 0.5; }
-  .box-item:hover .box-rect { opacity: 1; }
-  .box-whisk { stroke: var(--text-muted); stroke-width: 1; }
-  .box-med { stroke: var(--text-primary); stroke-width: 1.6; }
-
-  @media (max-width: 640px) {
-    .box-grid { grid-template-columns: 1fr; }
-  }
-
-  /* ── SITING FRAMEWORK: tabs ── */
-  #siting-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0; margin: 20px 0 4px; overflow: hidden; }
-  #siting-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-panel); }
-  .siting-tab { flex: 1; padding: 10px 8px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em; color: var(--text-muted); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .siting-tab:hover { color: var(--text-secondary); background: var(--bg-card); }
-  .siting-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--bg-card); }
-  .siting-panel { display: none; padding: 14px 12px 8px; }
-  .siting-panel.active { display: block; }
-
-  /* shared legend (tabs 1 + 2) */
-  .siting-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-bottom: 10px; }
-  .siting-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-secondary); font-family: 'DM Mono', monospace; cursor: pointer; user-select: none; transition: opacity 0.15s; }
-  .siting-legend-item.off { opacity: 0.3; }
-  .siting-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-
-  /* tab 1: scatter */
+  /* ── INSIGHTS: siting chart ── */
+  #siting-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 20px 0 4px; }
+  #siting-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  #siting-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .siting-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-secondary); font-family: 'DM Mono', monospace; cursor: pointer; user-select: none; opacity: 1; transition: opacity 0.15s; }
+  .siting-legend-item.off { opacity: 0.28; }
+  .siting-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  #siting-toggle-btn { padding: 7px 14px; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 0.05em; cursor: pointer; border-radius: 4px; background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); transition: background 0.15s, color 0.15s; white-space: nowrap; }
+  #siting-toggle-btn:hover, #siting-toggle-btn.active { background: var(--accent); color: var(--bg); }
   #siting-chart-area { position: relative; width: 100%; }
   #siting-svg { width: 100%; height: auto; display: block; }
   .siting-grid { stroke: var(--border); stroke-width: 1; }
-  .siting-median { stroke: var(--text-muted); stroke-width: 1.2; stroke-dasharray: 5,4; }
+  .siting-median { stroke: var(--text-muted); stroke-width: 1.3; stroke-dasharray: 5,4; }
   .siting-tick { font-family: 'DM Mono', monospace; font-size: 9px; fill: var(--text-muted); }
-  .siting-axis-title { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.05em; fill: var(--text-muted); }
-  .siting-qtitle { font-family: 'DM Mono', monospace; font-size: 10.5px; fill: var(--text-primary); font-weight: 500; letter-spacing: 0.02em; paint-order: stroke; stroke: var(--bg-card); stroke-width: 3px; stroke-linejoin: round; }
-  .siting-qdesc { font-family: 'DM Sans', sans-serif; font-size: 9px; fill: var(--text-muted); paint-order: stroke; stroke: var(--bg-card); stroke-width: 2.5px; stroke-linejoin: round; }
-  .siting-slabel { font-family: 'DM Sans', sans-serif; font-size: 8.5px; fill: var(--text-secondary); pointer-events: none; transition: opacity 0.2s; paint-order: stroke; stroke: var(--bg-card); stroke-width: 2.5px; stroke-linejoin: round; }
-  .siting-slabel.dim { opacity: 0.1; }
-  .siting-dot { stroke: var(--bg-card); stroke-width: 0.6; transition: opacity 0.2s; }
-  .siting-dot.dim { opacity: 0.1; }
-
-  /* tab 2: map */
-  #siting-map-wrap { position: relative; width: 100%; }
-  #siting-map { width: 100%; height: 430px; border-radius: 4px; background: var(--bg); overflow: hidden; position: relative; }
-  #siting-map-empty { display: none; align-items: center; justify-content: center; height: 430px; text-align: center; padding: 20px; }
-  #siting-map-empty p { font-size: 11.5px; color: var(--text-muted); line-height: 1.7; max-width: 380px; }
-  .siting-map-dot { cursor: pointer; stroke: var(--bg); stroke-width: 1; transition: opacity 0.2s; }
-  .siting-map-dot.dim { opacity: 0.1; pointer-events: none; }
-  .siting-map-dot.sel { stroke: var(--text-primary); stroke-width: 2; }
-  #siting-popup { position: absolute; display: none; background: var(--bg-panel); border: 1px solid var(--border-mid); border-radius: 5px; padding: 9px 11px; font-size: 11px; box-shadow: 0 6px 20px rgba(0,0,0,0.3); z-index: 30; min-width: 150px; pointer-events: auto; }
-  #siting-popup .pop-name { color: var(--text-primary); font-weight: 500; margin-bottom: 5px; }
-  #siting-popup .pop-q { font-family: 'DM Mono', monospace; font-size: 9px; padding: 1px 5px; border-radius: 2px; display: inline-block; margin-bottom: 6px; }
-  #siting-popup .pop-row { display: flex; justify-content: space-between; gap: 12px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); line-height: 1.7; }
-  #siting-popup .pop-row b { color: var(--text-secondary); font-weight: 500; }
-  #siting-popup .pop-close { position: absolute; top: 4px; right: 6px; cursor: pointer; color: var(--text-muted); font-size: 13px; line-height: 1; }
-  #siting-popup .pop-close:hover { color: var(--text-primary); }
-
-  /* tab 3: summary 2x2 */
-  .siting-sum { display: grid; grid-template-columns: auto 1fr 1fr; gap: 0; }
-  .sum-axis-y { display: flex; align-items: center; justify-content: center; padding: 0 8px; }
-  .sum-axis-y span { writing-mode: vertical-rl; transform: rotate(180deg); font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); letter-spacing: 0.08em; }
-  .sum-colhead { text-align: center; font-size: 11px; color: var(--text-secondary); font-style: italic; padding: 4px 0 10px; }
-  .sum-cell { padding: 12px 14px; }
-  .sum-cell h4 { font-size: 12.5px; font-weight: 500; color: var(--accent); margin-bottom: 7px; }
-  .sum-cell p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
-  .sum-cell-n { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text-muted); margin-top: 7px; }
-  .sum-b-right { border-right: 1px solid var(--border-mid); }
-  .sum-b-bottom { border-bottom: 1px solid var(--border-mid); }
-
-  @media (max-width: 640px) {
-    .siting-tab { font-size: 9px; padding: 9px 4px; }
-    .siting-sum { grid-template-columns: 1fr; }
-    .sum-axis-y { display: none; }
-    .sum-b-right { border-right: none; }
-    .sum-cell { border-bottom: 1px solid var(--border); }
-    #siting-map, #siting-map-empty { height: 340px; }
-  }
-
-  #siting-tooltip { position: absolute; display: none; pointer-events: none; background: var(--bg-panel); border: 1px solid var(--border-mid); border-radius: 5px; padding: 8px 10px; font-size: 10.5px; line-height: 1.55; color: var(--text-primary); box-shadow: 0 4px 14px rgba(0,0,0,0.25); z-index: 20; max-width: 240px; }
+  .siting-axis-title { font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: 0.06em; fill: var(--text-muted); text-transform: uppercase; }
+  .siting-corner { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.04em; fill: var(--text-muted); text-transform: uppercase; }
+  .siting-dot { stroke: var(--bg-panel); stroke-width: 0.6; cursor: pointer; transition: opacity 0.25s ease, stroke-width 0.1s; }
+  .siting-dot:hover { stroke: var(--text-primary); stroke-width: 1.6; }
+  #siting-svg.strategy-mode .siting-dot { opacity: 0; pointer-events: none; }
+  .quad-panel { opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
+  #siting-svg.strategy-mode .quad-panel { opacity: 1; pointer-events: auto; }
+  .quad-panel-inner { width: 100%; height: 100%; box-sizing: border-box; padding: 10px 12px; display: flex; flex-direction: column; justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif; }
+  .quad-panel-name { font-size: 11.5px; font-weight: 500; color: var(--text-primary); }
+  .quad-panel-desc { font-size: 10.5px; color: var(--text-secondary); line-height: 1.5; }
+  #siting-empty-state { display: none; align-items: center; justify-content: center; min-height: 260px; padding: 24px; text-align: center; }
+  #siting-empty-state p { font-size: 12px; color: var(--text-muted); line-height: 1.7; max-width: 420px; }
+  #siting-empty-state code { font-family: 'DM Mono', monospace; color: var(--accent); background: var(--bg); padding: 1px 5px; border-radius: 3px; }
+  #siting-tooltip { position: absolute; display: none; pointer-events: none; background: var(--bg-panel); border: 1px solid var(--border-mid); border-radius: 5px; padding: 7px 10px; font-size: 10.5px; line-height: 1.55; color: var(--text-primary); box-shadow: 0 4px 14px rgba(0,0,0,0.25); z-index: 20; white-space: nowrap; }
+  #siting-tooltip .tip-cluster { color: var(--text-secondary); }
   #siting-tooltip .tip-vals { color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 9.5px; }
-  #siting-tooltip .tip-q { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; margin-bottom: 4px; }
-  #siting-tooltip .tip-blurb { color: var(--text-secondary); font-size: 10px; line-height: 1.5; }
 
-  /* ── RECOMMENDATIONS: expandable typology detail rows ── */
-  tr.rec-row { cursor: pointer; }
-  tr.rec-row:hover td { background: var(--bg-card); }
-  tr.rec-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  tr.rec-row.open td { background: var(--bg-card); }
-  .rec-caret { display: inline-block; width: 0; height: 0; margin-right: 7px; vertical-align: middle; border-left: 4px solid var(--text-muted); border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; transition: transform 0.15s ease; }
-  tr.rec-row.open .rec-caret { transform: rotate(90deg); }
-  table.inv-table tbody tr.rec-detail-row:hover td { background: var(--bg-panel); }
-  table.inv-table tbody tr.rec-detail-row td { padding: 0; background: var(--bg-panel); }
-  .rec-detail-inner { border-left: 2px solid var(--accent); padding: 16px 18px 6px; }
-  .rec-detail-n { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-bottom: 10px; }
-  .rec-detail-inner p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; }
-  .rec-detail-inner strong { color: var(--text-primary); font-weight: 500; }
-  .rec-detail-inner .cluster-rec-finding { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: 12px !important; }
-  .rec-detail-inner .equity-note { font-size: 12px !important; }
-
-  /* ── INSIGHTS: typology recommendation summary table ── */
-  table.rec-summary-table.inv-table { table-layout: fixed; font-size: 11.5px; }
-  table.rec-summary-table.inv-table th:nth-child(1) { width: 17%; }
-  table.rec-summary-table.inv-table th:nth-child(2) { width: 15%; }
-  table.rec-summary-table.inv-table th:nth-child(3) { width: 21%; }
-  table.rec-summary-table.inv-table th:nth-child(4) { width: 26%; }
-  table.rec-summary-table.inv-table th:nth-child(5) { width: 21%; }
-  table.rec-summary-table.inv-table td:first-child { font-weight: 500; white-space: normal; color: var(--text-primary); }
-  table.rec-summary-table.inv-table td:nth-child(2),
-  table.rec-summary-table.inv-table td:nth-child(3),
-  table.rec-summary-table.inv-table td:nth-child(4),
-  table.rec-summary-table.inv-table td:nth-child(5) { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--text-secondary); }
-  table.rec-summary-table .finding-cluster-dot { display: inline-block; margin-right: 6px; vertical-align: middle; }
+  /* ── INSIGHTS: cluster recommendations ── */
+  .cluster-rec { border-top: 1px solid var(--border-mid); padding: 20px 0 4px; }
+  .cluster-rec-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; flex-wrap: wrap; }
+  .cluster-rec-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .cluster-rec-head h3 { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .cluster-rec-n { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-left: auto; }
+  .cluster-rec p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 10px; }
+  .cluster-rec strong { color: var(--text-primary); font-weight: 500; }
+  .cluster-rec-finding { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: 12px !important; }
+  .equity-note { font-size: 11.5px !important; color: var(--text-muted) !important; border-top: 1px solid var(--border); padding-top: 9px; }
+  .equity-note strong { color: var(--text-secondary) !important; }
 
   @media (max-width: 720px) {
     #siting-toolbar { flex-direction: column; align-items: flex-start; }
+    .cluster-rec-n { margin-left: 0; width: 100%; }
   }
-  #methodology-inner { max-width: 720px; min-width: 0; flex: 1 1 auto; margin: 0 auto; padding: 48px 32px 80px; }
+  #methodology-inner { max-width: 720px; margin: 0 auto; padding: 48px 32px 80px; }
   #methodology-inner h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
   #methodology-inner .lead { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
   .method-section { margin-bottom: 48px; }
   .method-section h2 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-family: 'DM Mono', monospace; }
   .method-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
   .method-section strong { color: var(--text-primary); font-weight: 500; }
-  .method-section ol.rq-list { margin: 14px 0 0 0; padding-left: 0; list-style: none; counter-reset: rq; }
-  .method-section ol.rq-list li { position: relative; padding-left: 30px; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary); line-height: 1.8; counter-increment: rq; }
-  .method-section ol.rq-list li:last-child { margin-bottom: 0; }
-  .method-section ol.rq-list li::before { content: counter(rq); position: absolute; left: 0; top: 0; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); line-height: 1.9; }
   .method-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
   .step-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 24px; padding-top: 1px; }
   .step-body h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
@@ -760,6 +641,12 @@
     <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"> <a href="https://www.linkedin.com/in/qian-erin-chen/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor;">Erin Chen</a> · Thesis · 2026</div>
   </div>
   <div id="nav-links">
+    <div class="nav-item" data-page="clusters">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
+      </svg>
+      3D Clusters
+    </div>
     <div class="nav-item active" data-page="map">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <path d="M2 4l4-2 4 2 4-2v10l-4 2-4-2-4 2V4z"/><path d="M6 2v10M10 4v10"/>
@@ -778,23 +665,11 @@
       </svg>
       Research Design
     </div>
-    <div class="nav-item" data-page="clusters">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
-        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
-      </svg>
-      Station Typologies
-    </div>
     <div class="nav-item" data-page="insights">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <path d="M8 2a4 4 0 0 1 2 7.46V11H6v-1.54A4 4 0 0 1 8 2z"/><path d="M6 12h4M6.5 14h3"/>
       </svg>
-      Findings
-    </div>
-    <div class="nav-item" data-page="recommendations">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
-        <circle cx="8" cy="8" r="5.5"/><path d="M10.3 5.7L7.2 7.2l-1.5 3.1 3.1-1.5 1.5-3.1z"/>
-      </svg>
-      Recommendations
+      Insights &amp; Recommendation
     </div>
   </div>
   <div id="nav-legend">
@@ -966,7 +841,7 @@
   <!-- CLUSTERS PAGE -->
   <div class="page" id="page-clusters">
     <div id="clusters-header">
-      <h1>Station Typologies</h1>
+      <h1>Station area typologies</h1>
       <div id="clusters-tabs">
         <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
       </div>
@@ -1005,22 +880,12 @@
   <div class="page" id="page-methodology">
     <div id="methodology-inner">
       <h1>Research Design</h1>
-      <p class="lead">MBTA Communities station areas differ substantially in built environment, transit access, and socioeconomic context, so a single network-wide model would average out the variation that matters most for local policy. The research design therefore runs three sequential stages: a network-wide regression identifies global VMT predictors, hierarchical clustering segments stations into six typologies, and within-cluster regressions uncover VMT dynamics inside each station type.</p>
-
-      <div class="method-section">
-        <h2>Research questions</h2>
-        <p>This thesis examines how built environment and transportation characteristics influence VMT in MBTA Communities, with the goal of developing actionable strategies for municipalities. Three questions guide the research:</p>
-        <ol class="rq-list">
-          <li>What land use and transit service characteristics currently define MBTA Communities station areas? Can the station areas be classified into distinct, useful typologies based on the characteristics?</li>
-          <li>Which factors are most strongly associated with VMT reduction in MBTA Communities?</li>
-          <li>What context-specific policy and design interventions can MBTA Communities implement to maximize VMT reduction?</li>
-        </ol>
-      </div>
+      <p class="lead">This analysis links built environment configuration at MBTA station areas to vehicle miles traveled per capita. MBTA Communities station areas differ substantially in built environment, transit access, and socioeconomic context, so a single network-wide model would average out the variation that matters most for local policy. The research design therefore runs three stages that build sequentially: a network-wide regression identifies global VMT predictors, a hierarchical clustering analysis segments stations into six typologies, and within-cluster regressions uncover VMT dynamics inside each station type.</p>
 
       <div class="method-section">
         <h2>Unit of analysis</h2>
         <p>Each observation is a 0.5-mile station area buffer around an MBTA Communities station, consistent with the threshold used in the Act itself. The analysis covers 163 of 169 station areas. Eastern Avenue, Box District, Islington, River Works, Haverhill, and Anderson/Woburn are excluded because each contains a commercial car rental business within the buffer; rental vehicle odometer readings are assigned to the rental company address, inflating the VMT measure with vehicles not driven by local residents.</p>
-        <p>VMT per capita is derived from Massachusetts Vehicle Census odometer readings collected at vehicle registration and assigned to the registered owner's block group. Block groups are clipped to the buffer and area-weighted; a second normalization factor accounts for sensitive and unbuildable land using the gross density denominator from MBTA Communities Act guidance. The dependent variable is log-transformed in all models.</p>
+        <p>VMT per capitais derived from Massachusetts Vehicle Census odometer readings collected at vehicle registration and assigned to the registered owner's block group. Block groups are clipped to the buffer and area-weighted; a second normalization factor accounts for sensitive and unbuildable land using the gross density denominator from MBTA Communities Act guidance. The dependent variable is log-transformed in all models.</p>
         <p>Variable selection is organized by two frameworks: the Five Ds (Ewing &amp; Cervero, 2010) for the regression blocks, and Node-Place theory (Bertolini, 1999) for the clustering structure.</p>
       </div>
 
@@ -1064,31 +929,6 @@
             </tbody>
           </table>
         </div>
-
-        <div class="inv-table-wrap src-table-wrap">
-          <table class="inv-table src-table">
-            <colgroup>
-              <col style="width:18%">
-              <col style="width:82%">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Source</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>MVC</td><td>Massachusetts Vehicle Census, Office of Performance Management and Innovation (OPMI)</td></tr>
-              <tr><td>ACS 5 Year</td><td>American Community Survey 5-Year Estimates, US Census Bureau</td></tr>
-              <tr><td>LODES</td><td>LEHD Origin-Destination Employment Statistics, US Census Bureau</td></tr>
-              <tr><td>GTFS</td><td>General Transit Feed Specification, MBTA schedule data</td></tr>
-              <tr><td>MassGIS</td><td>Bureau of Geographic Information, Commonwealth of Massachusetts</td></tr>
-              <tr><td>MassDOT</td><td>Massachusetts Department of Transportation</td></tr>
-              <tr><td>CTPS</td><td>Central Transportation Planning Staff, Boston Region MPO</td></tr>
-              <tr><td>OSM</td><td>OpenStreetMap</td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
       <style>
@@ -1103,9 +943,6 @@
         table.inv-table td:nth-child(3),
         table.inv-table td:nth-child(4) { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
         .inv-excl { font-style: italic; opacity: 0.65; }
-        .src-table-wrap { margin-top: 14px; }
-        table.src-table td:first-child { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
-        table.src-table td:nth-child(2) { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-secondary); }
         @media (max-width: 480px) {
           table.inv-table { font-size: 11px; }
           table.inv-table thead th, table.inv-table tbody td { padding: 7px 8px; }
@@ -1132,16 +969,31 @@
           <div class="step-num">03</div>
           <div class="step-body">
             <h4>Within-cluster regression</h4>
-            <p>Elastic Net regularization first selects predictors for each cluster from the full M7 set, handling collinearity and reducing overfitting given limited within-cluster samples. Housing density is protected from penalization in every model as the policy anchor of the Act. Variables are z-standardized globally across all 163 stations so coefficients compare across cluster models; each model is capped at five predictors subject to a limit of one parameter per four observations. The second stage refits OLS on the selected predictors with HC3 robust standard errors and computes LMG decomposition indices to partition explained variance, ranking built environment characteristics by relative explanatory importance within each station type.</p>
+            <p>Elastic Net regularization first selects predictors for each cluster from the full M7 set, handling collinearity and reducing overfitting given limited within-cluster samples. Housing density is protected from penalization in every model as the policy anchor of the Act. Variables are z-standardized globally across all 163 stations so coefficients compare across cluster models; each model is capped at five predictors subject to a limit of one parameter per four observations. The second stage refits OLS on the selected predictors with HC3 robust standard errors and computes LMG decompositionindices to partition explained variance, ranking built environment characteristics by relative explanatory importance within each station type.</p>
           </div>
-        </div>      </div>
+        </div>
+        <div class="method-note">
+          <strong>Post-selection inference:</strong> Elastic Net selects predictors and OLS estimates their coefficients on the same data, so coefficient magnitudes and significance tests may be inflated. Within-cluster results are interpreted as exploratory rather than inferential throughout.
+        </div>
+      </div>
+
+      <div class="method-section">
+        <h2>Data sources</h2>
+        <p><strong>Massachusetts Vehicle Census (OPMI)</strong>: odometer readings aggregated to station area buffers as the VMT measure.</p>
+        <p><strong>US Census / ACS 5-Year</strong>: housing unit density and demographic controls (median household income, household composition, age structure).</p>
+        <p><strong>LODES</strong>: employment density and job-to-population ratio.</p>
+        <p><strong>GTFS / MBTA schedule data</strong>: peak hour transit frequency as the clustering input.</p>
+        <p><strong>MassGIS parcels</strong>: land use entropy, intersection density, sidewalk and bike lane coverage.</p>
+        <p><strong>MassDOT</strong>: bus route diversity. </p>
+        <p><strong>CTPS</strong>: station parking spaces. </p>
+        <p><strong>OpenStreetMap</strong>: proximity to points of interest via a staged decay function.</p>
+      </div>
 
        <div class="method-section">
         <h2>Limitations</h2>
         <p><strong>Residential self-selection.</strong> The cross-sectional design cannot separate the built environment's influence on travel behavior from self-selection. Households that prefer to drive less may sort into dense, transit-accessible station areas, so observed associations reflect some combination of environment shaping behavior and preferences shaping location. Coefficients are interpreted as associations, not causal effects.</p>
         <p><strong>The VMT measure.</strong> VMT per capita combines vehicle ownership rates and driving intensity into one metric. A station area may show low VMT because many residents own no vehicle, or because owners drive little, and the aggregate cannot distinguish these. The Vehicle Census captures resident VMT only, not total roadway use, so findings speak to resident travel behavior rather than congestion or network traffic volumes.</p>
         <p><strong>Data timing.</strong> Variables are drawn from different years (ACS 2019 to 2024, LODES 2023, GTFS 2024, parking data from 2018), and the ACS five-year window spans the COVID-19 pandemic.</p>
-        <p><strong>Post-selection inference.</strong> Elastic Net selects predictors and OLS estimates their coefficients on the same data, so coefficient magnitudes and significance tests may be inflated. Within-cluster results are interpreted as exploratory rather than inferential throughout.</p>
         <p><strong>Within-cluster sample size.</strong> Clusters range from n=2 to n=62. By the ten-observations-per-predictor guideline, only Cluster 5 supports the full specification with adequate degrees of freedom. Cluster 3 (n=2) falls below any viable regression threshold and is examined through its cluster profile instead.</p>
        </div>
     </div>
@@ -1150,1190 +1002,56 @@
   <!-- INSIGHTS & RECOMMENDATION PAGE -->
   <div class="page" id="page-insights">
     <div id="methodology-inner">
-      <h1>Findings</h1>
-      <p class="lead">Two regressions ask different questions here. The cross-sectional model tests what predicts VMT across the whole network. The within-cluster models test whether that changes depending on what kind of place a station is. The findings below are organized the same way: regional first, then by cluster.</p>
+      <h1>Insights &amp; Recommendation</h1>
+      <p class="lead">Housing density in isolation does not reduce vehicle miles traveled. Density correlates with reduced driving because dense places also tend to have nearby employment, transit service, walkable street networks, and local destinations. When those features are absent, added density alone is unlikely to reduce VMT. The station typology shows this bundle operating unevenly across the network: housing density translates cleanly into lower VMT in uniform suburban settings (Cluster 5), while parking capacity, employment density, and resident demographics carry more weight in urban and regional nodes (Clusters 1, 2, and 4). Where density is sited, and how it is supported, determine whether new development reduces driving or locks it in.</p>
 
       <div class="method-section">
-        <h2>Regional Findings</h2>
-        <p>From the cross-sectional regression across all 163 station areas (Section 5.2). These hold, or fail to hold, network-wide.</p>
-
-        <div class="finding">
-          <div class="finding-num">1</div>
+        <h2>What the network-wide model shows</h2>
+        <div class="Twfinding">
+          <div class="finding-num">F1</div>
           <div class="finding-body">
-            <h4>Housing density's independent association attenuates as the other D variables enter.</h4>
-            <p>Housing density predicts VMT strongly on its own, but the effect evaporates once the other built environment variables enter the model. Density correlates with less driving because dense places also tend to have jobs, transit, and walkable streets nearby. It is the bundle doing the work, not density alone.</p>
+            <h4>Housing density's independent association attenuates as the other Ds enter</h4>
+            <p>Housing density carries a standardized beta of <strong>-0.271 (p&lt;0.001)</strong> when entered alone in M1. That association falls to <strong>-0.047 and non-significance</strong> by M4 and sits at approximately zero from M5 onward. The density effect the Act relies on is largely carried by the conditions that accompany density, not by density itself.</p>
           </div>
         </div>
-
         <div class="finding">
-          <div class="finding-num">2</div>
+          <div class="finding-num">F2</div>
           <div class="finding-body">
-            <h4>Employment density, land use entropy, and station parking are strong predictors for VMT variation.</h4>
-            <p>Where housing density drops out, these three hold. Jobs nearby shorten trips, the largest and steadiest effect in the model. More station parking means more driving. Land use entropy runs the wrong way, and finding 5 explains why: at a half-mile radius, mixed use on paper is not mixed use in practice.</p>
+            <h4>Employment density, land use entropy, and station parking hold under full control</h4>
+            <p>Employment density remains at approximately <strong>-0.12 through M7</strong>, the largest stable built environment effect in the model. Station parking is positive and significant at <strong>+0.04 (p&lt;0.05)</strong>. Entropy is positive and significant at approximately <strong>+0.50</strong>, which reads as a measurement effect rather than a policy signal: a 0.5-mile buffer captures dispersed auto-oriented mixing as readily as compact integration.</p>
           </div>
         </div>
-
         <div class="finding">
-          <div class="finding-num">3</div>
+          <div class="finding-num">F3</div>
           <div class="finding-body">
-            <h4>Bike lane coverage and transit frequency are significant or marginally significant early in the sequence but lose significance under fuller control.</h4>
-            <p>Both predict lower VMT early in the sequence, then fade once fuller controls enter. Neither is useless. Their effects are simply bound up with everything else that comes with a transit-rich place, and with who chooses to live there.</p>
+            <h4>Bike lane coverage and transit frequency wash out under fuller control</h4>
+            <p>Bike lane coverage is significant at M4 (<strong>-0.26</strong>) and then loses significance. Transit frequency is marginal at M5 and M6 and non-significant by M7. Both are absorbed by correlated built environment conditions rather than operating as independent levers at the network scale.</p>
           </div>
         </div>
-
         <div class="finding">
-          <div class="finding-num">4</div>
+          <div class="finding-num">F4</div>
           <div class="finding-body">
-            <h4>Young adult share shows evidence consistent with residential self-selection.</h4>
-            <p>Adding the share of young adults absorbs much of the built environment's apparent effect. People who prefer not to drive tend to choose transit-rich neighborhoods, so it is hard to tell how much of low VMT is the place and how much is the people who moved there. This is why every result here is an association, not a cause.</p>
+            <h4>Young adult share shows evidence consistent with residential self-selection</h4>
+            <p>In the M8 robustness check, young adult share enters at <strong>-1.43 (p&lt;0.001)</strong> and absorbs both employment density and entropy into non-significance. Adjusted R² rises from 0.611 (M7) to 0.679 (M8). This is consistent with the self-selection literature and is why every coefficient in this analysis is read as an association rather than a causal effect.</p>
           </div>
         </div>
-
-        <h3 class="sub-heading">The regression, model by model</h3>
-        <p>Block-entry OLS across all 163 station areas. Each column adds one dimension of the Five Ds; M7 is the final specification before the self-selection check.</p>
-
-        <div class="reg-table-wrap">
-          <table class="reg-table">
-            <thead>
-              <tr>
-                <th class="reg-rowhead"></th>
-                <th>M1<br>Housing<br>Density</th>
-                <th>M2<br>+ Full<br>Density</th>
-                <th>M3<br>+ Diversity<br>(D2)</th>
-                <th>M4<br>+ Design<br>(D3)</th>
-                <th>M5<br>+ Dist. to<br>Transit (D4)</th>
-                <th>M6<br>+ Dest.<br>Access (D5)</th>
-                <th>M7<br>+ Controls</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="reg-rowhead">(Intercept)</td>
-                <td>9.013***</td>
-                <td>9.012***</td>
-                <td>8.669***</td>
-                <td>8.809***</td>
-                <td>8.697***</td>
-                <td>8.698***</td>
-                <td>9.122***</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.041)</td>
-                <td>(0.042)</td>
-                <td>(0.097)</td>
-                <td>(0.285)</td>
-                <td>(0.300)</td>
-                <td>(0.302)</td>
-                <td>(1.533)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Housing Density <span class="reg-dag">†</span></td>
-                <td>-0.271***</td>
-                <td>-0.188***</td>
-                <td>-0.114*</td>
-                <td>-0.047</td>
-                <td>-0.006</td>
-                <td>-0.005</td>
-                <td>-0.002</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.024)</td>
-                <td>(0.046)</td>
-                <td>(0.052)</td>
-                <td>(0.074)</td>
-                <td>(0.081)</td>
-                <td>(0.083)</td>
-                <td>(0.091)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Employment Density <span class="reg-dag">†</span></td>
-                <td></td>
-                <td>-0.086*</td>
-                <td>-0.171***</td>
-                <td>-0.123**</td>
-                <td>-0.119*</td>
-                <td>-0.121*</td>
-                <td>-0.122*</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td>(0.041)</td>
-                <td>(0.048)</td>
-                <td>(0.047)</td>
-                <td>(0.046)</td>
-                <td>(0.048)</td>
-                <td>(0.049)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Land Use Entropy</td>
-                <td></td>
-                <td></td>
-                <td>0.834***</td>
-                <td>0.754***</td>
-                <td>0.521**</td>
-                <td>0.522**</td>
-                <td>0.499*</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td>(0.178)</td>
-                <td>(0.177)</td>
-                <td>(0.184)</td>
-                <td>(0.186)</td>
-                <td>(0.235)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Intersection <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>-0.021</td>
-                <td>-0.013</td>
-                <td>-0.016</td>
-                <td>-0.021</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.078)</td>
-                <td>(0.074)</td>
-                <td>(0.081)</td>
-                <td>(0.081)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Bike Lane Coverage <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>-0.260***</td>
-                <td>-0.103</td>
-                <td>-0.105</td>
-                <td>-0.088</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.061)</td>
-                <td>(0.071)</td>
-                <td>(0.070)</td>
-                <td>(0.071)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Transit Frequency</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>-0.038+</td>
-                <td>-0.037+</td>
-                <td>-0.035</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.022)</td>
-                <td>(0.021)</td>
-                <td>(0.024)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Station Parking <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>0.040**</td>
-                <td>0.040**</td>
-                <td>0.040*</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.015)</td>
-                <td>(0.015)</td>
-                <td>(0.015)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">POI Accessibility <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>0.004</td>
-                <td>0.006</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.017)</td>
-                <td>(0.020)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Med Income <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>-0.043</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.121)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">% HH with Children</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>0.339</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.381)</td>
-              </tr>
-              <tr class="reg-stat-first">
-                <td class="reg-rowhead">Num.Obs.</td>
-                <td>163</td>
-                <td>163</td>
-                <td>163</td>
-                <td>163</td>
-                <td>163</td>
-                <td>163</td>
-                <td>163</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">R²</td>
-                <td>0.416</td>
-                <td>0.440</td>
-                <td>0.529</td>
-                <td>0.583</td>
-                <td>0.632</td>
-                <td>0.632</td>
-                <td>0.635</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">R² Adj.</td>
-                <td>0.412</td>
-                <td>0.433</td>
-                <td>0.520</td>
-                <td>0.570</td>
-                <td>0.615</td>
-                <td>0.613</td>
-                <td>0.611</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="reg-note">+ p&lt;0.1, * p&lt;0.05, ** p&lt;0.01, *** p&lt;0.001. <span class="reg-dag">†</span> Log-transformed prior to correlation and regression analysis; all other variables in original units. Coefficients are elasticities or semi-elasticities against log VMT per capita.</p>
-
-        <h3 class="sub-heading">Housing density across the sequence</h3>
-        <p>The same coefficient, standardised, as each block enters. The percentage under each bar is how much of the M1 effect survives; whiskers are 95% confidence intervals.</p>
-        <div class="atten-card">
-          <svg id="atten-svg" viewBox="0 0 680 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Housing density coefficient attenuation across models M1 to M7">
-            <line class="atten-grid" x1="62" y1="275.9" x2="660" y2="275.9"/>
-            <text class="atten-tick" x="54" y="278.9" text-anchor="end">-0.3</text>
-            <line class="atten-grid" x1="62" y1="225.5" x2="660" y2="225.5"/>
-            <text class="atten-tick" x="54" y="228.5" text-anchor="end">-0.2</text>
-            <line class="atten-grid" x1="62" y1="175.1" x2="660" y2="175.1"/>
-            <text class="atten-tick" x="54" y="178.1" text-anchor="end">-0.1</text>
-            <line class="atten-grid" x1="62" y1="74.4" x2="660" y2="74.4"/>
-            <text class="atten-tick" x="54" y="77.4" text-anchor="end">0.1</text>
-            <text class="atten-tick" x="54" y="127.7" text-anchor="end">0.0</text>
-            <text class="atten-axis-title" x="14" y="160.0" text-anchor="middle" transform="rotate(-90 14 160.0)">Standardised β (housing density)</text>
-            <g class="atten-item">
-              <rect class="atten-bar" x="86.8" y="124.7" width="35.9" height="136.5"/>
-              <line class="atten-ci" x1="104.7" y1="284.9" x2="104.7" y2="237.6"/>
-              <line class="atten-ci" x1="99.7" y1="284.9" x2="109.7" y2="284.9"/>
-              <line class="atten-ci" x1="99.7" y1="237.6" x2="109.7" y2="237.6"/>
-              <text class="atten-pct" x="104.7" y="272.2" text-anchor="middle">100%</text>
-              <text class="atten-xlabel" x="104.7" y="308.0" text-anchor="end" transform="rotate(-38 104.7 308.0)">M1 Housing Density</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="172.2" y="124.7" width="35.9" height="94.7"/>
-              <line class="atten-ci" x1="190.1" y1="264.8" x2="190.1" y2="174.6"/>
-              <line class="atten-ci" x1="185.1" y1="264.8" x2="195.1" y2="264.8"/>
-              <line class="atten-ci" x1="185.1" y1="174.6" x2="195.1" y2="174.6"/>
-              <text class="atten-pct" x="190.1" y="230.4" text-anchor="middle">69.5%</text>
-              <text class="atten-xlabel" x="190.1" y="308.0" text-anchor="end" transform="rotate(-38 190.1 308.0)">M2 + Full Density</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="257.6" y="124.7" width="35.9" height="57.4"/>
-              <line class="atten-ci" x1="275.6" y1="233.5" x2="275.6" y2="131.8"/>
-              <line class="atten-ci" x1="270.6" y1="233.5" x2="280.6" y2="233.5"/>
-              <line class="atten-ci" x1="270.6" y1="131.8" x2="280.6" y2="131.8"/>
-              <text class="atten-pct" x="275.6" y="193.2" text-anchor="middle">42.2%</text>
-              <text class="atten-xlabel" x="275.6" y="308.0" text-anchor="end" transform="rotate(-38 275.6 308.0)">M3 + Diversity (D2)</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="343.1" y="124.7" width="35.9" height="23.7"/>
-              <line class="atten-ci" x1="361.0" y1="221.5" x2="361.0" y2="75.4"/>
-              <line class="atten-ci" x1="356.0" y1="221.5" x2="366.0" y2="221.5"/>
-              <line class="atten-ci" x1="356.0" y1="75.4" x2="366.0" y2="75.4"/>
-              <text class="atten-pct" x="361.0" y="159.4" text-anchor="middle">17.5%</text>
-              <text class="atten-xlabel" x="361.0" y="308.0" text-anchor="end" transform="rotate(-38 361.0 308.0)">M4 + Design (D3)</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="428.5" y="124.7" width="35.9" height="3.0"/>
-              <line class="atten-ci" x1="446.4" y1="207.3" x2="446.4" y2="48.2"/>
-              <line class="atten-ci" x1="441.4" y1="207.3" x2="451.4" y2="207.3"/>
-              <line class="atten-ci" x1="441.4" y1="48.2" x2="451.4" y2="48.2"/>
-              <text class="atten-pct" x="446.4" y="138.8" text-anchor="middle">2.1%</text>
-              <text class="atten-xlabel" x="446.4" y="308.0" text-anchor="end" transform="rotate(-38 446.4 308.0)">M5 + Dist. to Transit (D4)</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="513.9" y="124.7" width="35.9" height="2.5"/>
-              <line class="atten-ci" x1="531.9" y1="209.9" x2="531.9" y2="46.7"/>
-              <line class="atten-ci" x1="526.9" y1="209.9" x2="536.9" y2="209.9"/>
-              <line class="atten-ci" x1="526.9" y1="46.7" x2="536.9" y2="46.7"/>
-              <text class="atten-pct" x="531.9" y="138.3" text-anchor="middle">1.7%</text>
-              <text class="atten-xlabel" x="531.9" y="308.0" text-anchor="end" transform="rotate(-38 531.9 308.0)">M6 + Dest. Access (D5)</text>
-            </g>
-            <g class="atten-item">
-              <rect class="atten-bar" x="599.3" y="124.7" width="35.9" height="1.0"/>
-              <line class="atten-ci" x1="617.3" y1="214.9" x2="617.3" y2="37.1"/>
-              <line class="atten-ci" x1="612.3" y1="214.9" x2="622.3" y2="214.9"/>
-              <line class="atten-ci" x1="612.3" y1="37.1" x2="622.3" y2="37.1"/>
-              <text class="atten-pct" x="617.3" y="136.7" text-anchor="middle">0.8%</text>
-              <text class="atten-xlabel" x="617.3" y="308.0" text-anchor="end" transform="rotate(-38 617.3 308.0)">M7 + Controls</text>
-            </g>
-            <line class="atten-zero" x1="62" y1="124.7" x2="660" y2="124.7"/>
-          </svg>
-        </div>
-        <p class="reg-note">Bars cross into non-significance from M5 onward: the confidence interval spans zero.</p>
       </div>
-
-      <div class="method-section">
-        <h2>Cluster Findings</h2>
-        <p>From the within-cluster regression (Section 5.4), testing whether the same predictors hold differently by station type. Samples are small, so results are exploratory except for CL5 (n=62); elsewhere coefficient direction and LMG share are more reliable guides than p-values alone.</p>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c6)"></span>CL6</span>
-          </div>
-          <div class="finding-body">
-            <h4>Housing density's effect on VMT is concentrated in CL5 Suburban Residential Neighborhood</h4>
-            <p>Density reaches significance in exactly one cluster: the commuter rail suburbs. With 62 stations that look broadly alike, density variation shows up cleanly in VMT. A one standard deviation increase associates with roughly 18 percent less driving. Elsewhere density still matters in the urban cores, but the samples are too small to pin down by how much.</p>
-          </div>
-        </div>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1</span>
-          </div>
-          <div class="finding-body">
-            <h4>CL1 Urban Employment Node exemplifies the bundled-conditions hypothesis.</h4>
-            <p>No single predictor stands out here, because four share the weight almost evenly: bike lanes, parking, jobs, and housing density. That is the bundle argument made visible. No one lever dominates because no one lever is acting alone.</p>
-          </div>
-        </div>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5</span>
-          </div>
-          <div class="finding-body">
-            <h4>Demographic factors carry substantial weight within urban residential and suburban contexts</h4>
-            <p>In the dense residential neighborhoods, households with children predict VMT better than anything about the built environment. School runs and errands are trips that radial transit serves poorly. Income matters too, and negatively, in the regional centers and suburbs: wealthier station areas drive less. That raises a question worth asking early, about who actually benefits when TOD lowers driving.</p>
-          </div>
-        </div>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4</span>
-          </div>
-          <div class="finding-body">
-            <h4>Park-and-ride capacity positively associates with VMT across the urban and regional clusters</h4>
-            <p>More parking, more driving, consistently across the urban and regional clusters. Big garages pull in drivers from across the region, and they appear to shape how nearby residents travel too. Stations like Alewife and Wonderland carry well over 2,000 spaces each.</p>
-          </div>
-        </div>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5</span>
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c6)"></span>CL6</span>
-          </div>
-          <div class="finding-body">
-            <h4>Land-use entropy in CL5 and CL6 reflects categorical adjacency, not the walkable mix the Five Ds literature intends.</h4>
-            <p>The entropy measure says these places are mixed use, and the data says mixed use means more driving. That reading is wrong. In low-density areas the index picks up a strip mall next to a subdivision, not a walkable main street. Destination access in the same clusters points the other way, which confirms the measure is catching sprawl, not walkability.</p>
-          </div>
-        </div>
-
-        <div class="finding">
-          <div class="finding-clusters">
-            <span class="finding-cluster-tag"><span class="finding-cluster-dot" style="background:var(--c3)"></span>CL3</span>
-          </div>
-          <div class="finding-body">
-            <h4>CL3 demonstrates that transit infrastructure without the surrounding bundle produces suburban VMT outcomes.<span class="finding-badge">n=2 · descriptive</span></h4>
-            <p>Braintree and Route 128 both have real transit service, yet residents drive as much as people on the exurban fringe. The surrounding conditions are missing: low density, sparse intersections, and the largest parking capacity in the network. Transit access is necessary but not sufficient.</p>
-          </div>
-        </div>
-
-        <h3 class="sub-heading">Within-cluster regression</h3>
-        <p>Elastic Net selects predictors separately for each cluster, with housing density protected; OLS then estimates the coefficients.</p>
-        <div class="reg-table-wrap">
-          <table class="reg-table">
-            <thead>
-              <tr>
-                <th class="reg-rowhead"></th>
-                <th>Cl.1<br>Urban<br>Employment<br>Node</th>
-                <th>Cl.2<br>Urban<br>Residential<br>Node</th>
-                <th>Cl.4<br>Regional<br>Mixed-Use<br>Center</th>
-                <th>Cl.5<br>Suburban<br>Residential<br>Neighborhood</th>
-                <th>Cl.6<br>Exurban<br>Mixed-Use<br>Fringe</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="reg-rowhead">Housing density <span class="reg-dag">†</span></td>
-                <td>0.427</td>
-                <td>-0.139</td>
-                <td>0.060</td>
-                <td>-0.176***</td>
-                <td>-0.030</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.790)</td>
-                <td>(0.201)</td>
-                <td>(0.242)</td>
-                <td>(0.066)</td>
-                <td>(0.049)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Employment density</td>
-                <td>-0.091</td>
-                <td></td>
-                <td>-0.230</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.201)</td>
-                <td></td>
-                <td>(0.276)</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Land-use entropy</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>0.118+</td>
-                <td>0.207***</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>(0.098)</td>
-                <td>(0.057)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Intersection Count</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Bike lane coverage</td>
-                <td>-0.131</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.131)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Transit frequency (PHR)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Bus route diversity</td>
-                <td>-0.049</td>
-                <td>0.073</td>
-                <td>-0.075</td>
-                <td>-0.057</td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.112)</td>
-                <td>(0.085)</td>
-                <td>(0.126)</td>
-                <td>(0.050)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Park-and-ride spaces</td>
-                <td>0.178+</td>
-                <td>0.091</td>
-                <td>0.151</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td>(0.124)</td>
-                <td>(0.128)</td>
-                <td>(0.143)</td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">POI accessibility</td>
-                <td></td>
-                <td>0.300+</td>
-                <td></td>
-                <td>-0.024</td>
-                <td>-0.041+</td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td>(0.199)</td>
-                <td></td>
-                <td>(0.042)</td>
-                <td>(0.031)</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">Median income <span class="reg-dag">†</span></td>
-                <td></td>
-                <td></td>
-                <td>-0.046</td>
-                <td>-0.103+</td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td></td>
-                <td>(0.072)</td>
-                <td>(0.069)</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">% Household with children</td>
-                <td></td>
-                <td>0.313**</td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr class="reg-se">
-                <td class="reg-rowhead"></td>
-                <td></td>
-                <td>(0.143)</td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr class="reg-stat-first">
-                <td class="reg-rowhead">R²</td>
-                <td>0.471</td>
-                <td>0.643</td>
-                <td>0.340</td>
-                <td>0.383</td>
-                <td>0.633</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">R² Adj.</td>
-                <td>0.338</td>
-                <td>0.562</td>
-                <td>0.182</td>
-                <td>0.328</td>
-                <td>0.554</td>
-              </tr>
-              <tr>
-                <td class="reg-rowhead">n</td>
-                <td>26</td>
-                <td>28</td>
-                <td>27</td>
-                <td>62</td>
-                <td>18</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="reg-note">+ p&lt;0.25, * p&lt;0.1, ** p&lt;0.05, *** p&lt;0.01. Note these thresholds are looser than the all-stations table above, reflecting the smaller within-cluster samples. <span class="reg-dag">†</span> Log-transformed. Blank cells are predictors Elastic Net did not select for that cluster. CL3 (n=2) is too small for regression and is profiled below instead.</p>
-        <h3 class="sub-heading">Which predictor carries each cluster</h3>
-        <p>LMG decomposition splits each model's explained variance among its predictors. This is the more reliable guide where samples are small.</p>
-        <div class="lmg-wrap">
-          <div class="lmg-grid">
-            <div class="lmg-corner"></div>
-            <div class="lmg-colhead">CL1</div>
-            <div class="lmg-colhead">CL2</div>
-            <div class="lmg-colhead">CL4</div>
-            <div class="lmg-colhead">CL5</div>
-            <div class="lmg-colhead">CL6</div>
-            <div class="lmg-rowhead">Housing density</div>
-            <div class="lmg-cell" style="--lmg-op:0.247">13.8%</div>
-            <div class="lmg-cell" style="--lmg-op:0.376">25.9%</div>
-            <div class="lmg-cell" style="--lmg-op:0.144">4.1%</div>
-            <div class="lmg-cell" style="--lmg-op:0.514">38.9%</div>
-            <div class="lmg-cell" style="--lmg-op:0.139">3.7%</div>
-            <div class="lmg-rowhead">Employment density</div>
-            <div class="lmg-cell" style="--lmg-op:0.360">24.4%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell" style="--lmg-op:0.423">30.3%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-rowhead">Land-use entropy</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell" style="--lmg-op:0.258">14.8%</div>
-            <div class="lmg-cell lmg-dark" style="--lmg-op:0.950">79.8%</div>
-            <div class="lmg-rowhead">Bike lane coverage</div>
-            <div class="lmg-cell" style="--lmg-op:0.414">29.5%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-rowhead">Bus route diversity</div>
-            <div class="lmg-cell" style="--lmg-op:0.131">2.9%</div>
-            <div class="lmg-cell" style="--lmg-op:0.135">3.3%</div>
-            <div class="lmg-cell" style="--lmg-op:0.235">12.7%</div>
-            <div class="lmg-cell" style="--lmg-op:0.281">17.0%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-rowhead">Park-and-ride spaces</div>
-            <div class="lmg-cell" style="--lmg-op:0.413">29.4%</div>
-            <div class="lmg-cell" style="--lmg-op:0.222">11.5%</div>
-            <div class="lmg-cell" style="--lmg-op:0.496">37.2%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-rowhead">POI accessibility</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell" style="--lmg-op:0.201">9.5%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell" style="--lmg-op:0.212">10.5%</div>
-            <div class="lmg-cell" style="--lmg-op:0.276">16.5%</div>
-            <div class="lmg-rowhead">Median income</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell" style="--lmg-op:0.267">15.7%</div>
-            <div class="lmg-cell" style="--lmg-op:0.301">18.9%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-rowhead">% Household with Children</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-dark" style="--lmg-op:0.630">49.8%</div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-            <div class="lmg-cell lmg-empty"></div>
-          </div>
-        </div>
-        <p class="reg-note">Cell value = predictor's share of that cluster model's R². Blank = not selected for that cluster. CL3 (n=2) is excluded.</p>
-        <h3 class="sub-heading">Cluster profiles</h3>
-        <p>How the six station types differ on the dimensions that matter, including CL3, which the regression cannot cover.</p>
-        <div class="box-grid">
-          <div class="box-panel">
-            <div class="box-title">D4: Transit Peak-Hr Frequency</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="137.8" x2="322" y2="137.8"/>
-              <text class="box-tick" x="34" y="140.8" text-anchor="end">2.5</text>
-              <line class="box-grid-line" x1="40" y1="101.6" x2="322" y2="101.6"/>
-              <text class="box-tick" x="34" y="104.6" text-anchor="end">5</text>
-              <line class="box-grid-line" x1="40" y1="65.4" x2="322" y2="65.4"/>
-              <text class="box-tick" x="34" y="68.4" text-anchor="end">7.5</text>
-              <line class="box-grid-line" x1="40" y1="29.2" x2="322" y2="29.2"/>
-              <text class="box-tick" x="34" y="32.2" text-anchor="end">10</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="37.9" x2="63.5" y2="39.4"/>
-                <line class="box-whisk" x1="63.5" y1="78.5" x2="63.5" y2="103.1"/>
-                <line class="box-whisk" x1="59.5" y1="37.9" x2="67.5" y2="37.9"/>
-                <line class="box-whisk" x1="59.5" y1="103.1" x2="67.5" y2="103.1"/>
-                <rect class="box-rect" x="52.7" y="39.4" width="21.6" height="39.1" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="68.3" x2="74.3" y2="68.3"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="49.5" x2="110.5" y2="66.9"/>
-                <line class="box-whisk" x1="110.5" y1="77.0" x2="110.5" y2="79.9"/>
-                <line class="box-whisk" x1="106.5" y1="49.5" x2="114.5" y2="49.5"/>
-                <line class="box-whisk" x1="106.5" y1="79.9" x2="114.5" y2="79.9"/>
-                <rect class="box-rect" x="99.7" y="66.9" width="21.6" height="10.1" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="72.7" x2="121.3" y2="72.7"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="104.5" x2="157.5" y2="107.4"/>
-                <line class="box-whisk" x1="157.5" y1="116.1" x2="157.5" y2="121.9"/>
-                <line class="box-whisk" x1="153.5" y1="104.5" x2="161.5" y2="104.5"/>
-                <line class="box-whisk" x1="153.5" y1="121.9" x2="161.5" y2="121.9"/>
-                <rect class="box-rect" x="146.7" y="107.4" width="21.6" height="8.7" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="111.8" x2="168.3" y2="111.8"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="142.2" x2="204.5" y2="145.0"/>
-                <line class="box-whisk" x1="204.5" y1="150.8" x2="204.5" y2="155.2"/>
-                <line class="box-whisk" x1="200.5" y1="142.2" x2="208.5" y2="142.2"/>
-                <line class="box-whisk" x1="200.5" y1="155.2" x2="208.5" y2="155.2"/>
-                <rect class="box-rect" x="193.7" y="145.0" width="21.6" height="5.8" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="147.9" x2="215.3" y2="147.9"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="142.2" x2="251.5" y2="145.0"/>
-                <line class="box-whisk" x1="251.5" y1="150.8" x2="251.5" y2="161.0"/>
-                <line class="box-whisk" x1="247.5" y1="142.2" x2="255.5" y2="142.2"/>
-                <line class="box-whisk" x1="247.5" y1="161.0" x2="255.5" y2="161.0"/>
-                <rect class="box-rect" x="240.7" y="145.0" width="21.6" height="5.8" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="147.9" x2="262.3" y2="147.9"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="146.5" x2="298.5" y2="149.4"/>
-                <line class="box-whisk" x1="298.5" y1="153.7" x2="298.5" y2="162.4"/>
-                <line class="box-whisk" x1="294.5" y1="146.5" x2="302.5" y2="146.5"/>
-                <line class="box-whisk" x1="294.5" y1="162.4" x2="302.5" y2="162.4"/>
-                <rect class="box-rect" x="287.7" y="149.4" width="21.6" height="4.3" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="150.8" x2="309.3" y2="150.8"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-          <div class="box-panel">
-            <div class="box-title">D1: Housing Density (units/acre)</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="174.0" x2="322" y2="174.0"/>
-              <text class="box-tick" x="34" y="177.0" text-anchor="end">0</text>
-              <line class="box-grid-line" x1="40" y1="142.3" x2="322" y2="142.3"/>
-              <text class="box-tick" x="34" y="145.3" text-anchor="end">5</text>
-              <line class="box-grid-line" x1="40" y1="110.7" x2="322" y2="110.7"/>
-              <text class="box-tick" x="34" y="113.7" text-anchor="end">10</text>
-              <line class="box-grid-line" x1="40" y1="79.0" x2="322" y2="79.0"/>
-              <text class="box-tick" x="34" y="82.0" text-anchor="end">15</text>
-              <line class="box-grid-line" x1="40" y1="47.3" x2="322" y2="47.3"/>
-              <text class="box-tick" x="34" y="50.3" text-anchor="end">20</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="55.6" x2="63.5" y2="84.1"/>
-                <line class="box-whisk" x1="63.5" y1="118.3" x2="63.5" y2="166.4"/>
-                <line class="box-whisk" x1="59.5" y1="55.6" x2="67.5" y2="55.6"/>
-                <line class="box-whisk" x1="59.5" y1="166.4" x2="67.5" y2="166.4"/>
-                <rect class="box-rect" x="52.7" y="84.1" width="21.6" height="34.2" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="98.0" x2="74.3" y2="98.0"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="42.3" x2="110.5" y2="65.7"/>
-                <line class="box-whisk" x1="110.5" y1="148.0" x2="110.5" y2="162.6"/>
-                <line class="box-whisk" x1="106.5" y1="42.3" x2="114.5" y2="42.3"/>
-                <line class="box-whisk" x1="106.5" y1="162.6" x2="114.5" y2="162.6"/>
-                <rect class="box-rect" x="99.7" y="65.7" width="21.6" height="82.3" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="89.1" x2="121.3" y2="89.1"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="159.4" x2="157.5" y2="160.1"/>
-                <line class="box-whisk" x1="157.5" y1="161.3" x2="157.5" y2="162.0"/>
-                <line class="box-whisk" x1="153.5" y1="159.4" x2="161.5" y2="159.4"/>
-                <line class="box-whisk" x1="153.5" y1="162.0" x2="161.5" y2="162.0"/>
-                <rect class="box-rect" x="146.7" y="160.1" width="21.6" height="1.3" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="160.7" x2="168.3" y2="160.7"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="106.2" x2="204.5" y2="128.4"/>
-                <line class="box-whisk" x1="204.5" y1="152.5" x2="204.5" y2="163.9"/>
-                <line class="box-whisk" x1="200.5" y1="106.2" x2="208.5" y2="106.2"/>
-                <line class="box-whisk" x1="200.5" y1="163.9" x2="208.5" y2="163.9"/>
-                <rect class="box-rect" x="193.7" y="128.4" width="21.6" height="24.1" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="139.2" x2="215.3" y2="139.2"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="129.7" x2="251.5" y2="153.1"/>
-                <line class="box-whisk" x1="251.5" y1="166.4" x2="251.5" y2="172.1"/>
-                <line class="box-whisk" x1="247.5" y1="129.7" x2="255.5" y2="129.7"/>
-                <line class="box-whisk" x1="247.5" y1="172.1" x2="255.5" y2="172.1"/>
-                <rect class="box-rect" x="240.7" y="153.1" width="21.6" height="13.3" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="161.3" x2="262.3" y2="161.3"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="162.0" x2="298.5" y2="166.4"/>
-                <line class="box-whisk" x1="298.5" y1="170.2" x2="298.5" y2="172.7"/>
-                <line class="box-whisk" x1="294.5" y1="162.0" x2="302.5" y2="162.0"/>
-                <line class="box-whisk" x1="294.5" y1="172.7" x2="302.5" y2="172.7"/>
-                <rect class="box-rect" x="287.7" y="166.4" width="21.6" height="3.8" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="168.3" x2="309.3" y2="168.3"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-          <div class="box-panel">
-            <div class="box-title">D2: Land-Use Entropy</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="174.0" x2="322" y2="174.0"/>
-              <text class="box-tick" x="34" y="177.0" text-anchor="end">0</text>
-              <line class="box-grid-line" x1="40" y1="138.2" x2="322" y2="138.2"/>
-              <text class="box-tick" x="34" y="141.2" text-anchor="end">0.2</text>
-              <line class="box-grid-line" x1="40" y1="102.5" x2="322" y2="102.5"/>
-              <text class="box-tick" x="34" y="105.5" text-anchor="end">0.4</text>
-              <line class="box-grid-line" x1="40" y1="66.7" x2="322" y2="66.7"/>
-              <text class="box-tick" x="34" y="69.7" text-anchor="end">0.6</text>
-              <line class="box-grid-line" x1="40" y1="30.9" x2="322" y2="30.9"/>
-              <text class="box-tick" x="34" y="33.9" text-anchor="end">0.8</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="30.9" x2="63.5" y2="61.3"/>
-                <line class="box-whisk" x1="63.5" y1="91.7" x2="63.5" y2="109.6"/>
-                <line class="box-whisk" x1="59.5" y1="30.9" x2="67.5" y2="30.9"/>
-                <line class="box-whisk" x1="59.5" y1="109.6" x2="67.5" y2="109.6"/>
-                <rect class="box-rect" x="52.7" y="61.3" width="21.6" height="30.4" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="73.9" x2="74.3" y2="73.9"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="90.0" x2="110.5" y2="118.6"/>
-                <line class="box-whisk" x1="110.5" y1="152.5" x2="110.5" y2="166.8"/>
-                <line class="box-whisk" x1="106.5" y1="90.0" x2="114.5" y2="90.0"/>
-                <line class="box-whisk" x1="106.5" y1="166.8" x2="114.5" y2="166.8"/>
-                <rect class="box-rect" x="99.7" y="118.6" width="21.6" height="34.0" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="129.3" x2="121.3" y2="129.3"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="52.4" x2="157.5" y2="54.2"/>
-                <line class="box-whisk" x1="157.5" y1="57.8" x2="157.5" y2="59.6"/>
-                <line class="box-whisk" x1="153.5" y1="52.4" x2="161.5" y2="52.4"/>
-                <line class="box-whisk" x1="153.5" y1="59.6" x2="161.5" y2="59.6"/>
-                <rect class="box-rect" x="146.7" y="54.2" width="21.6" height="3.6" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="56.0" x2="168.3" y2="56.0"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="32.7" x2="204.5" y2="54.2"/>
-                <line class="box-whisk" x1="204.5" y1="79.2" x2="204.5" y2="88.2"/>
-                <line class="box-whisk" x1="200.5" y1="32.7" x2="208.5" y2="32.7"/>
-                <line class="box-whisk" x1="200.5" y1="88.2" x2="208.5" y2="88.2"/>
-                <rect class="box-rect" x="193.7" y="54.2" width="21.6" height="25.0" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="72.1" x2="215.3" y2="72.1"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="70.3" x2="251.5" y2="100.7"/>
-                <line class="box-whisk" x1="251.5" y1="134.7" x2="251.5" y2="170.4"/>
-                <line class="box-whisk" x1="247.5" y1="70.3" x2="255.5" y2="70.3"/>
-                <line class="box-whisk" x1="247.5" y1="170.4" x2="255.5" y2="170.4"/>
-                <rect class="box-rect" x="240.7" y="100.7" width="21.6" height="34.0" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="115.0" x2="262.3" y2="115.0"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="27.4" x2="298.5" y2="50.6"/>
-                <line class="box-whisk" x1="298.5" y1="79.2" x2="298.5" y2="100.7"/>
-                <line class="box-whisk" x1="294.5" y1="27.4" x2="302.5" y2="27.4"/>
-                <line class="box-whisk" x1="294.5" y1="100.7" x2="302.5" y2="100.7"/>
-                <rect class="box-rect" x="287.7" y="50.6" width="21.6" height="28.6" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="59.6" x2="309.3" y2="59.6"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-          <div class="box-panel">
-            <div class="box-title">D3: Intersection Density</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="174.0" x2="322" y2="174.0"/>
-              <text class="box-tick" x="34" y="177.0" text-anchor="end">0</text>
-              <line class="box-grid-line" x1="40" y1="137.8" x2="322" y2="137.8"/>
-              <text class="box-tick" x="34" y="140.8" text-anchor="end">50</text>
-              <line class="box-grid-line" x1="40" y1="101.6" x2="322" y2="101.6"/>
-              <text class="box-tick" x="34" y="104.6" text-anchor="end">100</text>
-              <line class="box-grid-line" x1="40" y1="65.4" x2="322" y2="65.4"/>
-              <text class="box-tick" x="34" y="68.4" text-anchor="end">150</text>
-              <line class="box-grid-line" x1="40" y1="29.2" x2="322" y2="29.2"/>
-              <text class="box-tick" x="34" y="32.2" text-anchor="end">200</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="34.3" x2="63.5" y2="66.9"/>
-                <line class="box-whisk" x1="63.5" y1="98.7" x2="63.5" y2="139.3"/>
-                <line class="box-whisk" x1="59.5" y1="34.3" x2="67.5" y2="34.3"/>
-                <line class="box-whisk" x1="59.5" y1="139.3" x2="67.5" y2="139.3"/>
-                <rect class="box-rect" x="52.7" y="66.9" width="21.6" height="31.8" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="80.6" x2="74.3" y2="80.6"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="29.2" x2="110.5" y2="68.3"/>
-                <line class="box-whisk" x1="110.5" y1="98.7" x2="110.5" y2="131.3"/>
-                <line class="box-whisk" x1="106.5" y1="29.2" x2="114.5" y2="29.2"/>
-                <line class="box-whisk" x1="106.5" y1="131.3" x2="114.5" y2="131.3"/>
-                <rect class="box-rect" x="99.7" y="68.3" width="21.6" height="30.4" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="82.1" x2="121.3" y2="82.1"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="108.9" x2="157.5" y2="122.6"/>
-                <line class="box-whisk" x1="157.5" y1="150.8" x2="157.5" y2="164.6"/>
-                <line class="box-whisk" x1="153.5" y1="108.9" x2="161.5" y2="108.9"/>
-                <line class="box-whisk" x1="153.5" y1="164.6" x2="161.5" y2="164.6"/>
-                <rect class="box-rect" x="146.7" y="122.6" width="21.6" height="28.2" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="137.1" x2="168.3" y2="137.1"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="45.2" x2="204.5" y2="70.5"/>
-                <line class="box-whisk" x1="204.5" y1="116.8" x2="204.5" y2="145.8"/>
-                <line class="box-whisk" x1="200.5" y1="45.2" x2="208.5" y2="45.2"/>
-                <line class="box-whisk" x1="200.5" y1="145.8" x2="208.5" y2="145.8"/>
-                <rect class="box-rect" x="193.7" y="70.5" width="21.6" height="46.3" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="98.7" x2="215.3" y2="98.7"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="77.0" x2="251.5" y2="108.1"/>
-                <line class="box-whisk" x1="251.5" y1="153.0" x2="251.5" y2="168.2"/>
-                <line class="box-whisk" x1="247.5" y1="77.0" x2="255.5" y2="77.0"/>
-                <line class="box-whisk" x1="247.5" y1="168.2" x2="255.5" y2="168.2"/>
-                <rect class="box-rect" x="240.7" y="108.1" width="21.6" height="44.9" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="134.2" x2="262.3" y2="134.2"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="121.2" x2="298.5" y2="142.9"/>
-                <line class="box-whisk" x1="298.5" y1="161.0" x2="298.5" y2="169.7"/>
-                <line class="box-whisk" x1="294.5" y1="121.2" x2="302.5" y2="121.2"/>
-                <line class="box-whisk" x1="294.5" y1="169.7" x2="302.5" y2="169.7"/>
-                <rect class="box-rect" x="287.7" y="142.9" width="21.6" height="18.1" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="155.9" x2="309.3" y2="155.9"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-          <div class="box-panel">
-            <div class="box-title">D4: Park-and-Ride Spaces</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="174.0" x2="322" y2="174.0"/>
-              <text class="box-tick" x="34" y="177.0" text-anchor="end">0</text>
-              <line class="box-grid-line" x1="40" y1="117.7" x2="322" y2="117.7"/>
-              <text class="box-tick" x="34" y="120.7" text-anchor="end">1k</text>
-              <line class="box-grid-line" x1="40" y1="61.4" x2="322" y2="61.4"/>
-              <text class="box-tick" x="34" y="64.4" text-anchor="end">2k</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="150.4" x2="63.5" y2="152.6"/>
-                <line class="box-whisk" x1="63.5" y1="174.0" x2="63.5" y2="174.0"/>
-                <line class="box-whisk" x1="59.5" y1="150.4" x2="67.5" y2="150.4"/>
-                <line class="box-whisk" x1="59.5" y1="174.0" x2="67.5" y2="174.0"/>
-                <rect class="box-rect" x="52.7" y="152.6" width="21.6" height="21.4" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="173.5" x2="74.3" y2="173.5"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="172.9" x2="110.5" y2="173.4"/>
-                <line class="box-whisk" x1="110.5" y1="174.0" x2="110.5" y2="174.0"/>
-                <line class="box-whisk" x1="106.5" y1="172.9" x2="114.5" y2="172.9"/>
-                <line class="box-whisk" x1="106.5" y1="174.0" x2="114.5" y2="174.0"/>
-                <rect class="box-rect" x="99.7" y="173.4" width="21.6" height="1.0" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="173.9" x2="121.3" y2="173.9"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="24.8" x2="157.5" y2="38.9"/>
-                <line class="box-whisk" x1="157.5" y1="81.1" x2="157.5" y2="100.8"/>
-                <line class="box-whisk" x1="153.5" y1="24.8" x2="161.5" y2="24.8"/>
-                <line class="box-whisk" x1="153.5" y1="100.8" x2="161.5" y2="100.8"/>
-                <rect class="box-rect" x="146.7" y="38.9" width="21.6" height="42.2" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="60.3" x2="168.3" y2="60.3"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="143.6" x2="204.5" y2="150.4"/>
-                <line class="box-whisk" x1="204.5" y1="161.6" x2="204.5" y2="174.0"/>
-                <line class="box-whisk" x1="200.5" y1="143.6" x2="208.5" y2="143.6"/>
-                <line class="box-whisk" x1="200.5" y1="174.0" x2="208.5" y2="174.0"/>
-                <rect class="box-rect" x="193.7" y="150.4" width="21.6" height="11.3" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="155.4" x2="215.3" y2="155.4"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="130.7" x2="251.5" y2="152.6"/>
-                <line class="box-whisk" x1="251.5" y1="168.4" x2="251.5" y2="174.0"/>
-                <line class="box-whisk" x1="247.5" y1="130.7" x2="255.5" y2="130.7"/>
-                <line class="box-whisk" x1="247.5" y1="174.0" x2="255.5" y2="174.0"/>
-                <rect class="box-rect" x="240.7" y="152.6" width="21.6" height="15.8" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="161.1" x2="262.3" y2="161.1"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="138.0" x2="298.5" y2="143.6"/>
-                <line class="box-whisk" x1="298.5" y1="155.4" x2="298.5" y2="170.6"/>
-                <line class="box-whisk" x1="294.5" y1="138.0" x2="302.5" y2="138.0"/>
-                <line class="box-whisk" x1="294.5" y1="170.6" x2="302.5" y2="170.6"/>
-                <rect class="box-rect" x="287.7" y="143.6" width="21.6" height="11.8" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="148.1" x2="309.3" y2="148.1"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-          <div class="box-panel">
-            <div class="box-title">Control: % Households with Children (<18)</div>
-            <svg viewBox="0 0 330 200" preserveAspectRatio="xMidYMid meet" class="box-svg">
-              <line class="box-grid-line" x1="40" y1="125.0" x2="322" y2="125.0"/>
-              <text class="box-tick" x="34" y="128.0" text-anchor="end">0.2</text>
-              <line class="box-grid-line" x1="40" y1="75.9" x2="322" y2="75.9"/>
-              <text class="box-tick" x="34" y="78.9" text-anchor="end">0.4</text>
-              <line class="box-grid-line" x1="40" y1="26.9" x2="322" y2="26.9"/>
-              <text class="box-tick" x="34" y="29.9" text-anchor="end">0.6</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="63.5" y1="98.0" x2="63.5" y2="117.6"/>
-                <line class="box-whisk" x1="63.5" y1="142.1" x2="63.5" y2="164.2"/>
-                <line class="box-whisk" x1="59.5" y1="98.0" x2="67.5" y2="98.0"/>
-                <line class="box-whisk" x1="59.5" y1="164.2" x2="67.5" y2="164.2"/>
-                <rect class="box-rect" x="52.7" y="117.6" width="21.6" height="24.5" style="fill:var(--c1)"/>
-                <line class="box-med" x1="52.7" y1="129.9" x2="74.3" y2="129.9"/>
-              </g>
-              <text class="box-xlabel" x="63.5" y="187.0" text-anchor="middle">CL1</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="110.5" y1="75.9" x2="110.5" y2="98.0"/>
-                <line class="box-whisk" x1="110.5" y1="142.1" x2="110.5" y2="174.0"/>
-                <line class="box-whisk" x1="106.5" y1="75.9" x2="114.5" y2="75.9"/>
-                <line class="box-whisk" x1="106.5" y1="174.0" x2="114.5" y2="174.0"/>
-                <rect class="box-rect" x="99.7" y="98.0" width="21.6" height="44.1" style="fill:var(--c2)"/>
-                <line class="box-med" x1="99.7" y1="127.4" x2="121.3" y2="127.4"/>
-              </g>
-              <text class="box-xlabel" x="110.5" y="187.0" text-anchor="middle">CL2</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="157.5" y1="98.0" x2="157.5" y2="100.5"/>
-                <line class="box-whisk" x1="157.5" y1="102.9" x2="157.5" y2="102.9"/>
-                <line class="box-whisk" x1="153.5" y1="98.0" x2="161.5" y2="98.0"/>
-                <line class="box-whisk" x1="153.5" y1="102.9" x2="161.5" y2="102.9"/>
-                <rect class="box-rect" x="146.7" y="100.5" width="21.6" height="2.5" style="fill:var(--c3)"/>
-                <line class="box-med" x1="146.7" y1="100.5" x2="168.3" y2="100.5"/>
-              </g>
-              <text class="box-xlabel" x="157.5" y="187.0" text-anchor="middle">CL3</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="204.5" y1="68.6" x2="204.5" y2="98.0"/>
-                <line class="box-whisk" x1="204.5" y1="122.5" x2="204.5" y2="137.2"/>
-                <line class="box-whisk" x1="200.5" y1="68.6" x2="208.5" y2="68.6"/>
-                <line class="box-whisk" x1="200.5" y1="137.2" x2="208.5" y2="137.2"/>
-                <rect class="box-rect" x="193.7" y="98.0" width="21.6" height="24.5" style="fill:var(--c4)"/>
-                <line class="box-med" x1="193.7" y1="110.3" x2="215.3" y2="110.3"/>
-              </g>
-              <text class="box-xlabel" x="204.5" y="187.0" text-anchor="middle">CL4</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="251.5" y1="49.0" x2="251.5" y2="80.8"/>
-                <line class="box-whisk" x1="251.5" y1="110.3" x2="251.5" y2="166.6"/>
-                <line class="box-whisk" x1="247.5" y1="49.0" x2="255.5" y2="49.0"/>
-                <line class="box-whisk" x1="247.5" y1="166.6" x2="255.5" y2="166.6"/>
-                <rect class="box-rect" x="240.7" y="80.8" width="21.6" height="29.4" style="fill:var(--c5)"/>
-                <line class="box-med" x1="240.7" y1="95.5" x2="262.3" y2="95.5"/>
-              </g>
-              <text class="box-xlabel" x="251.5" y="187.0" text-anchor="middle">CL5</text>
-              <g class="box-item">
-                <line class="box-whisk" x1="298.5" y1="73.5" x2="298.5" y2="93.1"/>
-                <line class="box-whisk" x1="298.5" y1="120.1" x2="298.5" y2="151.9"/>
-                <line class="box-whisk" x1="294.5" y1="73.5" x2="302.5" y2="73.5"/>
-                <line class="box-whisk" x1="294.5" y1="151.9" x2="302.5" y2="151.9"/>
-                <rect class="box-rect" x="287.7" y="93.1" width="21.6" height="27.0" style="fill:var(--c6)"/>
-                <line class="box-med" x1="287.7" y1="102.9" x2="309.3" y2="102.9"/>
-              </g>
-              <text class="box-xlabel" x="298.5" y="187.0" text-anchor="middle">CL6</text>
-            </svg>
-          </div>
-        </div>
-        <p class="reg-note">Box = interquartile range, line = median, whiskers = range excluding outliers.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- RECOMMENDATIONS PAGE -->
-  <div class="page" id="page-recommendations">
-    <div id="methodology-inner">
-      <h1>Recommendations</h1>
-      <p class="lead">Two frameworks turn the preceding findings into action: where in the network to prioritize density, and what to pair with it once you do.</p>
 
       <div class="method-section">
         <h2>Where to build: the Siting Framework</h2>
-        <p>Density alone does not guarantee VMT reduction, it depends on where it lands. Every station area is scored on bundle completeness (an equal-weighted z-score across Diversity, Design, Transit, and Distance) and vacant land share. Splitting the network at the median of each axis gives four siting strategies.</p>
+        <p>Density alone does not guarantee VMT reduction, it depends on where it lands. Every station area plots by bundle completeness (equal-weighted z-score across Diversity, Design, Transit, and Distance) against vacant land share, splitting the network into four strategies at the median of each axis. Hover a point for the station; toggle below for the strategy each quadrant calls for.</p>
 
         <div id="siting-card">
-          <div id="siting-tabs" role="tablist">
-            <button class="siting-tab active" data-tab="scatter" role="tab" type="button">Siting Profile</button>
-            <button class="siting-tab" data-tab="map" role="tab" type="button">Map</button>
-            <button class="siting-tab" data-tab="summary" role="tab" type="button">Strategy summary</button>
+          <div id="siting-toolbar">
+            <div id="siting-legend"></div>
+            <button id="siting-toggle-btn" type="button">Show strategy</button>
           </div>
-
-          <div class="siting-panel active" data-panel="scatter">
-            <div class="siting-legend" id="siting-legend-scatter"></div>
-            <div id="siting-chart-area">
-              <svg id="siting-svg" viewBox="0 0 760 560" preserveAspectRatio="xMidYMid meet"></svg>
-              <div id="siting-tooltip"></div>
+          <div id="siting-chart-area">
+            <svg id="siting-svg" viewBox="0 0 680 460" preserveAspectRatio="xMidYMid meet"></svg>
+            <div id="siting-empty-state">
+              <p>This chart needs two fields per station in <code>data/stations.json</code>: <strong>bundle_z</strong> (bundle completeness z-score) and <strong>vacant_share</strong> (vacant parcel share, 0 to 1). Add them and all 163 stations plot automatically.</p>
             </div>
-            <p class="reg-note">Colored by station typology; dashed lines mark the network medians. Hover any point for its station. Click the legend to filter by cluster. The vertical axis is a square-root scale, which separates the many stations bunched under 4% vacant.</p>
-          </div>
-
-          <div class="siting-panel" data-panel="map">
-            <div class="siting-legend" id="siting-legend-map"></div>
-            <div id="siting-map-wrap">
-              <div id="siting-map"></div>
-              <div id="siting-map-empty">
-                <p>The map needs station coordinates. This build reads them from <code>data/stations.json</code>; every station in that file is matched by name.</p>
-              </div>
-              <div id="siting-popup"></div>
-            </div>
-            <p class="reg-note">Stations colored by siting quadrant, not by cluster. Click any station for its scores.</p>
-          </div>
-
-          <div class="siting-panel" data-panel="summary">
-            <div class="siting-sum" id="siting-summary"></div>
+            <div id="siting-tooltip"></div>
           </div>
         </div>
 
@@ -2344,141 +1062,96 @@
 
       <div class="method-section">
         <h2>How to build: the Typology Framework</h2>
-        <p>A station area's cluster captures its place character, urban or suburban, residential or employment-oriented, well connected or peripheral. That character determines which interventions translate density into lower driving. The table below summarizes the lever, supporting investments, housing strategy, and equity consideration for each cluster. Select any row to expand the full reasoning and evidence behind it.</p>
+        <p>A station area's cluster captures its place character, urban or suburban, residential or employment-oriented, well connected or peripheral. That character determines which interventions translate density into lower driving. Each cluster below pairs the headline within-cluster finding with the levers the analysis supports.</p>
 
-        <div class="inv-table-wrap">
-          <table class="inv-table rec-summary-table">
-            <thead>
-              <tr>
-                <th>Cluster</th>
-                <th>Primary lever</th>
-                <th>Supporting investments</th>
-                <th>Housing strategy</th>
-                <th>Equity considerations</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="rec-row" data-cluster="1" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-1">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1: Urban Employment Node</td>
-                <td>Last-mile alternatives</td>
-                <td>Mixed-use zoning (Wrap garage with housing or commercial)<br>Complete streets</td>
-                <td>Develop vacant lots into TODs in Q1 and implement incremental infill in Q4.<br>Lease out air rights of publicly owned land.</td>
-                <td>Preserve existing affordable units in rapidly appreciating urban cores</td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-1" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c1)">
-                    <div class="rec-detail-n">n=26 · 3,639 VMT/capita</div>
+        <div class="cluster-rec" data-cluster="1">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c1)"></span>
+            <h3>Cluster 1 · Urban Employment Node</h3>
+            <span class="cluster-rec-n">n=26 · 3,639 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> No single significant coefficient. LMG splits explained variance four ways: bike lane coverage 29.5%, park-and-ride 29.4%, employment density 24.4%, housing density 13.8%. This cluster exemplifies the bundled-conditions hypothesis, and disrupting any one element weakens the whole.</p>
           <p>At a 29 percent car-free household rate, these stations already deliver the lowest automobile dependence in the network. The challenge is not aggressive VMT reduction but sustainable capacity building: absorbing new multifamily housing without diluting the transit infrastructure and commercial concentration that sustains the low-carbon baseline.</p>
           <p>The most actionable lever is <strong>parking management</strong>. Alewife, Quincy Adams, and Wonderland each host large structured garages, and availability of structured parking encourages driving over active modes even for residents inside the walkable radius. Because these facilities serve a legitimate regional park-and-ride function, the recommendation is not to cut station parking but to pair it with reliable micromobility, bus, and shuttle connections. The MBTA can wrap existing garages with housing or ground-floor commercial, or lease air rights for residential development, absorbing more of the Act's mandate while increasing the share of transit-reliant residents inside the rapid transit network.</p>
           <p>Second, <strong>protect the employment base while investing in active transportation</strong>. Complete streets policies can require sidewalk continuity, protected bike facilities, and safe crossings as conditions of development approval. Smart Growth or Mixed-Use Overlay Districts under Chapter 40R pair new housing production with retained employment uses rather than replacing them.</p>
           <p class="equity-note"><strong>Equity:</strong> Preserve existing affordable units in rapidly appreciating urban cores.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="2" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-2">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2: Urban Residential Node</td>
-                <td>Family trip-chain support</td>
-                <td>Safe Routes to School<br>All-day reliable bus routes</td>
-                <td>ADUs, conversions, courtyard infill (Q4)<br>Unit-mix requirements for 2-3BR family units</td>
-                <td>Retain family households in transit-rich neighborhoods. Prevent displacement to auto-dependent suburbs</td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-2" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c2)">
-                    <div class="rec-detail-n">n=28 · 4,589 VMT/capita</div>
+        </div>
+
+        <div class="cluster-rec" data-cluster="2">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c2)"></span>
+            <h3>Cluster 2 · Urban Residential Node</h3>
+            <span class="cluster-rec-n">n=28 · 4,589 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> Share of households with children is the strongest predictor (β=+0.313, p&lt;0.05), accounting for 49.8% of explained variance.</p>
           <p>Family households generate substantial driving demand through school drop-offs, childcare pickups, grocery runs, and medical appointments. The radial rapid transit system excels at moving commuters to downtown employment nodes but poorly accommodates the multi-stop trip-chaining these journeys require. When transit fails to support linked trips, families default to the automobile regardless of neighborhood density or transit proximity.</p>
           <p>The primary intervention is making non-auto travel viable for <strong>the trips families actually make</strong>. Prioritize Safe Routes to School infrastructure. Restructure bus service away from peak-hour commuter schedules toward high-frequency, all-day routes connecting residential neighborhoods to schools, childcare, neighborhood commercial centers, and parks. The MBTA can reallocate underutilized station parking toward secure bike storage, micromobility charging, and drop-off zones that reduce short-distance driving to the platform. Municipalities can pursue partnership with the Massachusetts Housing Partnership on the Complete Neighborhood Initiative.</p>
           <p>Most of these station areas sit in the preserve-and-maintain quadrant, so compliance will come through accessory dwelling units, conversions, and courtyard infill rather than ground-up redevelopment. The priority is ensuring new supply is accessible to families: unit-mix requirements specifying a balanced share of two- and three-bedroom units, and family-oriented design guidelines covering stroller storage and accessible play areas.</p>
           <p class="equity-note"><strong>Equity:</strong> Retain family households in transit-rich neighborhoods; prevent displacement to auto-dependent suburbs.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="3" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-3">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c3)"></span>CL3: Suburban Employment Node</td>
-                <td>Bundle development, leveraging existing frequent transit</td>
-                <td>Route 128: Optimize park-and-ride, improve express bus, reserve denser intervention for later phase</td>
-                <td>Braintree: TOD with mixed-use overlay</td>
-                <td></td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-3" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c3)">
-                    <div class="rec-detail-n">n=2 · 9,243 VMT/capita</div>
+        </div>
+
+        <div class="cluster-rec" data-cluster="3">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c3)"></span>
+            <h3>Cluster 3 · Suburban Employment Node</h3>
+            <span class="cluster-rec-n">n=2 · 9,243 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> Descriptive only; n=2 falls below any viable regression threshold. Braintree and Route 128 generate 9,243 VMT per capita despite relatively frequent transit service.</p>
           <p>Just as housing density alone cannot reduce VMT, transit frequency alone cannot mitigate automobile dependence when the surrounding built environment is structurally optimized for the car. The two stations occupy distinct positions in the Siting Framework and require different strategies.</p>
           <p><strong>Braintree</strong> sits in the immediate-opportunity quadrant, served directly by the Red Line with vacant and underutilized land available. It is a strong candidate for large-scale rapid transit TOD, with the physical capacity to build a critical mass of dense, mixed-income housing that constructs an urban intensity bundle from the ground up. Zoning should prioritize mixed-use overlay districts pairing residential density with ground-floor retail and employment.</p>
           <p><strong>Route 128</strong> sits in the conditional-density quadrant and functions primarily as a highway-interception commuter facility. Near-term strategy should prioritize regional access efficiency over pedestrian-scale infill: optimize park-and-ride operations, improve express bus connections to surrounding employment centers, and reserve denser intervention for a later phase. Longer term, its commuter rail service and available land make it a transit village candidate, though that requires regional coordination across the Westwood, Dedham, and Canton boundaries.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="4" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-4">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4: Regional Mixed-Use Center</td>
-                <td>Conditional density paired with anti-displacement measures</td>
-                <td>Inclusionary zoning;<br>Bus service quality<br>Employment retention</td>
-                <td>Mixed-use infill on downtown parcels.<br>Reinforce job centers, not residential-only zones</td>
-                <td>Deed-restricted affordable units (over 20% affordable units under 60% AMI) and tenant protections.</td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-4" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c4)">
-                    <div class="rec-detail-n">n=27 · 6,982 VMT/capita</div>
+        </div>
+
+        <div class="cluster-rec" data-cluster="4">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c4)"></span>
+            <h3>Cluster 4 · Regional Mixed-Use Center</h3>
+            <span class="cluster-rec-n">n=27 · 6,982 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> No significant coefficients, but park-and-ride capacity carries the largest variance share. Median income associates negatively with VMT, raising the question of who benefits from TOD-driven VMT reduction.</p>
           <p>These are the historic downtowns of eastern Massachusetts: Worcester, Lowell, Lawrence, Lynn, Brockton, New Bedford. They are among the few commuter rail contexts where a walkable urban fabric predates the automobile. They also have the lowest median household income in the network, historically serving working-class and immigrant populations. The challenge is converting inherited walkable fabric into realized VMT reduction without displacing the residents who would benefit most.</p>
           <p>Unlike urban rapid transit nodes where last-mile alternatives are abundant, parking at regional commuter rail downtowns serves a legitimate access function for commuters from surrounding towns. Station parking is needed, but it can take a different form: <strong>consolidate into structured facilities</strong> that accommodate regional commuters while freeing downtown land for high-density mixed-use infill. Employment density contributes meaningfully to lower VMT here, reinforcing that these downtowns should be maintained as job centers rather than converted into residential commuter zones.</p>
           <p>The distinctive lever is <strong>equity-conditioned density</strong>. The Act's current guidelines permit municipalities to require up to 10 percent of units as affordable at 80 percent AMI, with higher thresholds where an economic feasibility analysis supports them. For Cluster 4 communities, where incomes are lowest and displacement risk is acute, municipalities should pursue deeper inclusionary requirements targeting closer to 60 percent AMI, using Chapter 40R density bonuses and affordable housing trust fund allocations to make those thresholds viable. State authorities should prioritize trust fund allocations to compliance districts in this cluster. Because these communities rely heavily on local bus networks, infrastructure investment should prioritize bus service quality and dedicated lane expansion, addressing the multimodal needs the rail-centric framing of the Act overlooks.</p>
           <p class="equity-note"><strong>Equity:</strong> Deed-restricted affordable units and tenant protections in station areas undergoing reinvestment.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="5" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-5">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5: Suburban Residential Neighborhood</td>
-                <td>Conditional density with accessible transit improvements</td>
-                <td>Microtransit/shuttles<br>Last-mile pedestrian network<br>Inclusionary zoning</td>
-                <td>Multifamily zoning in Q2 stations with vacant land.<br>Pair with non-residential capital improvements</td>
-                <td>Inclusionary requirements ensure VMT benefits reach cost-burdened households</td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-5" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c5)">
-                    <div class="rec-detail-n">n=62 · 7,509 VMT/capita</div>
+        </div>
+
+        <div class="cluster-rec" data-cluster="5">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c5)"></span>
+            <h3>Cluster 5 · Suburban Residential Neighborhood</h3>
+            <span class="cluster-rec-n">n=62 · 7,509 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> Housing density is the single strongest predictor (β=-0.176, p&lt;0.01, LMG 38.9%). A one standard deviation increase associates with a 17.6 percent reduction in per capita driving. Strongest model in the typology.</p>
           <p>This is the critical testing ground for the Act. It contains the largest share of regulated municipalities and yields the clearest empirical signal in the study. With relatively uniform commuter rail service and built environment conditions across 62 stations, density variation translates cleanly into VMT variation, and the Act's core mechanism works largely as the policy theory intends.</p>
           <p>The primary directive is to guide density mandates toward station areas with structural capacity to absorb growth without locking in car-dependent travel. The Siting Framework locates these in the conditional-density quadrant: stations with vacant land but incomplete bundles. Municipalities should deploy <strong>conditional density</strong>, pairing multifamily zoning approvals with targeted non-residential capital improvements. Because most of these suburbs have strong commuter rail access but virtually no internal transit circulation, the most effective local levers are municipal microtransit pilots, on-demand shuttles, and safe last-mile pedestrian networks connecting platforms to surrounding residential areas.</p>
           <p>The within-cluster analysis also finds a positive association between land use entropy and VMT, which means mixed-use zoning designations alone do not reduce driving in low-density suburban contexts. Placing a commercial parcel adjacent to a residential subdivision yields no behavioral shift if the roadway layout forces residents to drive across the property line. Suburban planners should deprioritize nominal land use mix on paper and focus on neighborhood design standards ensuring physical connectivity, continuous sidewalks, and active transportation infrastructure.</p>
           <p class="equity-note"><strong>Equity:</strong> Median income associates negatively with VMT here, meaning lower-income suburban residents drive more and bear disproportionately high transportation costs. Inclusionary requirements in suburban compliance districts ensure low-VMT housing opportunities reach the households who would benefit most.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="6" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-6">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c6)"></span>CL6: Exurban Mixed-Use Fringe</td>
-                <td>Concentration over sprawl</td>
-                <td>TDM programs<br>Regional microtransit</td>
-                <td>Focus zoning tightly on town-center parcels with existing walkable fabric</td>
-                <td>Prioritize state/regional resources toward clusters where density reliably reduces driving</td>
-              </tr>
-              <tr class="rec-detail-row" id="rec-detail-6" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c6)">
-                    <div class="rec-detail-n">n=18 · 9,430 VMT/capita</div>
+        </div>
+
+        <div class="cluster-rec" data-cluster="6">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c6)"></span>
+            <h3>Cluster 6 · Exurban Mixed-Use Fringe</h3>
+            <span class="cluster-rec-n">n=18 · 9,430 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> Land use entropy is the only significant predictor (β=+0.207, p&lt;0.01), accounting for a dominant 79.8% of explained variance. The positive sign is a measurement artifact, not a policy lever.</p>
           <p>In an exurban context, a high entropy index captures coarse geographic adjacency of auto-dependent, disconnected uses: a highway-oriented strip mall next to a low-density subdivision, not a walkable pedestrian-scale environment. The POI accessibility measure points the opposite direction, confirming that functional destination access and nominal land use diversity are different things in these contexts.</p>
           <p>The honest planning assessment is that these are not near-term VMT reduction sites, and the Act's density mandate will deliver less here than anywhere else in the network. The most effective strategy is <strong>concentration rather than furthering sprawl</strong>. Where exurban communities must establish multifamily districts under the Act, planners should focus them tightly on the immediate town-center parcels that already possess some traditional walkable fabric. Allowing density to spread across the broader station buffer positions new housing in auto-dependent surroundings and locks in high-VMT travel for incoming residents.</p>
           <p>Because these outer rings structurally produce long-distance vehicle trips regardless of local conditions, capital-intensive bundle investment would be less effective here. The most promising near-term interventions lie outside the Act: travel demand management and pilot regional microtransit networks that manage trips the built environment alone cannot alter.</p>
           <p class="equity-note"><strong>Equity:</strong> Prioritize state and regional resources toward clusters where density reliably reduces driving.</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
+      </div>
 
+      <div class="method-section">
+        <h2>Using this atlas</h2>
+        <p>The frameworks above are designed for practitioners, but their utility depends on station-level access that a static document cannot deliver. A planner working in a Cluster 5 community needs to see exactly where their station sits in the 2x2, how its built environment compares to similar stations, and which intervention priorities the typology assigns. A 163-station network cannot be navigated through prose alone.</p>
+        <p>The <strong>Map</strong> displays the six clusters across the MBTA service area with station-level detail on built environment, transportation, demographic, and VMT variables. The <strong>Data Explorer</strong> allows filtering, sorting, and comparison across any variable in the analysis. The 3D PCA view shows how the clusters relate on the underlying built environment dimensions.</p>
+        <p>The atlas is built for use during ongoing implementation. Municipalities working through compliance, state agencies providing technical assistance, and advocates engaging with municipal processes can use it as a shared reference point. Where a municipality is debating compliance approaches, the atlas shows how their station compares to similar stations elsewhere in the network and what the analysis suggests about appropriate strategies.</p>
       </div>
     </div>
   </div>
 
+  <!-- DATA PAGE -->
   <div class="page" id="page-data">
     <div id="data-header">
       <h1>Station data explorer</h1>
@@ -2674,26 +1347,7 @@ Promise.all([
   buildStrip('strip-bike',    s => +s.bikelane_cov,    v => (v*100).toFixed(0) + '%',          '');
   buildStrip('strip-income',  s => +s.income,          v => '$' + Math.round(v/1000) + 'k',   '');
   if (document.getElementById('page-data').classList.contains('active')) buildDataTable();
-
-/* ── Typology table: expandable detail rows ── */
-(function initRecTable(){
-  document.querySelectorAll('tr.rec-row').forEach(function(row){
-    function toggle(){
-      var detail = document.getElementById('rec-detail-' + row.dataset.cluster);
-      if (!detail) return;
-      var open = detail.hasAttribute('hidden');
-      if (open) { detail.removeAttribute('hidden'); } else { detail.setAttribute('hidden',''); }
-      row.classList.toggle('open', open);
-      row.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    row.addEventListener('click', toggle);
-    row.addEventListener('keydown', function(e){
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-    });
-  });
-})();
-
-  if (document.getElementById('page-recommendations').classList.contains('active')) renderSitingChart();
+  if (document.getElementById('page-insights').classList.contains('active')) renderSitingChart();
 }).catch(err => {
   console.error('Data load failed:', err);
   document.getElementById('map-loading').innerHTML =
@@ -2717,542 +1371,155 @@ function ensureLuData(cb) {
 }
 
 // ─────────────────────────────────────────────
-// SITING FRAMEWORK (Recommendations page)
-// Three tabs: 2x2 scatter, map, strategy summary.
-//
-// bundle_z and vacant_pct are baked in below rather than read from
-// stations.json, because they are outputs of a finished analysis and
-// exist in exactly one correct state. Extracted from the thesis figure
-// (cluster_2x2_bundle_headroom.svg) and cross-checked against
-// TOD_combined.csv: all 163 stations, vacant_pct matched exactly.
-// Format: [station, cluster, bundle_z, vacant_pct]
+// SITING FRAMEWORK CHART (Insights page)
+// Reads two fields per station, added to data/stations.json:
+//   bundle_z       : bundle completeness, equal-weighted z-score across
+//                    Diversity (D2), Design (D3), Transit (D4), Distance (D5)
+//   vacant_share   : vacant parcel share of the station buffer, as a 0 to 1
+//                    fraction (matches the bikelane_cov convention; times 100 for display)
+// Stations missing either field are excluded from the plot rather than guessed.
 // ─────────────────────────────────────────────
-const SITING_DATA = [["Abington",5,-0.717,12.05],["Alewife",1,0.873,10.01],["Andover",4,-0.323,2.47],["Ashland",5,-1.214,15.56],["Assembly",1,1.252,19.89],["Attleboro",4,-0.258,2.13],["Auburndale",5,-0.275,2.16],["Ayer",6,-0.265,7.76],["Ball Square",2,0.3,1.28],["Ballardvale",5,-0.07,3.82],["Beachmont",1,0.212,29.13],["Beaconsfield",2,-0.065,1.07],["Bellingham Square",1,0.765,2.95],["Belmont",5,0.169,2.93],["Beverly",4,0.572,1.52],["Beverly Farms",5,-0.859,5.04],["Boston College",2,0.756,1.12],["Bradford",5,-0.703,4.87],["Braintree",3,0.047,8.67],["Brandeis/Roberts",4,-0.076,2.84],["Brandon Hall",2,0.761,0.6],["Bridgewater",5,-0.978,8.23],["Brockton",4,-0.286,12.88],["Brookline Hills",2,-0.285,1.42],["Brookline Village",1,1.229,14.43],["Campello",4,-0.548,6.82],["Canton Center",5,-0.307,12.69],["Canton Junction",5,-0.835,4.97],["Capen Street",2,0.733,8.6],["Central",1,1.482,1.13],["Central Avenue",2,0.716,2.28],["Chelsea",1,0.914,4.56],["Chestnut Hill",1,0.171,5.66],["Church Street",6,-0.982,8.74],["Cohasset",6,-0.585,8.25],["Concord",5,-0.442,0.54],["Coolidge Corner",2,1.007,0.76],["Davis",2,1.308,0.16],["Dean Road",2,0.701,0.29],["Dedham Corp. Center",6,-0.211,5.87],["East Somerville",1,1.208,3.34],["East Taunton",6,-1.323,30.54],["East Weymouth",5,-0.251,9.49],["Eliot",2,0.197,1.98],["Endicott",5,-0.294,4.31],["Englewood Avenue",2,1.008,1.0],["Fairbanks Street",2,0.846,0.74],["Fall River Depot",4,-0.152,3.25],["Fitchburg",4,-0.15,6.51],["Forge Park/495",6,-1.018,22.47],["Framingham",4,-0.359,1.74],["Franklin",4,-0.476,3.98],["Freetown",5,-1.426,14.1],["Gilman Square",2,0.948,0.88],["Gloucester",4,-0.096,4.58],["Grafton",5,-0.967,22.27],["Greenbush",6,-0.556,11.79],["Greenwood",5,0.252,4.02],["Halifax",5,-1.419,8.29],["Hamilton/Wenham",5,-0.504,18.53],["Hanson",6,-1.155,4.18],["Harvard",1,1.849,4.57],["Hawes Street",1,1.58,7.0],["Hersey",5,-0.52,0.13],["Holbrook/Randolph",5,-0.464,14.41],["Ipswich",4,-0.075,1.38],["Kendal Green",5,-0.225,4.43],["Kendall/MIT",1,1.632,12.3],["Kent Street",1,0.059,5.17],["Kingston",6,-1.201,15.02],["Lawrence",4,-0.842,5.48],["Lechmere",1,1.593,22.38],["Lincoln",6,-0.581,2.29],["Littleton/Route 495",6,-0.93,16.03],["Longwood",1,1.453,6.47],["Lowell",4,-0.142,8.14],["Lynn",4,0.496,1.26],["Magoun Square",2,1.17,0.85],["Malden Center",1,0.899,2.13],["Manchester",5,-0.244,1.91],["Mansfield",5,-0.726,2.9],["Medford/Tufts",1,1.447,1.2],["Melrose/Cedar Park",5,-0.112,0.49],["Melrose/Highlands",5,-0.615,3.84],["Middleborough",5,-0.704,11.89],["Milton",2,0.538,7.73],["Montello",4,-0.141,10.71],["Montserrat",5,-0.414,2.75],["Nantasket Junction",5,-0.581,12.42],["Natick Center",5,-0.121,2.49],["Needham Center",5,-0.011,0.27],["Needham Heights",5,-0.043,3.26],["Needham Junction",5,0.096,1.98],["New Bedford",4,-0.914,7.79],["Newburyport",6,-1.119,27.27],["Newton Centre",2,0.435,1.69],["Newton Highlands",2,0.495,1.76],["Newtonville",5,-0.504,1.87],["Norfolk",5,-0.414,8.04],["North Beverly",5,-0.619,1.98],["North Billerica",5,-0.881,5.73],["North Leominster",6,-0.282,14.07],["North Quincy",1,0.299,0.31],["North Scituate",5,-0.675,7.78],["North Wilmington",5,-0.662,7.94],["Norwood Central",4,-0.541,3.31],["Norwood Depot",5,0.121,1.19],["Oak Grove",2,0.434,0.96],["Porter",2,1.343,0.47],["Quincy Adams",1,1.567,5.31],["Quincy Center",1,0.936,3.05],["Reading",5,-0.123,1.2],["Reservoir",2,0.627,4.04],["Revere Beach",1,0.847,15.82],["Riverside",2,0.519,1.24],["Rockport",5,-0.603,3.88],["Route 128",3,-0.577,8.82],["Rowley",5,-1.444,19.28],["Saint Marys Street",1,1.679,10.61],["Saint Paul Street",1,1.19,3.02],["Salem",4,0.555,1.44],["Sharon",5,-0.123,2.19],["Shirley",6,-0.486,13.0],["Silver Hill",5,-0.753,4.97],["South Acton",6,-0.285,7.58],["South Attleboro",6,-0.861,9.1],["South Weymouth",5,-0.525,32.09],["Southborough",5,-0.915,7.09],["Stoughton",4,-0.174,3.78],["Summit Avenue",2,1.144,0.74],["Swampscott",5,0.176,1.5],["Tappan Street",2,0.78,0.18],["Union Square",1,1.405,2.39],["Valley Road",2,0.533,3.72],["Waban",2,0.054,3.87],["Wachusett",5,-0.906,22.4],["Wakefield",4,0.477,1.18],["Walpole",6,-0.634,6.59],["Waltham",4,-0.362,1.54],["Washington Square",2,0.676,0.29],["Waverley",4,0.176,1.28],["Wedgemere",5,-0.185,0.73],["Wellesley Farms",5,-0.59,3.48],["Wellesley Hills",5,0.4,0.66],["Wellesley Square",4,0.268,1.02],["Wellington",1,0.923,1.14],["West Concord",4,-0.246,5.69],["West Gloucester",5,-0.775,8.26],["West Hingham",6,-0.915,5.65],["West Medford",5,0.374,1.43],["West Natick",5,-0.797,4.71],["West Newton",5,-0.171,2.44],["Westborough",5,-1.408,3.58],["Weymouth Landing/East Braintree",5,-0.732,4.29],["Whitman",5,-0.652,23.28],["Wilmington",5,-0.396,7.01],["Winchester Center",4,-0.1,1.1],["Windsor Gardens",5,-0.501,9.82],["Wollaston",5,0.421,0.53],["Wonderland",1,0.464,24.05],["Woodland",2,1.177,1.0],["Worcester",4,-0.121,6.15],["Wyoming Hill",5,0.36,1.58]];
+let sitingStrategyMode = false;
+const sitingHiddenClusters = new Set();
 
-const SITING_QUADS = {
-  q1: { key:'q1', label:'Q1 Immediate opportunity', axis:'Q1 Bundle present, room to build', color:'var(--c1)',
-        blurb:'Bundle is in place and land is available. Added density compounds with existing employment, transit, and walkability. Highest VMT reduction per unit added.',
-        short:'Bundle in place, land available. Highest VMT reduction per unit added.' },
-  q2: { key:'q2', label:'Q2 Conditional density', axis:'Q2 Bundle absent, room to build', color:'var(--c4)',
-        blurb:'Can absorb density, but the bundle is incomplete. New housing must be paired with parallel investments in transit, street connectivity, and employment to deliver VMT reduction.',
-        short:'Room to build, bundle incomplete. Pair housing with transit, streets, jobs.' },
-  q3: { key:'q3', label:'Q3 Long-term investment', axis:'Q3 Bundle absent, little room to build', color:'var(--c6)',
-        blurb:'Neither lever is readily available. Bundle investment must precede density. Compliance relies on ADUs and small-scale infill, not ground-up development.',
-        short:'Neither lever ready. Bundle investment first; ADUs and infill only.' },
-  q4: { key:'q4', label:'Q4 Preserve and maintain', axis:'Q4 Bundle present, little room to build', color:'var(--c2)',
-        blurb:'Bundle already delivers low VMT, but little room for new construction. Strategy is incremental densification and protecting the conditions that keep driving low.',
-        short:'Low VMT already, little room left. Densify incrementally, protect what works.' }
-};
-
-let sitingRows = null;
-let sitingMedians = null;
-const sitingHiddenQuads = new Set();
-let sitingActiveTab = 'scatter';
-let sitingMapBuilt = false;
-let sitingScatterPinned = null;
+const SITING_QUADS = [
+  { key: 'q2', gx: 0, gy: 0, name: 'Q2 · Conditional density',      desc: 'Room to build, bundle incomplete. Pair housing with transit, street, and job investment.' },
+  { key: 'q1', gx: 1, gy: 0, name: 'Q1 · Immediate opportunity',    desc: 'Bundle in place, land available. Highest VMT reduction per unit added.' },
+  { key: 'q3', gx: 0, gy: 1, name: 'Q3 · Long-term investment',     desc: 'Neither lever ready. Bundle investment must precede density; ADUs and infill only.' },
+  { key: 'q4', gx: 1, gy: 1, name: 'Q4 · Preserve and maintain',    desc: 'Bundle already delivers low VMT, little room left. Densify incrementally and protect what works.' }
+];
 
 function sitingMedian(arr) {
   const s = [...arr].sort((a, b) => a - b);
-  const m = Math.floor(s.length / 2);
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
-function sitingQuadOf(z, v, mz, mv) {
-  const room = v >= mv, bundle = z >= mz;
-  return room ? (bundle ? 'q1' : 'q2') : (bundle ? 'q4' : 'q3');
+function sitingValidStations() {
+  return STATIONS.filter(s => Number.isFinite(+s.bundle_z) && Number.isFinite(+s.vacant_share));
 }
 
-function sitingInit() {
-  if (sitingRows) return;
-  const zs = SITING_DATA.map(r => r[2]);
-  const vs = SITING_DATA.map(r => r[3]);
-  const mz = sitingMedian(zs), mv = sitingMedian(vs);
-  sitingMedians = { z: mz, v: mv };
-  sitingRows = SITING_DATA.map(r => ({
-    station: r[0], cluster: r[1], z: r[2], v: r[3],
-    quad: sitingQuadOf(r[2], r[3], mz, mv)
-  }));
-}
-
-function sitingCounts() {
-  const c = { q1:0, q2:0, q3:0, q4:0 };
-  sitingRows.forEach(r => c[r.quad]++);
-  return c;
-}
-
-const sitingHiddenClusters = new Set();
-
-// Tab 1 is coloured by cluster, so its legend filters clusters.
-// Tab 2 is coloured by quadrant, so its legend filters quadrants.
-// Each legend drives the view it belongs to.
-function renderSitingLegend(elId) {
-  const el = document.getElementById(elId);
-  if (!el) return;
+function renderSitingLegend(all) {
+  const el = document.getElementById('siting-legend');
   el.innerHTML = '';
-
-  if (elId === 'siting-legend-scatter') {
-    [1, 2, 3, 4, 5, 6].forEach(c => {
-      const meta = CLUSTER_META[c];
-      if (!meta || !sitingRows.some(r => r.cluster === c)) return;
-      const item = document.createElement('div');
-      item.className = 'siting-legend-item' + (sitingHiddenClusters.has(c) ? ' off' : '');
-      item.innerHTML = `<span class="siting-legend-dot" style="background:${meta.color}"></span>${meta.name}`;
-      item.addEventListener('click', () => {
-        if (sitingHiddenClusters.has(c)) sitingHiddenClusters.delete(c); else sitingHiddenClusters.add(c);
-        renderSitingLegend('siting-legend-scatter');
-        applySitingFilter();
-      });
-      el.appendChild(item);
-    });
-    return;
-  }
-
-  ['q1','q2','q3','q4'].forEach(k => {
-    const q = SITING_QUADS[k];
+  [1, 2, 3, 4, 5, 6].forEach(c => {
+    const meta = CLUSTER_META[c];
+    if (!all.some(s => +s.cluster === c)) return;
     const item = document.createElement('div');
-    item.className = 'siting-legend-item' + (sitingHiddenQuads.has(k) ? ' off' : '');
-    item.innerHTML = `<span class="siting-legend-dot" style="background:${q.color}"></span>${q.axis}`;
+    item.className = 'siting-legend-item' + (sitingHiddenClusters.has(c) ? ' off' : '');
+    item.innerHTML = `<span class="siting-legend-dot" style="background:${meta.color}"></span>${meta.name}`;
     item.addEventListener('click', () => {
-      if (sitingHiddenQuads.has(k)) sitingHiddenQuads.delete(k); else sitingHiddenQuads.add(k);
-      renderSitingLegend('siting-legend-map');
-      applySitingFilter();
+      if (sitingHiddenClusters.has(c)) sitingHiddenClusters.delete(c); else sitingHiddenClusters.add(c);
+      renderSitingChart();
     });
     el.appendChild(item);
   });
 }
 
-function applySitingFilter() {
-  document.querySelectorAll('.siting-dot').forEach(d => {
-    d.classList.toggle('dim', sitingHiddenClusters.has(+d.dataset.cluster));
-  });
-  document.querySelectorAll('.siting-slabel').forEach(l => {
-    const dot = document.querySelector(`.siting-dot[data-station="${CSS.escape(l.textContent)}"]`);
-    l.classList.toggle('dim', dot ? dot.classList.contains('dim') : false);
-  });
-  if (sitingMap && sitingMap.getLayer && sitingMap.getLayer('siting-dots')) {
-    sitingMap.setPaintProperty('siting-dots', 'circle-opacity', sitingOpacityExpr());
-  }
-  const pop = document.getElementById('siting-popup');
-  if (pop && pop.style.display === 'block' && pop.dataset.quad && sitingHiddenQuads.has(pop.dataset.quad)) {
-    pop.style.display = 'none';
-    delete pop.dataset.station;
-  }
-}
+function renderSitingChart() {
+  const svg     = document.getElementById('siting-svg');
+  const empty   = document.getElementById('siting-empty-state');
+  const toolbar = document.getElementById('siting-toolbar');
+  if (!svg || !STATIONS.length) return;
 
-// Labels chosen offline with collision detection against every dot and
-// every other label, so they never overlap. station -> [dx, dy, anchor]
-const SITING_LABELS = {"South Weymouth":[7,11,"start"],"East Taunton":[7,-5,"start"],"Beachmont":[7,-5,"start"],"Newburyport":[7,-5,"start"],"Wonderland":[7,-5,"start"],"Whitman":[7,-5,"start"],"Lechmere":[7,-5,"start"],"Assembly":[7,-5,"start"],"Brockton":[7,-5,"start"],"Kendall/MIT":[7,-5,"start"],"Alewife":[7,-5,"start"],"Braintree":[7,-5,"start"],"Lowell":[7,11,"start"],"Worcester":[7,-5,"start"],"Harvard":[-7,-5,"end"],"Quincy Center":[-7,-5,"end"],"Mansfield":[-7,-5,"end"],"Sharon":[7,11,"start"],"Malden Center":[7,-5,"start"],"Wellington":[7,-5,"start"],"Central":[7,-5,"start"],"Concord":[7,-5,"start"],"Porter":[7,-5,"start"],"Davis":[7,-5,"start"],"Hersey":[7,-5,"start"]};
-
-// ── Tab 1: the 2x2 scatter (coloured by cluster) ──
-function renderSitingScatter() {
-  const svg = document.getElementById('siting-svg');
-  if (!svg) return;
-  sitingInit();
-
-  const W = 760, H = 560, M = { top: 64, right: 24, bottom: 96, left: 60 };
-  const xMin = -1.65, xMax = 2.05, vMaxRaw = 34;
-  const sq = v => Math.sqrt(Math.max(v, 0));
-  const px = z => M.left + (z - xMin) / (xMax - xMin) * (W - M.left - M.right);
-  // sqrt scale: 81 of 163 stations sit under the 4% median, and a linear
-  // axis stacks them into an unreadable band. sqrt spreads the low end
-  // while keeping rank order intact.
-  const py = v => H - M.bottom - (sq(v) / sq(vMaxRaw)) * (H - M.top - M.bottom);
-  const mx = px(sitingMedians.z), my = py(sitingMedians.v);
-
-  let s = '';
-  for (let t = -1; t <= 2; t++) {
-    s += `<line class="siting-grid" x1="${px(t)}" y1="${M.top}" x2="${px(t)}" y2="${H-M.bottom}"/>`;
-    s += `<text class="siting-tick" x="${px(t)}" y="${H-M.bottom+16}" text-anchor="middle">${t}</text>`;
-  }
-  [0, 1, 2, 5, 10, 20, 30].forEach(t => {
-    s += `<line class="siting-grid" x1="${M.left}" y1="${py(t)}" x2="${W-M.right}" y2="${py(t)}"/>`;
-    s += `<text class="siting-tick" x="${M.left-8}" y="${py(t)+3}" text-anchor="end">${t}%</text>`;
-  });
-  s += `<text class="siting-axis-title" x="${(M.left+W-M.right)/2}" y="${H-M.bottom+34}" text-anchor="middle">Bundle completeness (z-score)</text>`;
-  const ym = (M.top + H - M.bottom) / 2;
-  s += `<text class="siting-axis-title" x="14" y="${ym}" text-anchor="middle" transform="rotate(-90 14 ${ym})">Vacant land share (sqrt scale)</text>`;
-
-  s += `<line class="siting-median" x1="${mx}" y1="${M.top}" x2="${mx}" y2="${H-M.bottom}"/>`;
-  s += `<line class="siting-median" x1="${M.left}" y1="${my}" x2="${W-M.right}" y2="${my}"/>`;
-
-  // Quadrant title + description sit in reserved bands: the top pair in the
-  // margin above the plot, the bottom pair in a strip under the median line.
-  // Dots never enter these bands, so the text always stays legible.
-  const wrap = (txt, max) => {
-    const words = txt.split(' '); const out = []; let line = '';
-    words.forEach(w => {
-      if ((line + ' ' + w).trim().length > max) { out.push(line.trim()); line = w; }
-      else line += ' ' + w;
-    });
-    if (line.trim()) out.push(line.trim());
-    return out;
-  };
-  const corners = [
-    ['q2', M.left + 4, 22, 'start'],
-    ['q1', W - M.right - 4, 22, 'end'],
-    ['q3', M.left + 4, H - M.bottom + 56, 'start'],
-    ['q4', W - M.right - 4, H - M.bottom + 56, 'end']
-  ];
-  corners.forEach(([k, x, y, anch]) => {
-    const q = SITING_QUADS[k];
-    s += `<text class="siting-qtitle" x="${x}" y="${y}" text-anchor="${anch}">${q.axis}</text>`;
-    const isTop = (k === 'q1' || k === 'q2');
-    wrap(q.short, isTop ? 46 : 60).forEach((ln, i) => {
-      s += `<text class="siting-qdesc" x="${x}" y="${y + 12 + i * 9.5}" text-anchor="${anch}">${ln}</text>`;
-    });
-  });
-
-  sitingRows.forEach(r => {
-    const meta = CLUSTER_META[r.cluster] || {};
-    s += `<circle class="siting-dot" data-quad="${r.quad}" data-cluster="${r.cluster}" `
-       + `cx="${px(r.z).toFixed(1)}" cy="${py(r.v).toFixed(1)}" r="3.7" `
-       + `style="fill:${meta.color || '#888'}" data-station="${r.station}" `
-       + `data-z="${r.z.toFixed(2)}" data-v="${r.v.toFixed(1)}"><title>${r.station}</title></circle>`;
-  });
-
-  // selective station labels
-  sitingRows.forEach(r => {
-    const L = SITING_LABELS[r.station];
-    if (!L) return;
-    const [dx, dy, anch] = L;
-    s += `<text class="siting-slabel" data-quad="${r.quad}" x="${(px(r.z)+dx).toFixed(1)}" `
-       + `y="${(py(r.v)+dy).toFixed(1)}" text-anchor="${anch}">${r.station}</text>`;
-  });
-
-  svg.innerHTML = s;
-
-  const tip = document.getElementById('siting-tooltip');
-  const area = document.getElementById('siting-chart-area');
-  const positionTip = e => {
-    const rc = area.getBoundingClientRect();
-    let left = e.clientX - rc.left + 12;
-    if (left + 220 > rc.width) left = rc.width - 225;
-    tip.style.left = Math.max(4, left) + 'px';
-    tip.style.top = (e.clientY - rc.top + 12) + 'px';
-  };
-  const fillTip = d => {
-    const meta = CLUSTER_META[+d.dataset.cluster] || {};
-    tip.innerHTML = `<strong>${d.dataset.station}</strong><br>`
-      + `<span class="tip-q" style="color:${meta.color || '#888'}">${meta.name || ''}</span><br>`
-      + `<span class="tip-vals">bundle ${d.dataset.z} · vacant ${d.dataset.v}%</span>`;
-  };
-  svg.querySelectorAll('.siting-dot').forEach(d => {
-    d.addEventListener('mousemove', e => {
-      if (sitingScatterPinned) return;
-      fillTip(d);
-      tip.style.display = 'block';
-      positionTip(e);
-    });
-    d.addEventListener('mouseleave', () => {
-      if (!sitingScatterPinned) tip.style.display = 'none';
-    });
-    d.addEventListener('click', e => {
-      e.stopPropagation();
-      sitingScatterPinned = d.dataset.station;
-      fillTip(d);
-      tip.style.display = 'block';
-      positionTip(e);
-    });
-  });
-  if (!area.dataset.pinListener) {
-    area.dataset.pinListener = '1';
-    area.addEventListener('click', () => {
-      if (!sitingScatterPinned) return;
-      sitingScatterPinned = null;
-      tip.style.display = 'none';
-    });
-  }
-  applySitingFilter();
-}
-
-// ── Tab 2: the map (Mapbox basemap, same style as the main map page) ──
-let sitingMap = null;
-let sitingMapLayersReady = false;
-let sitingGeoJSON = null;
-let sitingCoordsByStation = {};
-
-const SITING_QUAD_HEX = { q1: '#0cb2af', q2: '#f29222', q3: '#5b6abf', q4: '#a1c65d' };
-
-function sitingQuadColorExpr() {
-  return ['match', ['get', 'quad'],
-    'q1', SITING_QUAD_HEX.q1,
-    'q2', SITING_QUAD_HEX.q2,
-    'q3', SITING_QUAD_HEX.q3,
-    'q4', SITING_QUAD_HEX.q4,
-    '#888'
-  ];
-}
-
-function sitingOpacityExpr() {
-  if (!sitingHiddenQuads.size) return 0.9;
-  return ['case', ['in', ['get', 'quad'], ['literal', Array.from(sitingHiddenQuads)]], 0.08, 0.9];
-}
-
-function buildSitingGeoJSON() {
-  const coords = {};
-  (STATIONS || []).forEach(s => {
-    if (Number.isFinite(+s.lat) && Number.isFinite(+s.lng)) coords[s.name] = [+s.lng, +s.lat];
-  });
-  sitingCoordsByStation = coords;
-  const withXY = sitingRows.filter(r => coords[r.station]);
-  sitingGeoJSON = {
-    type: 'FeatureCollection',
-    features: withXY.map(r => ({
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: coords[r.station] },
-      properties: { station: r.station, quad: r.quad, v: r.v, z: r.z }
-    }))
-  };
-  return withXY;
-}
-
-function addSitingMapLayers() {
-  if (!sitingMap || !sitingGeoJSON) return;
-
-  // ── MBTA Communities municipality boundaries ──────────────────────
-  if (window._communities) {
-    if (sitingMap.getSource('siting-communities')) {
-      sitingMap.getSource('siting-communities').setData(window._communities);
-    } else {
-      sitingMap.addSource('siting-communities', { type: 'geojson', data: window._communities });
-      sitingMap.addLayer({
-        id: 'siting-community-hatch',
-        type: 'fill',
-        source: 'siting-communities',
-        paint: {
-          'fill-color': isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
-          'fill-opacity': 1
-        }
-      });
-      sitingMap.addLayer({
-        id: 'siting-community-outline',
-        type: 'line',
-        source: 'siting-communities',
-        paint: {
-          'line-color': '#7d7d7d',
-          'line-width': 0.5,
-          'line-opacity': 0
-        }
-      });
-    }
-  }
-
-  // ── Commuter Rail lines ────────────────────────────────────────────
-  if (window._commuterRail) {
-    if (sitingMap.getSource('siting-commuter-rail')) {
-      sitingMap.getSource('siting-commuter-rail').setData(window._commuterRail);
-    } else {
-      sitingMap.addSource('siting-commuter-rail', { type: 'geojson', data: window._commuterRail });
-      sitingMap.addLayer({
-        id: 'siting-commuter-rail-line',
-        type: 'line',
-        source: 'siting-commuter-rail',
-        paint: {
-          'line-color': isDark ? '#ad7eed' : '#6c489c',
-          'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.2, 12, 2.5],
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.55, 10, 0.75]
-        }
-      });
-    }
-  }
-
-  // ── Rapid Transit lines ─────────────────────────────────────────────
-  if (window._rapidTransit) {
-    if (sitingMap.getSource('siting-rapid-transit')) {
-      sitingMap.getSource('siting-rapid-transit').setData(window._rapidTransit);
-    } else {
-      sitingMap.addSource('siting-rapid-transit', { type: 'geojson', data: window._rapidTransit });
-      sitingMap.addLayer({
-        id: 'siting-rapid-transit-line',
-        type: 'line',
-        source: 'siting-rapid-transit',
-        paint: {
-          'line-color': [
-            'match', ['get', 'LINE'],
-            'RED',    '#DA291C',
-            'ORANGE', '#ED8B00',
-            'GREEN',  '#00843D',
-            'BLUE',   '#003DA5',
-            'SILVER', '#7C878E',
-            '#888888'
-          ],
-          'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.5, 12, 3.5],
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.7, 10, 0.9]
-        }
-      });
-    }
-  }
-
-  if (sitingMap.getSource('siting-stations')) {
-    sitingMap.getSource('siting-stations').setData(sitingGeoJSON);
-  } else {
-    sitingMap.addSource('siting-stations', { type: 'geojson', data: sitingGeoJSON });
-  }
-  if (!sitingMap.getLayer('siting-dots')) {
-    sitingMap.addLayer({
-      id: 'siting-dots',
-      type: 'circle',
-      source: 'siting-stations',
-      paint: {
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 3.5, 12, 6],
-        'circle-color': sitingQuadColorExpr(),
-        'circle-stroke-width': 1,
-        'circle-stroke-color': isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)',
-        'circle-opacity': sitingOpacityExpr()
-      }
-    });
-    sitingMap.on('click', 'siting-dots', e => {
-      const f = e.features[0];
-      if (sitingHiddenQuads.has(f.properties.quad)) return;
-      showSitingPopup(f.properties, e.lngLat);
-    });
-    sitingMap.on('click', e => {
-      const hits = sitingMap.queryRenderedFeatures(e.point, { layers: ['siting-dots'] });
-      if (!hits.length) {
-        const pop = document.getElementById('siting-popup');
-        pop.style.display = 'none';
-        delete pop.dataset.station;
-      }
-    });
-    sitingMap.on('mouseenter', 'siting-dots', () => { sitingMap.getCanvas().style.cursor = 'pointer'; });
-    sitingMap.on('mouseleave', 'siting-dots', () => { sitingMap.getCanvas().style.cursor = ''; });
-  }
-  sitingMapLayersReady = true;
-}
-
-function fitSitingMapBounds(withXY) {
-  if (!withXY.length) return;
-  const bounds = new mapboxgl.LngLatBounds();
-  withXY.forEach(r => bounds.extend(sitingCoordsByStation[r.station]));
-  sitingMap.fitBounds(bounds, { padding: 32, duration: 0 });
-}
-
-function positionSitingPopup(lngLat) {
-  const pop = document.getElementById('siting-popup');
-  const wrap = document.getElementById('siting-map-wrap');
-  if (!sitingMap || pop.style.display !== 'block') return;
-  const pt = sitingMap.project(lngLat);
-  const wr = wrap.getBoundingClientRect();
-  let left = pt.x + 12, top = pt.y - 10;
-  if (left + 175 > wr.width) left = pt.x - 185;
-  if (top + 120 > wr.height) top = wr.height - 125;
-  pop.style.left = Math.max(4, left) + 'px';
-  pop.style.top = Math.max(4, top) + 'px';
-}
-
-function showSitingPopup(props, lngLat) {
-  const pop = document.getElementById('siting-popup');
-  pop.dataset.quad = props.quad;
-  pop.dataset.station = props.station;
-  const v = +props.v, z = +props.z;
-  pop.innerHTML = `<span class="pop-close">×</span>`
-    + `<div class="pop-name">${props.station}</div>`
-    + `<div class="pop-row"><span>Vacant land</span><b>${v.toFixed(1)}%</b></div>`
-    + `<div class="pop-row"><span>Bundle score</span><b>${z >= 0 ? '+' : ''}${z.toFixed(2)}</b></div>`;
-  pop.style.display = 'block';
-  positionSitingPopup(lngLat);
-  pop.querySelector('.pop-close').addEventListener('click', ev => {
-    ev.stopPropagation();
-    pop.style.display = 'none';
-    delete pop.dataset.station;
-  });
-}
-
-// Basemap style swap — re-add the siting layers after the style reloads
-function restoreSitingLayersAfterStyleSwap() {
-  if (!sitingMap) return;
-  sitingMap.once('styledata', () => {
-    sitingMapLayersReady = false;
-    addSitingMapLayers();
-  });
-}
-
-function renderSitingMap() {
-  sitingInit();
-  const wrap = document.getElementById('siting-map');
-  const empty = document.getElementById('siting-map-empty');
-  if (!wrap) return;
-
-  const withXY = buildSitingGeoJSON();
-  if (!withXY.length) {
-    wrap.style.display = 'none';
+  const all = sitingValidStations();
+  if (!all.length) {
+    svg.style.display = 'none';
+    toolbar.style.display = 'none';
     empty.style.display = 'flex';
     return;
   }
-  wrap.style.display = 'block';
+  toolbar.style.display = 'flex';
+  svg.style.display = 'block';
   empty.style.display = 'none';
+  renderSitingLegend(all);
 
-  if (!sitingMap) {
-    mapboxgl.accessToken = MAPBOX_TOKEN;
-    sitingMap = new mapboxgl.Map({
-      container: 'siting-map',
-      style: isDark ? STYLE_MINIMAL : STYLE_MINIMAL_LIGHT,
-      center: [-71.1, 42.35],
-      zoom: 9,
-      attributionControl: false
-    });
-    sitingMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
-    sitingMap.on('load', () => {
-      addSitingMapLayers();
-      fitSitingMapBounds(withXY);
-    });
-    sitingMap.on('move', () => {
-      const pop = document.getElementById('siting-popup');
-      if (pop.style.display === 'block' && pop.dataset.station) {
-        const coords = sitingCoordsByStation[pop.dataset.station];
-        if (coords) positionSitingPopup(coords);
-      }
-    });
-  } else if (sitingMapLayersReady) {
-    addSitingMapLayers();
-    setTimeout(() => sitingMap.resize(), 50);
+  const valid = all.filter(s => !sitingHiddenClusters.has(+s.cluster));
+  const W = 680, H = 460;
+  const M = { top: 34, right: 24, bottom: 46, left: 54 };
+  const xs = all.map(s => +s.bundle_z);
+  const ys = all.map(s => +s.vacant_share * 100);
+  const xMin = Math.min(-2, Math.floor(Math.min(...xs) * 10) / 10);
+  const xMax = Math.max(2, Math.ceil(Math.max(...xs) * 10) / 10);
+  const yMax = Math.max(30, Math.ceil(Math.max(...ys) / 5) * 5);
+  const medX = sitingMedian(xs);
+  const medY = sitingMedian(ys);
+  const xScale = v => M.left + (v - xMin) / (xMax - xMin) * (W - M.left - M.right);
+  const yScale = v => H - M.bottom - (v / yMax) * (H - M.top - M.bottom);
+  const pxMedX = xScale(medX), pxMedY = yScale(medY);
+
+  let s = '';
+  for (let t = Math.ceil(xMin); t <= Math.floor(xMax); t++) {
+    const x = xScale(t);
+    s += `<line class="siting-grid" x1="${x}" y1="${M.top}" x2="${x}" y2="${H - M.bottom}"/>`;
+    s += `<text class="siting-tick" x="${x}" y="${H - M.bottom + 18}" text-anchor="middle">${t}</text>`;
   }
-  sitingMapBuilt = true;
-  applySitingFilter();
-}
+  for (let t = 0; t <= yMax; t += 10) {
+    const y = yScale(t);
+    s += `<line class="siting-grid" x1="${M.left}" y1="${y}" x2="${W - M.right}" y2="${y}"/>`;
+    s += `<text class="siting-tick" x="${M.left - 8}" y="${y + 3}" text-anchor="end">${t}%</text>`;
+  }
+  s += `<text class="siting-axis-title" x="${(M.left + W - M.right) / 2}" y="${H - 8}" text-anchor="middle">Bundle completeness (z-score)</text>`;
+  const yMid = (M.top + H - M.bottom) / 2;
+  s += `<text class="siting-axis-title" x="16" y="${yMid}" text-anchor="middle" transform="rotate(-90 16 ${yMid})">Vacant land share</text>`;
+  s += `<text class="siting-corner" x="${M.left + 2}" y="${M.top - 12}" text-anchor="start">Bundle absent · room to build</text>`;
+  s += `<text class="siting-corner" x="${W - M.right - 2}" y="${M.top - 12}" text-anchor="end">Bundle present · room to build</text>`;
+  s += `<text class="siting-corner" x="${M.left + 2}" y="${H - M.bottom + 34}" text-anchor="start">Bundle absent · little room</text>`;
+  s += `<text class="siting-corner" x="${W - M.right - 2}" y="${H - M.bottom + 34}" text-anchor="end">Bundle present · little room</text>`;
+  s += `<line class="siting-median" x1="${pxMedX}" y1="${M.top}" x2="${pxMedX}" y2="${H - M.bottom}"/>`;
+  s += `<line class="siting-median" x1="${M.left}" y1="${pxMedY}" x2="${W - M.right}" y2="${pxMedY}"/>`;
 
-// ── Tab 3: the strategy summary ──
-function renderSitingSummary() {
-  sitingInit();
-  const el = document.getElementById('siting-summary');
-  if (!el) return;
-  const cell = (k, cls) => {
-    const q = SITING_QUADS[k];
-    return `<div class="sum-cell ${cls}"><h4 style="color:${q.color}">${q.label}</h4>`
-         + `<p>${q.blurb}</p></div>`;
-  };
-  el.innerHTML =
-      `<div></div>`
-    + `<div class="sum-colhead">Bundle absent</div>`
-    + `<div class="sum-colhead">Bundle present</div>`
-    + `<div class="sum-axis-y"><span>Room to build</span></div>`
-    + cell('q2', 'sum-b-right sum-b-bottom')
-    + cell('q1', 'sum-b-bottom')
-    + `<div class="sum-axis-y"><span>Little room</span></div>`
-    + cell('q3', 'sum-b-right')
-    + cell('q4', '');
-}
-
-function renderSitingChart() {
-  if (sitingActiveTab === 'scatter') renderSitingScatter();
-  else if (sitingActiveTab === 'map') renderSitingMap();
-  else renderSitingSummary();
-  renderSitingLegend('siting-legend-scatter');
-  renderSitingLegend('siting-legend-map');
-}
-
-document.querySelectorAll('.siting-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    sitingActiveTab = btn.dataset.tab;
-    document.querySelectorAll('.siting-tab').forEach(b => b.classList.toggle('active', b === btn));
-    document.querySelectorAll('.siting-panel').forEach(p =>
-      p.classList.toggle('active', p.dataset.panel === sitingActiveTab));
-    const tip = document.getElementById('siting-tooltip');
-    if (tip) tip.style.display = 'none';
-    sitingScatterPinned = null;
-    renderSitingChart();
+  valid.forEach(st => {
+    const cx = xScale(+st.bundle_z), cy = yScale(+st.vacant_share * 100);
+    const color = (CLUSTER_META[+st.cluster] || {}).color || '#888';
+    s += `<circle class="siting-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4" style="fill:${color}" `
+       + `data-name="${st.name}" data-cluster="${st.cluster}" data-x="${(+st.bundle_z).toFixed(2)}" data-y="${(+st.vacant_share * 100).toFixed(1)}"/>`;
   });
-});
+
+  const bounds = {
+    q2: [M.left, M.top, pxMedX, pxMedY],
+    q1: [pxMedX, M.top, W - M.right, pxMedY],
+    q3: [M.left, pxMedY, pxMedX, H - M.bottom],
+    q4: [pxMedX, pxMedY, W - M.right, H - M.bottom]
+  };
+  SITING_QUADS.forEach(q => {
+    const [x0, y0, x1, y1] = bounds[q.key];
+    s += `<foreignObject class="quad-panel" x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(x1 - x0).toFixed(1)}" height="${(y1 - y0).toFixed(1)}">`
+       + `<div xmlns="http://www.w3.org/1999/xhtml" class="quad-panel-inner">`
+       + `<div class="quad-panel-name">${q.name}</div><div class="quad-panel-desc">${q.desc}</div></div></foreignObject>`;
+  });
+
+  svg.innerHTML = s;
+  svg.classList.toggle('strategy-mode', sitingStrategyMode);
+
+  const tip = document.getElementById('siting-tooltip');
+  const area = document.getElementById('siting-chart-area');
+  svg.querySelectorAll('.siting-dot').forEach(dot => {
+    dot.addEventListener('mouseenter', () => {
+      const meta = CLUSTER_META[+dot.dataset.cluster] || {};
+      tip.innerHTML = `<strong>${dot.dataset.name}</strong><br><span class="tip-cluster">${meta.name || ''}</span><br>`
+        + `<span class="tip-vals">bundle ${dot.dataset.x} · vacant ${dot.dataset.y}%</span>`;
+      tip.style.display = 'block';
+    });
+    dot.addEventListener('mousemove', e => {
+      const rect = area.getBoundingClientRect();
+      tip.style.left = (e.clientX - rect.left + 14) + 'px';
+      tip.style.top  = (e.clientY - rect.top + 14) + 'px';
+    });
+    dot.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+  });
+}
+
+function toggleSitingStrategy() {
+  sitingStrategyMode = !sitingStrategyMode;
+  const svg = document.getElementById('siting-svg');
+  const btn = document.getElementById('siting-toggle-btn');
+  svg.classList.toggle('strategy-mode', sitingStrategyMode);
+  btn.textContent = sitingStrategyMode ? 'Show stations' : 'Show strategy';
+  btn.classList.toggle('active', sitingStrategyMode);
+}
+document.getElementById('siting-toggle-btn').addEventListener('click', toggleSitingStrategy);
+
 // ─────────────────────────────────────────────
 // NAVIGATION
 // ─────────────────────────────────────────────
@@ -3267,7 +1534,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map');
     if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
     if (target === 'data' && dataReady) buildDataTable();
-    if (target === 'recommendations' && dataReady) renderSitingChart();
+    if (target === 'insights' && dataReady) renderSitingChart();
     if (target === 'map' && map) setTimeout(() => map.resize(), 50);
   });
 });
@@ -4496,12 +2763,6 @@ function applyTheme(dark) {
     const newStyle = dark ? STYLE_MINIMAL : STYLE_MINIMAL_LIGHT;
     map.setStyle(newStyle);
     restoreLayersAfterStyleSwap();
-  }
-
-  // Keep the Recommendations page siting map in sync with the theme
-  if (sitingMap) {
-    sitingMap.setStyle(dark ? STYLE_MINIMAL : STYLE_MINIMAL_LIGHT);
-    restoreSitingLayersAfterStyleSwap();
   }
 
   // Relayout Plotly charts with new axis colors

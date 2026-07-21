@@ -443,21 +443,17 @@
   #siting-tooltip .tip-q { font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500; margin-bottom: 4px; }
   #siting-tooltip .tip-blurb { color: var(--text-secondary); font-size: 10px; line-height: 1.5; }
 
-  /* ── RECOMMENDATIONS: expandable typology detail rows ── */
-  tr.rec-row { cursor: pointer; }
-  tr.rec-row:hover td { background: var(--bg-card); }
-  tr.rec-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  tr.rec-row.open td { background: var(--bg-card); }
-  .rec-caret { display: inline-block; width: 0; height: 0; margin-right: 7px; vertical-align: middle; border-left: 4px solid var(--text-muted); border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; transition: transform 0.15s ease; }
-  tr.rec-row.open .rec-caret { transform: rotate(90deg); }
-  table.inv-table tbody tr.rec-detail-row:hover td { background: var(--bg-panel); }
-  table.inv-table tbody tr.rec-detail-row td { padding: 0; background: var(--bg-panel); }
-  .rec-detail-inner { border-left: 2px solid var(--accent); padding: 16px 18px 6px; }
-  .rec-detail-n { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-bottom: 10px; }
-  .rec-detail-inner p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 10px; font-family: 'DM Sans', sans-serif; }
-  .rec-detail-inner strong { color: var(--text-primary); font-weight: 500; }
-  .rec-detail-inner .cluster-rec-finding { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: 12px !important; }
-  .rec-detail-inner .equity-note { font-size: 12px !important; }
+  /* ── INSIGHTS: cluster recommendations ── */
+  .cluster-rec { border-top: 1px solid var(--border-mid); padding: 20px 0 4px; }
+  .cluster-rec-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; flex-wrap: wrap; }
+  .cluster-rec-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .cluster-rec-head h3 { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .cluster-rec-n { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); margin-left: auto; }
+  .cluster-rec p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.75; margin-bottom: 10px; }
+  .cluster-rec strong { color: var(--text-primary); font-weight: 500; }
+  .cluster-rec-finding { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: 12px !important; }
+  .equity-note { font-size: 11.5px !important; color: var(--text-muted) !important; border-top: 1px solid var(--border); padding-top: 9px; }
+  .equity-note strong { color: var(--text-secondary) !important; }
 
   /* ── INSIGHTS: typology recommendation summary table ── */
   table.rec-summary-table.inv-table { table-layout: fixed; font-size: 11.5px; }
@@ -475,6 +471,7 @@
 
   @media (max-width: 720px) {
     #siting-toolbar { flex-direction: column; align-items: flex-start; }
+    .cluster-rec-n { margin-left: 0; width: 100%; }
   }
   #methodology-inner { max-width: 720px; min-width: 0; flex: 1 1 auto; margin: 0 auto; padding: 48px 32px 80px; }
   #methodology-inner h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
@@ -483,10 +480,6 @@
   .method-section h2 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-family: 'DM Mono', monospace; }
   .method-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
   .method-section strong { color: var(--text-primary); font-weight: 500; }
-  .method-section ol.rq-list { margin: 14px 0 0 0; padding-left: 0; list-style: none; counter-reset: rq; }
-  .method-section ol.rq-list li { position: relative; padding-left: 30px; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary); line-height: 1.8; counter-increment: rq; }
-  .method-section ol.rq-list li:last-child { margin-bottom: 0; }
-  .method-section ol.rq-list li::before { content: counter(rq); position: absolute; left: 0; top: 0; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); line-height: 1.9; }
   .method-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
   .step-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 24px; padding-top: 1px; }
   .step-body h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
@@ -760,6 +753,12 @@
     <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"> <a href="https://www.linkedin.com/in/qian-erin-chen/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor;">Erin Chen</a> · Thesis · 2026</div>
   </div>
   <div id="nav-links">
+    <div class="nav-item" data-page="clusters">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
+      </svg>
+      3D Clusters
+    </div>
     <div class="nav-item active" data-page="map">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <path d="M2 4l4-2 4 2 4-2v10l-4 2-4-2-4 2V4z"/><path d="M6 2v10M10 4v10"/>
@@ -778,17 +777,11 @@
       </svg>
       Research Design
     </div>
-    <div class="nav-item" data-page="clusters">
-      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
-        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
-      </svg>
-      Station Typologies
-    </div>
     <div class="nav-item" data-page="insights">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
         <path d="M8 2a4 4 0 0 1 2 7.46V11H6v-1.54A4 4 0 0 1 8 2z"/><path d="M6 12h4M6.5 14h3"/>
       </svg>
-      Findings
+      Insights
     </div>
     <div class="nav-item" data-page="recommendations">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -966,7 +959,7 @@
   <!-- CLUSTERS PAGE -->
   <div class="page" id="page-clusters">
     <div id="clusters-header">
-      <h1>Station Typologies</h1>
+      <h1>Station area typologies</h1>
       <div id="clusters-tabs">
         <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
       </div>
@@ -1005,17 +998,7 @@
   <div class="page" id="page-methodology">
     <div id="methodology-inner">
       <h1>Research Design</h1>
-      <p class="lead">MBTA Communities station areas differ substantially in built environment, transit access, and socioeconomic context, so a single network-wide model would average out the variation that matters most for local policy. The research design therefore runs three sequential stages: a network-wide regression identifies global VMT predictors, hierarchical clustering segments stations into six typologies, and within-cluster regressions uncover VMT dynamics inside each station type.</p>
-
-      <div class="method-section">
-        <h2>Research questions</h2>
-        <p>This thesis examines how built environment and transportation characteristics influence VMT in MBTA Communities, with the goal of developing actionable strategies for municipalities. Three questions guide the research:</p>
-        <ol class="rq-list">
-          <li>What land use and transit service characteristics currently define MBTA Communities station areas? Can the station areas be classified into distinct, useful typologies based on the characteristics?</li>
-          <li>Which factors are most strongly associated with VMT reduction in MBTA Communities?</li>
-          <li>What context-specific policy and design interventions can MBTA Communities implement to maximize VMT reduction?</li>
-        </ol>
-      </div>
+      <p class="lead">This analysis links built environment configuration at MBTA station areas to vehicle miles traveled per capita. MBTA Communities station areas differ substantially in built environment, transit access, and socioeconomic context, so a single network-wide model would average out the variation that matters most for local policy. The research design therefore runs three stages that build sequentially: a network-wide regression identifies global VMT predictors, a hierarchical clustering analysis segments stations into six typologies, and within-cluster regressions uncover VMT dynamics inside each station type.</p>
 
       <div class="method-section">
         <h2>Unit of analysis</h2>
@@ -1064,31 +1047,6 @@
             </tbody>
           </table>
         </div>
-
-        <div class="inv-table-wrap src-table-wrap">
-          <table class="inv-table src-table">
-            <colgroup>
-              <col style="width:18%">
-              <col style="width:82%">
-            </colgroup>
-            <thead>
-              <tr>
-                <th>Source</th>
-                <th>Full name</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>MVC</td><td>Massachusetts Vehicle Census, Office of Performance Management and Innovation (OPMI)</td></tr>
-              <tr><td>ACS 5 Year</td><td>American Community Survey 5-Year Estimates, US Census Bureau</td></tr>
-              <tr><td>LODES</td><td>LEHD Origin-Destination Employment Statistics, US Census Bureau</td></tr>
-              <tr><td>GTFS</td><td>General Transit Feed Specification, MBTA schedule data</td></tr>
-              <tr><td>MassGIS</td><td>Bureau of Geographic Information, Commonwealth of Massachusetts</td></tr>
-              <tr><td>MassDOT</td><td>Massachusetts Department of Transportation</td></tr>
-              <tr><td>CTPS</td><td>Central Transportation Planning Staff, Boston Region MPO</td></tr>
-              <tr><td>OSM</td><td>OpenStreetMap</td></tr>
-            </tbody>
-          </table>
-        </div>
       </div>
 
       <style>
@@ -1103,9 +1061,6 @@
         table.inv-table td:nth-child(3),
         table.inv-table td:nth-child(4) { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
         .inv-excl { font-style: italic; opacity: 0.65; }
-        .src-table-wrap { margin-top: 14px; }
-        table.src-table td:first-child { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
-        table.src-table td:nth-child(2) { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text-secondary); }
         @media (max-width: 480px) {
           table.inv-table { font-size: 11px; }
           table.inv-table thead th, table.inv-table tbody td { padding: 7px 8px; }
@@ -1134,14 +1089,29 @@
             <h4>Within-cluster regression</h4>
             <p>Elastic Net regularization first selects predictors for each cluster from the full M7 set, handling collinearity and reducing overfitting given limited within-cluster samples. Housing density is protected from penalization in every model as the policy anchor of the Act. Variables are z-standardized globally across all 163 stations so coefficients compare across cluster models; each model is capped at five predictors subject to a limit of one parameter per four observations. The second stage refits OLS on the selected predictors with HC3 robust standard errors and computes LMG decomposition indices to partition explained variance, ranking built environment characteristics by relative explanatory importance within each station type.</p>
           </div>
-        </div>      </div>
+        </div>
+        <div class="method-note">
+          <strong>Post-selection inference:</strong> Elastic Net selects predictors and OLS estimates their coefficients on the same data, so coefficient magnitudes and significance tests may be inflated. Within-cluster results are interpreted as exploratory rather than inferential throughout.
+        </div>
+      </div>
+
+      <div class="method-section">
+        <h2>Data sources</h2>
+        <p><strong>Massachusetts Vehicle Census (OPMI)</strong>: odometer readings aggregated to station area buffers as the VMT measure.</p>
+        <p><strong>US Census / ACS 5-Year</strong>: housing unit density and demographic controls (median household income, household composition, age structure).</p>
+        <p><strong>LODES</strong>: employment density and job-to-population ratio.</p>
+        <p><strong>GTFS / MBTA schedule data</strong>: peak hour transit frequency as the clustering input.</p>
+        <p><strong>MassGIS parcels</strong>: land use entropy, intersection density, sidewalk and bike lane coverage.</p>
+        <p><strong>MassDOT</strong>: bus route diversity. </p>
+        <p><strong>CTPS</strong>: station parking spaces. </p>
+        <p><strong>OpenStreetMap</strong>: proximity to points of interest via a staged decay function.</p>
+      </div>
 
        <div class="method-section">
         <h2>Limitations</h2>
         <p><strong>Residential self-selection.</strong> The cross-sectional design cannot separate the built environment's influence on travel behavior from self-selection. Households that prefer to drive less may sort into dense, transit-accessible station areas, so observed associations reflect some combination of environment shaping behavior and preferences shaping location. Coefficients are interpreted as associations, not causal effects.</p>
         <p><strong>The VMT measure.</strong> VMT per capita combines vehicle ownership rates and driving intensity into one metric. A station area may show low VMT because many residents own no vehicle, or because owners drive little, and the aggregate cannot distinguish these. The Vehicle Census captures resident VMT only, not total roadway use, so findings speak to resident travel behavior rather than congestion or network traffic volumes.</p>
         <p><strong>Data timing.</strong> Variables are drawn from different years (ACS 2019 to 2024, LODES 2023, GTFS 2024, parking data from 2018), and the ACS five-year window spans the COVID-19 pandemic.</p>
-        <p><strong>Post-selection inference.</strong> Elastic Net selects predictors and OLS estimates their coefficients on the same data, so coefficient magnitudes and significance tests may be inflated. Within-cluster results are interpreted as exploratory rather than inferential throughout.</p>
         <p><strong>Within-cluster sample size.</strong> Clusters range from n=2 to n=62. By the ten-observations-per-predictor guideline, only Cluster 5 supports the full specification with adequate degrees of freedom. Cluster 3 (n=2) falls below any viable regression threshold and is examined through its cluster profile instead.</p>
        </div>
     </div>
@@ -1150,7 +1120,7 @@
   <!-- INSIGHTS & RECOMMENDATION PAGE -->
   <div class="page" id="page-insights">
     <div id="methodology-inner">
-      <h1>Findings</h1>
+      <h1>Insights</h1>
       <p class="lead">Two regressions ask different questions here. The cross-sectional model tests what predicts VMT across the whole network. The within-cluster models test whether that changes depending on what kind of place a station is. The findings below are organized the same way: regional first, then by cluster.</p>
 
       <div class="method-section">
@@ -2298,7 +2268,7 @@
   <div class="page" id="page-recommendations">
     <div id="methodology-inner">
       <h1>Recommendations</h1>
-      <p class="lead">Two frameworks turn the preceding findings into action: where in the network to prioritize density, and what to pair with it once you do.</p>
+      <p class="lead">Two frameworks turn the findings on the Insights page into action: where in the network to prioritize density, and what to pair with it once you do.</p>
 
       <div class="method-section">
         <h2>Where to build: the Siting Framework</h2>
@@ -2344,7 +2314,7 @@
 
       <div class="method-section">
         <h2>How to build: the Typology Framework</h2>
-        <p>A station area's cluster captures its place character, urban or suburban, residential or employment-oriented, well connected or peripheral. That character determines which interventions translate density into lower driving. The table below summarizes the lever, supporting investments, housing strategy, and equity consideration for each cluster. Select any row to expand the full reasoning and evidence behind it.</p>
+        <p>A station area's cluster captures its place character, urban or suburban, residential or employment-oriented, well connected or peripheral. That character determines which interventions translate density into lower driving. The table below summarizes the lever, supporting investments, housing strategy, and equity consideration for each cluster; the write-ups underneath give the full reasoning and evidence behind each row.</p>
 
         <div class="inv-table-wrap">
           <table class="inv-table rec-summary-table">
@@ -2358,123 +2328,135 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="rec-row" data-cluster="1" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-1">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1: Urban Employment Node</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c1)"></span>CL1: Urban Employment Node</td>
                 <td>Last-mile alternatives</td>
                 <td>Mixed-use zoning (Wrap garage with housing or commercial)<br>Complete streets</td>
                 <td>Develop vacant lots into TODs in Q1 and implement incremental infill in Q4.<br>Lease out air rights of publicly owned land.</td>
                 <td>Preserve existing affordable units in rapidly appreciating urban cores</td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-1" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c1)">
-                    <div class="rec-detail-n">n=26 · 3,639 VMT/capita</div>
-          <p class="cluster-rec-finding"><strong>Finding:</strong> No single significant coefficient. LMG splits explained variance four ways: bike lane coverage 29.5%, park-and-ride 29.4%, employment density 24.4%, housing density 13.8%. This cluster exemplifies the bundled-conditions hypothesis, and disrupting any one element weakens the whole.</p>
-          <p>At a 29 percent car-free household rate, these stations already deliver the lowest automobile dependence in the network. The challenge is not aggressive VMT reduction but sustainable capacity building: absorbing new multifamily housing without diluting the transit infrastructure and commercial concentration that sustains the low-carbon baseline.</p>
-          <p>The most actionable lever is <strong>parking management</strong>. Alewife, Quincy Adams, and Wonderland each host large structured garages, and availability of structured parking encourages driving over active modes even for residents inside the walkable radius. Because these facilities serve a legitimate regional park-and-ride function, the recommendation is not to cut station parking but to pair it with reliable micromobility, bus, and shuttle connections. The MBTA can wrap existing garages with housing or ground-floor commercial, or lease air rights for residential development, absorbing more of the Act's mandate while increasing the share of transit-reliant residents inside the rapid transit network.</p>
-          <p>Second, <strong>protect the employment base while investing in active transportation</strong>. Complete streets policies can require sidewalk continuity, protected bike facilities, and safe crossings as conditions of development approval. Smart Growth or Mixed-Use Overlay Districts under Chapter 40R pair new housing production with retained employment uses rather than replacing them.</p>
-          <p class="equity-note"><strong>Equity:</strong> Preserve existing affordable units in rapidly appreciating urban cores.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="2" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-2">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2: Urban Residential Node</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c2)"></span>CL2: Urban Residential Node</td>
                 <td>Family trip-chain support</td>
                 <td>Safe Routes to School<br>All-day reliable bus routes</td>
                 <td>ADUs, conversions, courtyard infill (Q4)<br>Unit-mix requirements for 2-3BR family units</td>
                 <td>Retain family households in transit-rich neighborhoods. Prevent displacement to auto-dependent suburbs</td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-2" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c2)">
-                    <div class="rec-detail-n">n=28 · 4,589 VMT/capita</div>
-          <p class="cluster-rec-finding"><strong>Finding:</strong> Share of households with children is the strongest predictor (β=+0.313, p&lt;0.05), accounting for 49.8% of explained variance.</p>
-          <p>Family households generate substantial driving demand through school drop-offs, childcare pickups, grocery runs, and medical appointments. The radial rapid transit system excels at moving commuters to downtown employment nodes but poorly accommodates the multi-stop trip-chaining these journeys require. When transit fails to support linked trips, families default to the automobile regardless of neighborhood density or transit proximity.</p>
-          <p>The primary intervention is making non-auto travel viable for <strong>the trips families actually make</strong>. Prioritize Safe Routes to School infrastructure. Restructure bus service away from peak-hour commuter schedules toward high-frequency, all-day routes connecting residential neighborhoods to schools, childcare, neighborhood commercial centers, and parks. The MBTA can reallocate underutilized station parking toward secure bike storage, micromobility charging, and drop-off zones that reduce short-distance driving to the platform. Municipalities can pursue partnership with the Massachusetts Housing Partnership on the Complete Neighborhood Initiative.</p>
-          <p>Most of these station areas sit in the preserve-and-maintain quadrant, so compliance will come through accessory dwelling units, conversions, and courtyard infill rather than ground-up redevelopment. The priority is ensuring new supply is accessible to families: unit-mix requirements specifying a balanced share of two- and three-bedroom units, and family-oriented design guidelines covering stroller storage and accessible play areas.</p>
-          <p class="equity-note"><strong>Equity:</strong> Retain family households in transit-rich neighborhoods; prevent displacement to auto-dependent suburbs.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="3" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-3">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c3)"></span>CL3: Suburban Employment Node</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c3)"></span>CL3: Suburban Employment Node</td>
                 <td>Bundle development, leveraging existing frequent transit</td>
                 <td>Route 128: Optimize park-and-ride, improve express bus, reserve denser intervention for later phase</td>
                 <td>Braintree: TOD with mixed-use overlay</td>
                 <td></td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-3" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c3)">
-                    <div class="rec-detail-n">n=2 · 9,243 VMT/capita</div>
-          <p class="cluster-rec-finding"><strong>Finding:</strong> Descriptive only; n=2 falls below any viable regression threshold. Braintree and Route 128 generate 9,243 VMT per capita despite relatively frequent transit service.</p>
-          <p>Just as housing density alone cannot reduce VMT, transit frequency alone cannot mitigate automobile dependence when the surrounding built environment is structurally optimized for the car. The two stations occupy distinct positions in the Siting Framework and require different strategies.</p>
-          <p><strong>Braintree</strong> sits in the immediate-opportunity quadrant, served directly by the Red Line with vacant and underutilized land available. It is a strong candidate for large-scale rapid transit TOD, with the physical capacity to build a critical mass of dense, mixed-income housing that constructs an urban intensity bundle from the ground up. Zoning should prioritize mixed-use overlay districts pairing residential density with ground-floor retail and employment.</p>
-          <p><strong>Route 128</strong> sits in the conditional-density quadrant and functions primarily as a highway-interception commuter facility. Near-term strategy should prioritize regional access efficiency over pedestrian-scale infill: optimize park-and-ride operations, improve express bus connections to surrounding employment centers, and reserve denser intervention for a later phase. Longer term, its commuter rail service and available land make it a transit village candidate, though that requires regional coordination across the Westwood, Dedham, and Canton boundaries.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="4" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-4">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4: Regional Mixed-Use Center</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c4)"></span>CL4: Regional Mixed-Use Center</td>
                 <td>Conditional density paired with anti-displacement measures</td>
                 <td>Inclusionary zoning;<br>Bus service quality<br>Employment retention</td>
                 <td>Mixed-use infill on downtown parcels.<br>Reinforce job centers, not residential-only zones</td>
                 <td>Deed-restricted affordable units (over 20% affordable units under 60% AMI) and tenant protections.</td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-4" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c4)">
-                    <div class="rec-detail-n">n=27 · 6,982 VMT/capita</div>
-          <p class="cluster-rec-finding"><strong>Finding:</strong> No significant coefficients, but park-and-ride capacity carries the largest variance share. Median income associates negatively with VMT, raising the question of who benefits from TOD-driven VMT reduction.</p>
-          <p>These are the historic downtowns of eastern Massachusetts: Worcester, Lowell, Lawrence, Lynn, Brockton, New Bedford. They are among the few commuter rail contexts where a walkable urban fabric predates the automobile. They also have the lowest median household income in the network, historically serving working-class and immigrant populations. The challenge is converting inherited walkable fabric into realized VMT reduction without displacing the residents who would benefit most.</p>
-          <p>Unlike urban rapid transit nodes where last-mile alternatives are abundant, parking at regional commuter rail downtowns serves a legitimate access function for commuters from surrounding towns. Station parking is needed, but it can take a different form: <strong>consolidate into structured facilities</strong> that accommodate regional commuters while freeing downtown land for high-density mixed-use infill. Employment density contributes meaningfully to lower VMT here, reinforcing that these downtowns should be maintained as job centers rather than converted into residential commuter zones.</p>
-          <p>The distinctive lever is <strong>equity-conditioned density</strong>. The Act's current guidelines permit municipalities to require up to 10 percent of units as affordable at 80 percent AMI, with higher thresholds where an economic feasibility analysis supports them. For Cluster 4 communities, where incomes are lowest and displacement risk is acute, municipalities should pursue deeper inclusionary requirements targeting closer to 60 percent AMI, using Chapter 40R density bonuses and affordable housing trust fund allocations to make those thresholds viable. State authorities should prioritize trust fund allocations to compliance districts in this cluster. Because these communities rely heavily on local bus networks, infrastructure investment should prioritize bus service quality and dedicated lane expansion, addressing the multimodal needs the rail-centric framing of the Act overlooks.</p>
-          <p class="equity-note"><strong>Equity:</strong> Deed-restricted affordable units and tenant protections in station areas undergoing reinvestment.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="5" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-5">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5: Suburban Residential Neighborhood</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c5)"></span>CL5: Suburban Residential Neighborhood</td>
                 <td>Conditional density with accessible transit improvements</td>
                 <td>Microtransit/shuttles<br>Last-mile pedestrian network<br>Inclusionary zoning</td>
                 <td>Multifamily zoning in Q2 stations with vacant land.<br>Pair with non-residential capital improvements</td>
                 <td>Inclusionary requirements ensure VMT benefits reach cost-burdened households</td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-5" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c5)">
-                    <div class="rec-detail-n">n=62 · 7,509 VMT/capita</div>
-          <p class="cluster-rec-finding"><strong>Finding:</strong> Housing density is the single strongest predictor (β=-0.176, p&lt;0.01, LMG 38.9%). A one standard deviation increase associates with a 17.6 percent reduction in per capita driving. Strongest model in the typology.</p>
-          <p>This is the critical testing ground for the Act. It contains the largest share of regulated municipalities and yields the clearest empirical signal in the study. With relatively uniform commuter rail service and built environment conditions across 62 stations, density variation translates cleanly into VMT variation, and the Act's core mechanism works largely as the policy theory intends.</p>
-          <p>The primary directive is to guide density mandates toward station areas with structural capacity to absorb growth without locking in car-dependent travel. The Siting Framework locates these in the conditional-density quadrant: stations with vacant land but incomplete bundles. Municipalities should deploy <strong>conditional density</strong>, pairing multifamily zoning approvals with targeted non-residential capital improvements. Because most of these suburbs have strong commuter rail access but virtually no internal transit circulation, the most effective local levers are municipal microtransit pilots, on-demand shuttles, and safe last-mile pedestrian networks connecting platforms to surrounding residential areas.</p>
-          <p>The within-cluster analysis also finds a positive association between land use entropy and VMT, which means mixed-use zoning designations alone do not reduce driving in low-density suburban contexts. Placing a commercial parcel adjacent to a residential subdivision yields no behavioral shift if the roadway layout forces residents to drive across the property line. Suburban planners should deprioritize nominal land use mix on paper and focus on neighborhood design standards ensuring physical connectivity, continuous sidewalks, and active transportation infrastructure.</p>
-          <p class="equity-note"><strong>Equity:</strong> Median income associates negatively with VMT here, meaning lower-income suburban residents drive more and bear disproportionately high transportation costs. Inclusionary requirements in suburban compliance districts ensure low-VMT housing opportunities reach the households who would benefit most.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr class="rec-row" data-cluster="6" tabindex="0" role="button" aria-expanded="false" aria-controls="rec-detail-6">
-                <td><span class="rec-caret" aria-hidden="true"></span><span class="finding-cluster-dot" style="background:var(--c6)"></span>CL6: Exurban Mixed-Use Fringe</td>
+              <tr>
+                <td><span class="finding-cluster-dot" style="background:var(--c6)"></span>CL6: Exurban Mixed-Use Fringe</td>
                 <td>Concentration over sprawl</td>
                 <td>TDM programs<br>Regional microtransit</td>
                 <td>Focus zoning tightly on town-center parcels with existing walkable fabric</td>
                 <td>Prioritize state/regional resources toward clusters where density reliably reduces driving</td>
               </tr>
-              <tr class="rec-detail-row" id="rec-detail-6" hidden>
-                <td colspan="5">
-                  <div class="rec-detail-inner" style="border-left-color:var(--c6)">
-                    <div class="rec-detail-n">n=18 · 9,430 VMT/capita</div>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="cluster-rec" data-cluster="1">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c1)"></span>
+            <h3>Cluster 1 · Urban Employment Node</h3>
+            <span class="cluster-rec-n">n=26 · 3,639 VMT/capita</span>
+          </div>
+          <p class="cluster-rec-finding"><strong>Finding:</strong> No single significant coefficient. LMG splits explained variance four ways: bike lane coverage 29.5%, park-and-ride 29.4%, employment density 24.4%, housing density 13.8%. This cluster exemplifies the bundled-conditions hypothesis, and disrupting any one element weakens the whole.</p>
+          <p>At a 29 percent car-free household rate, these stations already deliver the lowest automobile dependence in the network. The challenge is not aggressive VMT reduction but sustainable capacity building: absorbing new multifamily housing without diluting the transit infrastructure and commercial concentration that sustains the low-carbon baseline.</p>
+          <p>The most actionable lever is <strong>parking management</strong>. Alewife, Quincy Adams, and Wonderland each host large structured garages, and availability of structured parking encourages driving over active modes even for residents inside the walkable radius. Because these facilities serve a legitimate regional park-and-ride function, the recommendation is not to cut station parking but to pair it with reliable micromobility, bus, and shuttle connections. The MBTA can wrap existing garages with housing or ground-floor commercial, or lease air rights for residential development, absorbing more of the Act's mandate while increasing the share of transit-reliant residents inside the rapid transit network.</p>
+          <p>Second, <strong>protect the employment base while investing in active transportation</strong>. Complete streets policies can require sidewalk continuity, protected bike facilities, and safe crossings as conditions of development approval. Smart Growth or Mixed-Use Overlay Districts under Chapter 40R pair new housing production with retained employment uses rather than replacing them.</p>
+          <p class="equity-note"><strong>Equity:</strong> Preserve existing affordable units in rapidly appreciating urban cores.</p>
+        </div>
+
+        <div class="cluster-rec" data-cluster="2">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c2)"></span>
+            <h3>Cluster 2 · Urban Residential Node</h3>
+            <span class="cluster-rec-n">n=28 · 4,589 VMT/capita</span>
+          </div>
+          <p class="cluster-rec-finding"><strong>Finding:</strong> Share of households with children is the strongest predictor (β=+0.313, p&lt;0.05), accounting for 49.8% of explained variance.</p>
+          <p>Family households generate substantial driving demand through school drop-offs, childcare pickups, grocery runs, and medical appointments. The radial rapid transit system excels at moving commuters to downtown employment nodes but poorly accommodates the multi-stop trip-chaining these journeys require. When transit fails to support linked trips, families default to the automobile regardless of neighborhood density or transit proximity.</p>
+          <p>The primary intervention is making non-auto travel viable for <strong>the trips families actually make</strong>. Prioritize Safe Routes to School infrastructure. Restructure bus service away from peak-hour commuter schedules toward high-frequency, all-day routes connecting residential neighborhoods to schools, childcare, neighborhood commercial centers, and parks. The MBTA can reallocate underutilized station parking toward secure bike storage, micromobility charging, and drop-off zones that reduce short-distance driving to the platform. Municipalities can pursue partnership with the Massachusetts Housing Partnership on the Complete Neighborhood Initiative.</p>
+          <p>Most of these station areas sit in the preserve-and-maintain quadrant, so compliance will come through accessory dwelling units, conversions, and courtyard infill rather than ground-up redevelopment. The priority is ensuring new supply is accessible to families: unit-mix requirements specifying a balanced share of two- and three-bedroom units, and family-oriented design guidelines covering stroller storage and accessible play areas.</p>
+          <p class="equity-note"><strong>Equity:</strong> Retain family households in transit-rich neighborhoods; prevent displacement to auto-dependent suburbs.</p>
+        </div>
+
+        <div class="cluster-rec" data-cluster="3">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c3)"></span>
+            <h3>Cluster 3 · Suburban Employment Node</h3>
+            <span class="cluster-rec-n">n=2 · 9,243 VMT/capita</span>
+          </div>
+          <p class="cluster-rec-finding"><strong>Finding:</strong> Descriptive only; n=2 falls below any viable regression threshold. Braintree and Route 128 generate 9,243 VMT per capita despite relatively frequent transit service.</p>
+          <p>Just as housing density alone cannot reduce VMT, transit frequency alone cannot mitigate automobile dependence when the surrounding built environment is structurally optimized for the car. The two stations occupy distinct positions in the Siting Framework and require different strategies.</p>
+          <p><strong>Braintree</strong> sits in the immediate-opportunity quadrant, served directly by the Red Line with vacant and underutilized land available. It is a strong candidate for large-scale rapid transit TOD, with the physical capacity to build a critical mass of dense, mixed-income housing that constructs an urban intensity bundle from the ground up. Zoning should prioritize mixed-use overlay districts pairing residential density with ground-floor retail and employment.</p>
+          <p><strong>Route 128</strong> sits in the conditional-density quadrant and functions primarily as a highway-interception commuter facility. Near-term strategy should prioritize regional access efficiency over pedestrian-scale infill: optimize park-and-ride operations, improve express bus connections to surrounding employment centers, and reserve denser intervention for a later phase. Longer term, its commuter rail service and available land make it a transit village candidate, though that requires regional coordination across the Westwood, Dedham, and Canton boundaries.</p>
+        </div>
+
+        <div class="cluster-rec" data-cluster="4">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c4)"></span>
+            <h3>Cluster 4 · Regional Mixed-Use Center</h3>
+            <span class="cluster-rec-n">n=27 · 6,982 VMT/capita</span>
+          </div>
+          <p class="cluster-rec-finding"><strong>Finding:</strong> No significant coefficients, but park-and-ride capacity carries the largest variance share. Median income associates negatively with VMT, raising the question of who benefits from TOD-driven VMT reduction.</p>
+          <p>These are the historic downtowns of eastern Massachusetts: Worcester, Lowell, Lawrence, Lynn, Brockton, New Bedford. They are among the few commuter rail contexts where a walkable urban fabric predates the automobile. They also have the lowest median household income in the network, historically serving working-class and immigrant populations. The challenge is converting inherited walkable fabric into realized VMT reduction without displacing the residents who would benefit most.</p>
+          <p>Unlike urban rapid transit nodes where last-mile alternatives are abundant, parking at regional commuter rail downtowns serves a legitimate access function for commuters from surrounding towns. Station parking is needed, but it can take a different form: <strong>consolidate into structured facilities</strong> that accommodate regional commuters while freeing downtown land for high-density mixed-use infill. Employment density contributes meaningfully to lower VMT here, reinforcing that these downtowns should be maintained as job centers rather than converted into residential commuter zones.</p>
+          <p>The distinctive lever is <strong>equity-conditioned density</strong>. The Act's current guidelines permit municipalities to require up to 10 percent of units as affordable at 80 percent AMI, with higher thresholds where an economic feasibility analysis supports them. For Cluster 4 communities, where incomes are lowest and displacement risk is acute, municipalities should pursue deeper inclusionary requirements targeting closer to 60 percent AMI, using Chapter 40R density bonuses and affordable housing trust fund allocations to make those thresholds viable. State authorities should prioritize trust fund allocations to compliance districts in this cluster. Because these communities rely heavily on local bus networks, infrastructure investment should prioritize bus service quality and dedicated lane expansion, addressing the multimodal needs the rail-centric framing of the Act overlooks.</p>
+          <p class="equity-note"><strong>Equity:</strong> Deed-restricted affordable units and tenant protections in station areas undergoing reinvestment.</p>
+        </div>
+
+        <div class="cluster-rec" data-cluster="5">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c5)"></span>
+            <h3>Cluster 5 · Suburban Residential Neighborhood</h3>
+            <span class="cluster-rec-n">n=62 · 7,509 VMT/capita</span>
+          </div>
+          <p class="cluster-rec-finding"><strong>Finding:</strong> Housing density is the single strongest predictor (β=-0.176, p&lt;0.01, LMG 38.9%). A one standard deviation increase associates with a 17.6 percent reduction in per capita driving. Strongest model in the typology.</p>
+          <p>This is the critical testing ground for the Act. It contains the largest share of regulated municipalities and yields the clearest empirical signal in the study. With relatively uniform commuter rail service and built environment conditions across 62 stations, density variation translates cleanly into VMT variation, and the Act's core mechanism works largely as the policy theory intends.</p>
+          <p>The primary directive is to guide density mandates toward station areas with structural capacity to absorb growth without locking in car-dependent travel. The Siting Framework locates these in the conditional-density quadrant: stations with vacant land but incomplete bundles. Municipalities should deploy <strong>conditional density</strong>, pairing multifamily zoning approvals with targeted non-residential capital improvements. Because most of these suburbs have strong commuter rail access but virtually no internal transit circulation, the most effective local levers are municipal microtransit pilots, on-demand shuttles, and safe last-mile pedestrian networks connecting platforms to surrounding residential areas.</p>
+          <p>The within-cluster analysis also finds a positive association between land use entropy and VMT, which means mixed-use zoning designations alone do not reduce driving in low-density suburban contexts. Placing a commercial parcel adjacent to a residential subdivision yields no behavioral shift if the roadway layout forces residents to drive across the property line. Suburban planners should deprioritize nominal land use mix on paper and focus on neighborhood design standards ensuring physical connectivity, continuous sidewalks, and active transportation infrastructure.</p>
+          <p class="equity-note"><strong>Equity:</strong> Median income associates negatively with VMT here, meaning lower-income suburban residents drive more and bear disproportionately high transportation costs. Inclusionary requirements in suburban compliance districts ensure low-VMT housing opportunities reach the households who would benefit most.</p>
+        </div>
+
+        <div class="cluster-rec" data-cluster="6">
+          <div class="cluster-rec-head">
+            <span class="cluster-rec-dot" style="background:var(--c6)"></span>
+            <h3>Cluster 6 · Exurban Mixed-Use Fringe</h3>
+            <span class="cluster-rec-n">n=18 · 9,430 VMT/capita</span>
+          </div>
           <p class="cluster-rec-finding"><strong>Finding:</strong> Land use entropy is the only significant predictor (β=+0.207, p&lt;0.01), accounting for a dominant 79.8% of explained variance. The positive sign is a measurement artifact, not a policy lever.</p>
           <p>In an exurban context, a high entropy index captures coarse geographic adjacency of auto-dependent, disconnected uses: a highway-oriented strip mall next to a low-density subdivision, not a walkable pedestrian-scale environment. The POI accessibility measure points the opposite direction, confirming that functional destination access and nominal land use diversity are different things in these contexts.</p>
           <p>The honest planning assessment is that these are not near-term VMT reduction sites, and the Act's density mandate will deliver less here than anywhere else in the network. The most effective strategy is <strong>concentration rather than furthering sprawl</strong>. Where exurban communities must establish multifamily districts under the Act, planners should focus them tightly on the immediate town-center parcels that already possess some traditional walkable fabric. Allowing density to spread across the broader station buffer positions new housing in auto-dependent surroundings and locks in high-VMT travel for incoming residents.</p>
           <p>Because these outer rings structurally produce long-distance vehicle trips regardless of local conditions, capital-intensive bundle investment would be less effective here. The most promising near-term interventions lie outside the Act: travel demand management and pilot regional microtransit networks that manage trips the built environment alone cannot alter.</p>
           <p class="equity-note"><strong>Equity:</strong> Prioritize state and regional resources toward clusters where density reliably reduces driving.</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
+      </div>
 
+      <div class="method-section">
+        <h2>Using this atlas</h2>
+        <p>The frameworks above are designed for practitioners, but their utility depends on station-level access that a static document cannot deliver. A planner working in a Cluster 5 community needs to see exactly where their station sits in the Siting Profile, how its built environment compares to similar stations, and which intervention priorities the typology assigns. A 163-station network cannot be navigated through prose alone.</p>
+        <p>The <strong>Map</strong> displays the six clusters across the MBTA service area with station-level detail on built environment, transportation, demographic, and VMT variables. The <strong>Data Explorer</strong> allows filtering, sorting, and comparison across any variable in the analysis. The 3D PCA view shows how the clusters relate on the underlying built environment dimensions.</p>
+        <p>The atlas is built for use during ongoing implementation. Municipalities working through compliance, state agencies providing technical assistance, and advocates engaging with municipal processes can use it as a shared reference point. Where a municipality is debating compliance approaches, the atlas shows how their station compares to similar stations elsewhere in the network and what the analysis suggests about appropriate strategies.</p>
       </div>
     </div>
   </div>
@@ -2674,25 +2656,6 @@ Promise.all([
   buildStrip('strip-bike',    s => +s.bikelane_cov,    v => (v*100).toFixed(0) + '%',          '');
   buildStrip('strip-income',  s => +s.income,          v => '$' + Math.round(v/1000) + 'k',   '');
   if (document.getElementById('page-data').classList.contains('active')) buildDataTable();
-
-/* ── Typology table: expandable detail rows ── */
-(function initRecTable(){
-  document.querySelectorAll('tr.rec-row').forEach(function(row){
-    function toggle(){
-      var detail = document.getElementById('rec-detail-' + row.dataset.cluster);
-      if (!detail) return;
-      var open = detail.hasAttribute('hidden');
-      if (open) { detail.removeAttribute('hidden'); } else { detail.setAttribute('hidden',''); }
-      row.classList.toggle('open', open);
-      row.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    row.addEventListener('click', toggle);
-    row.addEventListener('keydown', function(e){
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-    });
-  });
-})();
-
   if (document.getElementById('page-recommendations').classList.contains('active')) renderSitingChart();
 }).catch(err => {
   console.error('Data load failed:', err);

@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas of MBTA Transit Adjacent Communities</title>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f11;
+    --bg-panel: #13141a;
+    --bg-card: #1a1c24;
+    --bg-card-hover: #20222e;
+    --border: rgba(255,255,255,0.07);
+    --border-mid: rgba(255,255,255,0.12);
+    --text-primary: #f0ede8;
+    --text-secondary: #8a8880;
+    --text-muted: #999999;
+    --accent: #a8dadc;
+    --accent-dim: rgba(168,218,220,0.12);
+    --nav-w: 220px;
+    --panel-w: 340px;
+
+    --c1: #0cb2af; --c1-bg: rgba(12,178,175,0.15);
+    --c2: #a1c65d; --c2-bg: rgba(161,198,93,0.15);
+    --c3: #fac723; --c3-bg: rgba(250,199,35,0.15);
+    --c4: #f29222; --c4-bg: rgba(242,146,34,0.15);
+    --c5: #e95e50; --c5-bg: rgba(233,94,80,0.15);
+    --c6: #5b6abf; --c6-bg: rgba(91,106,191,0.15);
+  }
+
+  html[data-theme="light"] {
+    --bg: #f5f5f2;
+    --bg-panel: #ffffff;
+    --bg-card: #edecea;
+    --bg-card-hover: #e3e1dd;
+    --border: rgba(0,0,0,0.07);
+    --border-mid: rgba(0,0,0,0.14);
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-muted: #888888;
+    --accent: #0cb2af;
+    --accent-dim: rgba(12,178,175,0.10);
+  }
+
+  /* Light-mode overrides for hard-coded dark rgba values */
+  html[data-theme="light"] .nav-item:hover { background: rgba(0,0,0,0.04); }
+  html[data-theme="light"] .overlay-row { border-bottom-color: rgba(0,0,0,0.05); }
+  html[data-theme="light"] table.dt tr:hover td { background: rgba(0,0,0,0.03) !important; }
+  html[data-theme="light"] .mapboxgl-ctrl-group button:hover { background: rgba(0,0,0,0.06); }
+  html[data-theme="light"] .mapboxgl-ctrl-group .mapboxgl-ctrl-icon { filter: none; }
+  html[data-theme="light"] .mobile-legend-item { background: rgba(255,255,255,0.92); }
+  html[data-theme="light"] #mobile-title { background: var(--bg); }
+
+  /* Theme toggle button — fixed lower-right corner */
+  #theme-toggle {
+    position: fixed; bottom: 16px; right: 16px; z-index: 300;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 12px 7px 10px; cursor: pointer;
+    font-size: 11px; color: var(--text-secondary);
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    user-select: none;
+    transition: color 0.15s, border-color 0.15s, box-shadow 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #theme-toggle:hover { color: var(--text-primary); border-color: var(--accent); box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
+  #theme-toggle-icon { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.7; }
+  #theme-toggle:hover #theme-toggle-icon { opacity: 1; }
+
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 14px; }
+
+  /* ── NAV ── */
+  #nav {
+    position: fixed; left: 0; top: 0; bottom: 0; width: var(--nav-w);
+    background: var(--bg-panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; z-index: 200;
+  }
+  #nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+  #nav-logo .title { font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); line-height: 1.4; }
+  #nav-logo .sub { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: 'DM Mono', monospace; line-height: 1.5; }
+  #nav-links { padding: 12px 0; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; cursor: pointer;
+    font-size: 12px; font-weight: 400; color: var(--text-secondary);
+    border-left: 2px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--accent-dim); }
+  .nav-item .nav-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  /* nav legend section */
+  #nav-legend {
+    flex: 1; overflow-y: auto; padding: 20px 20px 24px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  #nav-legend.hidden { display: none; }
+  #nav-legend .legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  /* overlay panel inside nav — no box */
+
+  /* ── PAGES ── */
+  #app { margin-left: var(--nav-w); height: 100vh; overflow: hidden; }
+  .page { display: none; height: 100%; }
+  .page.active { display: flex; }
+
+  /* ── MAP PAGE ── */
+  #page-map { position: relative; overflow: hidden; }
+  #map { flex: 1; height: 100%; }
+  #map-loading {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); z-index: 5; flex-direction: column; gap: 12px;
+    font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace;
+  }
+  .spinner { width: 24px; height: 24px; border: 2px solid var(--border-mid); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #map-controls { position: absolute; top: 16px; left: 16px; display: flex; gap: 6px; z-index: 10; align-items: center; }
+
+  /* ── OVERLAY PANEL ── */
+  #overlay-panel { width: 240px; }
+  #overlay-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0 8px; cursor: pointer; user-select: none;
+  }
+  #overlay-panel-header:hover .overlay-panel-title { color: var(--text-primary); }
+  .overlay-panel-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+  .overlay-chevron { width: 10px; height: 10px; flex-shrink: 0; color: var(--text-muted); transition: transform 0.2s; }
+  #overlay-panel.collapsed .overlay-chevron { transform: rotate(-90deg); }
+  #overlay-panel-body { padding: 0 0 12px; }
+  #overlay-panel.collapsed #overlay-panel-body { display: none; }
+  .overlay-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 0; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .overlay-row:last-child { border-bottom: none; }
+  .overlay-row:hover .overlay-row-label { color: var(--text-primary); }
+  .overlay-row.disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+  .overlay-toggle {
+    width: 26px; height: 14px; border-radius: 7px; flex-shrink: 0;
+    background: var(--border-mid); position: relative;
+    transition: background 0.2s;
+  }
+  .overlay-toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--text-muted); transition: transform 0.2s, background 0.2s;
+  }
+  .overlay-row.active .overlay-toggle { background: var(--accent); }
+  .overlay-row.active .overlay-toggle::after { transform: translateX(12px); background: #fff; }
+  .overlay-row-label { font-size: 11px; color: var(--text-secondary); flex: 1; }
+  /* land use sub-legend */
+  #lu-sub-legend { padding: 6px 0 2px 35px; display: none; }
+  .overlay-row.active + #lu-sub-legend { display: block; }
+  .lu-legend-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); padding: 1px 0; }
+  .lu-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; opacity: 0.9; }
+
+  /* ── STATION SEARCH ── */
+  #station-search-wrap {
+    position: absolute; top: 60px; left: 16px; z-index: 20; width: 240px;
+  }
+  #station-search-row { display: flex; gap: 6px; }
+  #station-search {
+    flex: 1; height: 32px; padding: 0 12px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 11px; border-radius: 4px; outline: none;
+    transition: border-color 0.15s;
+  }
+  #station-search::placeholder { color: var(--text-muted); }
+  #station-search:focus { border-color: var(--accent); }
+  #btn-reset-view {
+    height: 32px; width: 32px; flex-shrink: 0;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-secondary); border-radius: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #btn-reset-view:hover { color: var(--accent); border-color: var(--accent); }
+  #search-results {
+    margin-top: 4px; background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 4px; overflow: hidden; display: none;
+  }
+  .search-result-item {
+    padding: 8px 12px; font-size: 11px; color: var(--text-secondary);
+    cursor: pointer; transition: background 0.1s, color 0.1s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .search-result-item:hover, .search-result-item.active {
+    background: var(--accent-dim); color: var(--text-primary);
+  }
+  .search-result-cluster {
+    font-size: 9px; font-family: 'DM Mono', monospace;
+    color: var(--text-muted); margin-left: 6px;
+  }
+  .map-btn {
+    height: 32px; padding: 0 14px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
+    border-radius: 4px; cursor: pointer;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  .map-btn:hover { color: var(--text-primary); }
+  .map-btn.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+  /* Side panel */
+  #side-panel {
+    width: var(--panel-w); height: 100%;
+    background: var(--bg-panel); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transform: translateX(var(--panel-w));
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+  }
+  #side-panel.open { transform: translateX(0); }
+  #panel-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-secondary); font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, background 0.15s;
+  }
+  #panel-close:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+  #panel-content { padding: 48px 24px 24px; position: relative; }
+  #panel-cluster-bar { height: 3px; width: 40px; border-radius: 2px; margin-bottom: 16px; }
+  #panel-station-name { font-size: 18px; font-weight: 500; line-height: 1.2; margin-bottom: 4px; }
+  #panel-cluster-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 24px; font-family: 'DM Mono', monospace; }
+  .panel-section { margin-bottom: 24px; }
+  .panel-section-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 5px; font-family: 'DM Mono', monospace; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { background: var(--bg-card); border-radius: 6px; padding: 12px; border: 1px solid var(--border); }
+  .stat-card .val { font-size: 20px; font-weight: 500; color: var(--text-primary); line-height: 1; }
+  .stat-card .lbl { font-size: 10px; color: var(--text-muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+  #sv-container {
+    border-radius: 6px; overflow: hidden; border: 1px solid var(--border);
+    aspect-ratio: 16/9; background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: var(--text-muted); text-align: center; padding: 12px;
+  }
+  #sv-container img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  #sv-link { display: block; text-align: center; margin-top: 8px; font-size: 11px; color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; transition: opacity 0.15s; }
+  #sv-link:hover { opacity: 0.7; }
+
+  /* Map legend + overlay column — now live in nav, these are no-op fallbacks */
+  #left-col { display: none; }
+  #map-legend {
+    background: transparent; border: none;
+    border-radius: 0; padding: 0;
+  }
+  #map-legend .legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; font-family: 'DM Mono', monospace; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-secondary); padding: 3px 0; cursor: pointer; transition: color 0.15s; }
+  .legend-item:hover { color: var(--text-primary); }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .legend-item.legend-dimmed { opacity: 0.3; }
+  .legend-item.legend-dimmed:hover { opacity: 0.6; color: var(--text-secondary); }
+
+  /* ── CLUSTERS PAGE ── */
+  #page-clusters { flex-direction: column; overflow: hidden; }
+  #clusters-header { padding: 28px 32px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #clusters-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+  #clusters-tabs { display: flex; gap: 0; }
+  .cluster-tab { padding: 8px 18px; font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; font-family: 'DM Mono', monospace; transition: color 0.15s, border-color 0.15s; }
+  .cluster-tab:hover { color: var(--text-secondary); }
+  .cluster-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+  #clusters-body { flex: 1; overflow: hidden; display: flex; position: relative; }
+  #clusters-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; max-width: 560px; line-height: 1.6; padding: 14px 32px 0; flex-shrink: 0; }
+  #pca-legend { position: absolute; bottom: 20px; left: 20px; display: flex; flex-direction: column; gap: 6px; pointer-events: none; z-index: 10; }
+  .pca-legend-title { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 2px; }
+  .pca-legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-secondary); font-family: 'DM Mono', monospace; }
+  .pca-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  #clusters-body { flex: 1; overflow: hidden; display: flex; }
+  #plot-3d { flex: 1; height: 100%; }
+  #cluster-detail-panel { width: 320px; border-left: 1px solid var(--border); background: var(--bg-panel); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  #cluster-detail-panel h3 { font-size: 13px; font-weight: 500; }
+  #cluster-detail-panel p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .cluster-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .cluster-stat-row .k { color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 10px; }
+  .cluster-stat-row .v { color: var(--text-primary); font-weight: 500; }
+  #cd-goto-map {
+    display: none; width: 100%; margin-top: 8px;
+    padding: 9px 14px; font-size: 11px; font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em; cursor: pointer; border-radius: 4px;
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    color: var(--accent); transition: background 0.15s, color 0.15s;
+    text-align: center;
+  }
+  #cd-goto-map:hover { background: var(--accent); color: var(--bg); }
+
+  /* ── SCATTER IN DETAIL PANEL ── */
+  #scatter-panel-section { margin-top: 4px; border-top: 1px solid var(--border); padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  #scatter-controls { display: flex; flex-direction: column; gap: 8px; }
+  .scatter-ctrl-group label { display: block; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-bottom: 4px; }
+  .scatter-ctrl-group select { width: 100%; background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Mono', monospace; font-size: 10px; padding: 5px 8px; border-radius: 3px; cursor: pointer; appearance: auto; -webkit-appearance: auto; }
+  .scatter-ctrl-group select:focus { outline: none; border-color: var(--accent); }
+  #plot-scatter { width: 100%; flex: none; }
+
+  /* ── METHODOLOGY PAGE ── */
+  #page-methodology { overflow-y: auto; }
+  #methodology-inner { max-width: 720px; margin: 0 auto; padding: 48px 32px 80px; }
+  #methodology-inner h1 { font-size: 24px; font-weight: 400; margin-bottom: 8px; }
+  #methodology-inner .lead { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 32px; }
+  .method-section { margin-bottom: 48px; }
+  .method-section h2 { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; font-family: 'DM Mono', monospace; }
+  .method-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+  .method-section strong { color: var(--text-primary); font-weight: 500; }
+  .method-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .step-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent); min-width: 24px; padding-top: 1px; }
+  .step-body h4 { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .step-body p { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .method-note { background: var(--bg-card); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; padding: 12px 16px; margin-top: 16px; font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+  /* ── DATA PAGE ── */
+  #page-data { flex-direction: column; overflow: hidden; }
+  #data-header { padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  #data-header h1 { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
+  #data-header p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  #data-body { flex: 1; overflow: hidden; padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+  /* Controls */
+  #dt-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-shrink: 0; }
+  #dt-search { height: 30px; padding: 0 10px; background: var(--bg-card); border: 1px solid var(--border-mid); color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: 11px; border-radius: 4px; outline: none; min-width: 200px; }
+  #dt-search::placeholder { color: var(--text-muted); }
+  #dt-search:focus { border-color: var(--accent); }
+  #dt-cluster-filters { display: flex; flex-wrap: wrap; gap: 5px; }
+  .dt-filter-btn { height: 26px; padding: 0 8px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 10px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: color 0.15s, border-color 0.15s, background 0.15s; white-space: nowrap; }
+  .dt-filter-btn:hover { color: var(--text-primary); border-color: var(--border-mid); }
+  .dt-filter-btn.active { background: var(--bg-card); border-color: var(--border-mid); color: var(--text-primary); }
+  .dt-filter-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  /* Table */
+  #dt-wrap { flex: 1; overflow: auto; border: 1px solid var(--border); border-radius: 6px; min-height: 0; }
+  table.dt { border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+  table.dt thead { position: sticky; top: 0; z-index: 2; background: var(--bg-panel); }
+  table.dt th { padding: 7px 8px; text-align: left; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-primary); font-family: 'DM Mono', monospace; font-weight: 500; border-bottom: 1px solid var(--border-mid); user-select: none; }
+  table.dt th.dt-sort { cursor: pointer; }
+  table.dt th.dt-sort:hover { color: var(--accent); }
+  table.dt th.dt-sort-asc::after { content: ' ↑'; opacity: 0.7; }
+  table.dt th.dt-sort-desc::after { content: ' ↓'; opacity: 0.7; }
+  table.dt td { padding: 5px 8px; border-bottom: 1px solid var(--border); color: var(--text-secondary); }
+  table.dt tr:last-child td { border-bottom: none; }
+  table.dt tr:hover td { background: rgba(255,255,255,0.025); cursor: pointer; }
+  table.dt td.dt-num { font-family: 'DM Mono', monospace; font-size: 10px; text-align: right; color: var(--text-muted); }
+  table.dt th.dt-num { text-align: right; }
+  table.dt td.dt-lu { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  table.dt .dt-grp-header th { background: var(--bg-card); color: var(--accent); font-size: 8px; letter-spacing: 0.14em; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  .dt-station-name { font-weight: 500; font-size: 11px; }
+  /* Group dividers — vertical accent lines (right-edge of last col in each group) */
+  table.dt tr.dt-grp-header th:not(:last-child) { border-right: 1px solid rgba(168,218,220,0.45); }
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(4),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(11),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(16),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(19),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(23),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(26),
+  table.dt thead tr:not(.dt-grp-header) th:nth-child(30) { border-right: 1px solid rgba(168,218,220,0.45); }
+  table.dt tbody td:nth-child(4),
+  table.dt tbody td:nth-child(11),
+  table.dt tbody td:nth-child(16),
+  table.dt tbody td:nth-child(19),
+  table.dt tbody td:nth-child(23),
+  table.dt tbody td:nth-child(26),
+  table.dt tbody td:nth-child(30) { border-right: 1px solid rgba(168,218,220,0.45); }
+  /* Frozen first column */
+  table.dt thead tr th:first-child { position: sticky; left: 0; z-index: 5; background: var(--bg-panel); }
+  table.dt tbody td:first-child { position: sticky; left: 0; z-index: 1; background: var(--bg-panel); }
+  table.dt tr:hover td:first-child { background: var(--bg-card); }
+  /* Every 5th row — subtle reading guide */
+  table.dt tbody tr:nth-child(5n) td { border-bottom: 1px solid rgba(255,255,255,0.14); }
+
+  /* Mapbox overrides */
+  .mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left { display: none; }
+  .mapboxgl-ctrl-top-right { top: 16px; right: 16px; }
+  .mapboxgl-ctrl-group { background: var(--bg-panel) !important; border: 1px solid var(--border-mid) !important; border-radius: 4px !important; }
+  .mapboxgl-ctrl-group button { background: transparent !important; }
+  .mapboxgl-ctrl-group button:hover { background: rgba(255,255,255,0.05) !important; }
+  .mapboxgl-ctrl-group .mapboxgl-ctrl-icon { filter: invert(1) opacity(0.5); }
+
+  /* Age distribution bar */
+  .age-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+  .age-seg { height: 100%; }
+  .age-legend { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+  .age-leg-item { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+  .age-leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Bus route badges */
+  .route-badges { display: flex; flex-wrap: wrap; gap: 4px; }
+  .route-badge { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-family: 'DM Mono', monospace; border: 1px solid rgba(168,218,220,0.3); color: #a8dadc; background: rgba(168,218,220,0.07); }
+  .route-badge.rta { border-color: rgba(255,255,255,0.12); color: var(--text-secondary); background: transparent; }
+
+  /* Inline stat pair */
+  .stat-pair { display: flex; gap: 32px; }
+  .stat-mini .val { font-size: 18px; font-weight: 500; color: var(--text-primary); line-height: 1.2; }
+  .stat-mini .lbl { font-size: 9px; color: var(--text-muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+  /* ── Mobile-only elements (hidden on desktop) ── */
+  #mobile-menu-btn {
+    display: none;
+    position: fixed; top: 12px; left: 12px; z-index: 300;
+    width: 36px; height: 36px;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 4px; color: var(--text-secondary); cursor: pointer;
+    align-items: center; justify-content: center;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #mobile-menu-btn:hover { color: var(--text-primary); border-color: var(--accent); }
+  #nav-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 350; }
+  #mobile-title { display: none; }
+  #cd-expand-btn { display: none; }
+  #sheet-handle {
+    display: none; width: 36px; height: 4px;
+    background: var(--border-mid); border-radius: 2px;
+    margin: 12px auto 4px; flex-shrink: 0;
+  }
+  #mobile-legend-strip {
+    display: none; position: absolute;
+    bottom: 16px; left: 8px; right: 8px;
+    z-index: 50; flex-wrap: wrap; gap: 4px;
+    transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+  }
+  .mobile-legend-item {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(19,20,26,0.88); backdrop-filter: blur(6px);
+    border: 1px solid var(--border-mid); border-radius: 20px;
+    padding: 4px 8px 4px 6px;
+    font-size: 10px; color: var(--text-secondary);
+    font-family: 'DM Mono', monospace;
+    cursor: pointer; white-space: nowrap; pointer-events: auto;
+    transition: color 0.15s;
+  }
+  .mobile-legend-item:hover { color: var(--text-primary); }
+  .mobile-legend-item.legend-dimmed { opacity: 0.3; }
+  .mobile-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Mobile responsive ── */
+  @media (max-width: 640px) {
+    /* Nav becomes a hidden side drawer */
+    #nav {
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 400;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    }
+    #nav.mobile-open { transform: translateX(0); }
+    #nav-backdrop.visible { display: block; }
+
+    /* Hamburger button */
+    #mobile-menu-btn { display: flex; }
+
+    /* App: full width (no left margin for nav); pad top to clear fixed title bar */
+    #app { margin-left: 0; padding-top: 44px; }
+
+    /* Search bar: shifted right to clear hamburger */
+    #station-search-wrap { top: 12px; left: 56px; width: calc(100% - 68px); }
+
+    /* Map style toggle buttons: below the top bar */
+    #map-controls { top: 56px; left: 12px; }
+
+    /* Mapbox nav control */
+    .mapboxgl-ctrl-top-right { top: 56px; right: 8px; }
+
+    /* Side panel → bottom sheet */
+    #side-panel {
+      position: fixed;
+      width: 100%; height: 75vh;
+      top: auto; bottom: 0; left: 0; right: 0;
+      border-left: none; border-top: 1px solid var(--border-mid);
+      border-radius: 12px 12px 0 0;
+      transform: translateY(100%);
+      overflow-y: auto;
+      z-index: 200;
+    }
+    #side-panel.open { transform: translateY(0); }
+
+    /* Show drag handle and floating legend strip */
+    #sheet-handle { display: block; }
+    #mobile-legend-strip { display: flex; }
+    #mobile-legend-strip.sheet-open { bottom: calc(75vh + 8px); }
+
+    /* Close button: smaller offset on sheet */
+    #panel-close { top: 12px; right: 12px; }
+
+    /* Clusters page: stack vertically */
+    #clusters-body { flex-direction: column; }
+    #cluster-detail-panel {
+      width: 100%; max-height: 45vh;
+      border-left: none; border-top: 1px solid var(--border);
+      overflow-y: auto;
+    }
+    #plot-3d { height: 38vh; flex: none; }
+    #clusters-header { padding: 16px 16px 0; }
+    /* Hide the long description text — legend moves above the plot instead */
+    #clusters-desc { display: none; }
+    /* Lift pca-legend out of absolute overlay and put it above the plot */
+    #pca-legend {
+      position: static;
+      order: -1;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 3px 14px;
+      padding: 8px 16px 6px;
+      pointer-events: auto;
+    }
+    .pca-legend-title { width: 100%; margin-bottom: 2px; }
+    .pca-legend-item { font-size: 10px; }
+    /* Cluster detail panel: collapsed = name+desc only, expanded = full */
+    #cluster-detail-panel {
+      position: relative;
+      max-height: 90px;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    #cluster-detail-panel.cd-expanded { max-height: 60vh; overflow-y: auto; }
+    #scatter-panel-section { overflow: visible; }
+    #cd-expand-btn {
+      position: absolute; top: 8px; right: 10px;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg-card); border: 1px solid var(--border-mid);
+      color: var(--text-secondary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s, background 0.15s;
+      z-index: 5;
+    }
+    #cd-expand-btn:hover { color: var(--accent); }
+    /* When expanded, give the PCA plot less height so panel can fit */
+    #cluster-detail-panel.cd-expanded ~ * { flex-shrink: 1; }
+    #page-clusters.panel-expanded #plot-3d { height: 20vh; }
+    /* Mobile page title top-right */
+    #mobile-title {
+      display: block;
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 44px;
+      background: var(--bg);
+      z-index: 250; pointer-events: none;
+    }
+
+    /* Methodology page: narrower padding */
+    #methodology-inner { padding: 32px 16px 60px; }
+
+    /* Data page: tighter padding */
+    #data-header { padding: 16px 16px 12px; }
+    #data-body { padding: 8px 10px 12px; }
+    #dt-search { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Theme toggle button (fixed lower-right) -->
+<button id="theme-toggle" aria-label="Toggle light/dark theme">
+  <svg id="theme-toggle-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+    <circle cx="8" cy="8" r="3.5"/>
+    <line x1="8" y1="1" x2="8" y2="2.5"/><line x1="8" y1="13.5" x2="8" y2="15"/>
+    <line x1="1" y1="8" x2="2.5" y2="8"/><line x1="13.5" y1="8" x2="15" y2="8"/>
+    <line x1="3.05" y1="3.05" x2="4.11" y2="4.11"/><line x1="11.89" y1="11.89" x2="12.95" y2="12.95"/>
+    <line x1="12.95" y1="3.05" x2="11.89" y2="4.11"/><line x1="4.11" y1="11.89" x2="3.05" y2="12.95"/>
+  </svg>
+  Light mode
+</button>
+
+<!-- Mobile nav backdrop and hamburger button -->
+<div id="nav-backdrop"></div>
+<button id="mobile-menu-btn" aria-label="Open menu">
+  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5">
+    <line x1="2" y1="4.5" x2="14" y2="4.5"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="11.5" x2="14" y2="11.5"/>
+  </svg>
+</button>
+<div id="mobile-title"></div>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div id="nav-logo">
+    <div class="title">Atlas of MBTA Transit Adjacent Communities<br></div>
+    <div class="sub" style="color:var(--text-primary);">Beyond Density · VMT-Informed<br>Implementation of the<br>MBTA Communities Act</div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted);font-family:'DM Mono',monospace;"> <a href="https://www.linkedin.com/in/qian-erin-chen/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor;">Erin Chen</a> · Thesis · 2026</div>
+  </div>
+  <div id="nav-links">
+    <div class="nav-item" data-page="clusters">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="8" cy="8" r="2"/>
+      </svg>
+      3D Clusters
+    </div>
+    <div class="nav-item active" data-page="map">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M2 4l4-2 4 2 4-2v10l-4 2-4-2-4 2V4z"/><path d="M6 2v10M10 4v10"/>
+      </svg>
+      Map
+    </div>
+    <div class="nav-item" data-page="data">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <rect x="2" y="10" width="3" height="4" rx="1"/><rect x="6.5" y="6" width="3" height="8" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/>
+      </svg>
+      Data Explorer
+    </div>
+    <div class="nav-item" data-page="methodology">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M3 4h10M3 8h7M3 12h4"/>
+      </svg>
+      Research Design
+    </div>
+    <div class="nav-item" data-page="insights">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M8 2a4 4 0 0 1 2 7.46V11H6v-1.54A4 4 0 0 1 8 2z"/><path d="M6 12h4M6.5 14h3"/>
+      </svg>
+      Insights &amp; Recommendation
+    </div>
+  </div>
+  <div id="nav-legend">
+    <div class="legend-title">Station typology</div>
+    <div class="legend-item" data-cluster="1"><div class="legend-swatch" style="background:var(--c1)"></div>Urban Employment Node</div>
+    <div class="legend-item" data-cluster="2"><div class="legend-swatch" style="background:var(--c2)"></div>Urban Residential Node</div>
+    <div class="legend-item" data-cluster="3"><div class="legend-swatch" style="background:var(--c3)"></div>Suburban Employment Node</div>
+    <div class="legend-item" data-cluster="4"><div class="legend-swatch" style="background:var(--c4)"></div>Transitional Mixed-Use Area</div>
+    <div class="legend-item" data-cluster="5"><div class="legend-swatch" style="background:var(--c5)"></div>Suburban Residential Fringe</div>
+    <div class="legend-item" data-cluster="6"><div class="legend-swatch" style="background:var(--c6)"></div>Exurban Mixed-Use Fringe</div>
+    <div id="overlay-panel" style="margin-top:16px;">
+      <div id="overlay-panel-header">
+        <span class="overlay-panel-title">Map Overlays</span>
+        <svg class="overlay-chevron" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polyline points="2,3.5 5,6.5 8,3.5"/>
+        </svg>
+      </div>
+      <div id="overlay-panel-body">
+        <div class="overlay-row" id="overlay-landuse">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Land Use</span>
+        </div>
+        <div id="lu-sub-legend">
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFFFA8;border:1px solid rgba(0,0,0,0.2)"></div>Residential 1–2 Family</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFAA00"></div>Residential Multifamily</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#FFD48A;border:1px solid rgba(0,0,0,0.1)"></div>Residential Other</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#C8A052"></div>Mixed Use</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#E84B22"></div>Commercial / Office</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#C29ED7"></div>Industrial / Mfg.</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#BEBEBE;border:1px solid rgba(0,0,0,0.1)"></div>Transportation / Utility</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#b7d5f0"></div>Public Facilities</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#73DF80"></div>Open Space</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#9C9C9C"></div>Parking Facilities</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#CCCCCC;border:1px solid rgba(0,0,0,0.1)"></div>Vacant Land</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
+        </div>
+        <div class="overlay-row disabled" id="overlay-hudensity"><div class="overlay-toggle"></div><span class="overlay-row-label">Housing Density</span></div>
+        <div class="overlay-row disabled" id="overlay-landvalue"><div class="overlay-toggle"></div><span class="overlay-row-label">Land Value</span></div>
+        <div class="overlay-row disabled" id="overlay-flood"><div class="overlay-toggle"></div><span class="overlay-row-label">Flood Risk</span></div>
+        <div class="overlay-row disabled" id="overlay-publicland"><div class="overlay-toggle"></div><span class="overlay-row-label">Vacant Land</span></div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ── APP ── -->
+<div id="app">
+
+  <!-- MAP PAGE -->
+  <div class="page active" id="page-map">
+    <div id="map">
+      <div id="map-loading">
+        <div class="spinner"></div>
+        <span>Loading station data…</span>
+      </div>
+    </div>
+
+    <div id="map-controls">
+      <button class="map-btn active" id="btn-minimal">Minimal</button>
+      <button class="map-btn" id="btn-satellite">Satellite</button>
+    </div>
+
+    <div id="station-search-wrap">
+      <div id="station-search-row">
+        <input id="station-search" type="text" placeholder="Search station…" autocomplete="off" />
+        <button id="btn-reset-view" title="Reset view">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 8a6 6 0 1 0 1.5-3.9"/><polyline points="2 3.5 2 8 6.5 8"/>
+          </svg>
+        </button>
+      </div>
+      <div id="search-results"></div>
+    </div>
+
+    <div id="side-panel" class="open">
+      <div id="sheet-handle"></div>
+      <button id="panel-close">&#x2715;</button>
+      <div id="panel-content">
+        <div id="panel-cluster-bar"></div>
+        <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:4px;" id="panel-selected-label">Selected station</div>
+        <div id="panel-station-name" style="font-size:18px;font-weight:500;line-height:1.2;margin-bottom:4px;">Click a point</div>
+        <div id="panel-cluster-label" style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:24px;font-family:'DM Mono',monospace;">Select a station on the map</div>
+
+        <div class="panel-section">
+          <div class="panel-section-title"style="color:var(--text-primary);">VMT per capita / year</div>
+          <div id="strip-vmt"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Housing units / acre</div>
+          <div id="strip-density"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Peak trains / hr</div>
+          <div id="strip-freq"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Job density / acre</div>
+          <div id="strip-jobden"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Job to population ratio</div>
+          <div id="strip-jobmix"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Land use entropy</div>
+          <div id="strip-entropy"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Intersection density / acre</div>
+          <div id="strip-intx"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Bike lane coverage</div>
+          <div id="strip-bike"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Median household income</div>
+          <div id="strip-income"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Age distribution</div>
+          <div id="panel-age-bar">
+            <div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div>
+            <div class="age-legend"><span style="color:var(--text-muted);font-size:9px;font-family:'DM Mono',monospace;">Select a station</span></div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Bus routes in area</div>
+          <div id="panel-bus-routes"><span style="color:var(--text-muted);font-size:10px;font-family:'DM Mono',monospace;">Select a station</span></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="stat-pair">
+            <div>
+              <div class="panel-section-title" style="color:var(--text-primary);">Parking spaces</div>
+              <div id="panel-parking" class="stat-mini"><div class="val">—</div><div class="lbl">total spaces</div></div>
+            </div>
+            <div>
+              <div class="panel-section-title" style="color:var(--text-primary);">Bluebike stations</div>
+              <div id="panel-bluebike" class="stat-mini"><div class="val">—</div><div class="lbl">within 0.5 mi</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="panel-section-title" style="color:var(--text-primary);">Street view</div>
+          <div id="sv-container">
+            <span id="sv-placeholder">Add a Google Street View Static API key to enable image previews.</span>
+            <img id="sv-img" alt="Street View" />
+          </div>
+          <a id="sv-link" href="#" target="_blank" rel="noopener noreferrer">Open in Google Maps ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile floating legend strip -->
+    <div id="mobile-legend-strip">
+      <div class="mobile-legend-item" data-cluster="1"><div class="mobile-legend-dot" style="background:var(--c1)"></div>Urban Employment</div>
+      <div class="mobile-legend-item" data-cluster="2"><div class="mobile-legend-dot" style="background:var(--c2)"></div>Urban Residential</div>
+      <div class="mobile-legend-item" data-cluster="3"><div class="mobile-legend-dot" style="background:var(--c3)"></div>Suburban Employment</div>
+      <div class="mobile-legend-item" data-cluster="4"><div class="mobile-legend-dot" style="background:var(--c4)"></div>Transitional Mixed-Use</div>
+      <div class="mobile-legend-item" data-cluster="5"><div class="mobile-legend-dot" style="background:var(--c5)"></div>Suburban Residential Fringe</div>
+      <div class="mobile-legend-item" data-cluster="6"><div class="mobile-legend-dot" style="background:var(--c6)"></div>Exurban Mixed-Use Fringe</div>
+    </div>
+  </div>
+
+  <!-- CLUSTERS PAGE -->
+  <div class="page" id="page-clusters">
+    <div id="clusters-header">
+      <h1>Station area typologies</h1>
+      <div id="clusters-tabs">
+        <div class="cluster-tab active" data-ctab="3d">3D PCA view</div>
+      </div>
+    </div>
+    <div id="clusters-body">
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;">
+        <p id="clusters-desc">Ward hierarchical clustering (k=6) on activity intensity, job mix, land use entropy, and transit frequency. PC1 explains 43% of variance (activity &amp; transit intensity); PC2 explains 37% (land use diversity). Click any point to explore station detail.</p>
+        <div id="plot-3d" style="flex:1;"></div>
+        <div id="pca-legend"></div>
+      </div>
+      <div id="cluster-detail-panel">
+        <button id="cd-expand-btn" aria-label="Expand panel">
+          <svg id="cd-expand-icon" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,10 8,6 12,10"/></svg>
+        </button>
+        <h3 id="cd-name" style="color:var(--text-primary);">Click a point</h3>
+        <p id="cd-desc" style="font-size:11px;">Select a station in the plot to see cluster-level characteristics here.</p>
+        <div id="scatter-panel-section">
+          <div id="scatter-controls">
+            <div class="scatter-ctrl-group">
+              <label>Y axis</label>
+              <select id="scatter-y"></select>
+            </div>
+            <div class="scatter-ctrl-group">
+              <label>X axis</label>
+              <select id="scatter-x"></select>
+            </div>
+          </div>
+          <div id="plot-scatter"></div>
+        </div>
+        <button id="cd-goto-map">View on map ↗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- METHODOLOGY PAGE -->
+  <div class="page" id="page-methodology">
+    <div id="methodology-inner">
+      <h1>Research Design</h1>
+      <p class="lead">This analysis links land use configuration at MBTA station areas to vehicle miles traveled per capita, using cross-sectional OLS regression, Ward hierarchical clustering, and longitudinal long-difference regression. The goal is to identify whether variation in station-area typology — not density alone — predicts VMT, and whether that variation has policy implications for differentiated implementation of the MBTA Communities Act.</p>
+
+      <div class="method-section">
+        <h2>Unit of analysis</h2>
+        <p>Each observation is a <strong>0.5-mile station area buffer</strong> around an MBTA Communities station (n=169, excluding Boston). VMT per capita is derived from Massachusetts Vehicle Census odometer readings, aggregated to buffers via block group clipping and area-weighted normalization. The dependent variable is log-transformed to address right skew.</p>
+      </div>
+
+      <div class="method-section">
+        <h2>Analytical pipeline</h2>
+        <div class="method-step">
+          <div class="step-num">01</div>
+          <div class="step-body">
+            <h4>Cross-sectional OLS regression</h4>
+            <p>Establishes baseline relationships between land use variables and VMT per capita across station areas. Controls include median household income, young adult share (18–34), and senior share (65+). Housing density is retained as a policy-anchor variable regardless of VIF.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">02</div>
+          <div class="step-body">
+            <h4>Hierarchical clustering (k=6)</h4>
+            <p>Ward.D2 linkage on Euclidean distances across four input variables: <strong>activity intensity</strong> (housing + job density composite), <strong>job mix</strong>, <strong>land use entropy</strong>, and <strong>peak transit frequency</strong>. VMT is deliberately excluded from clustering inputs to avoid circularity with its role as the regression outcome. Six clusters selected via dendrogram inspection and silhouette analysis.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">03</div>
+          <div class="step-body">
+            <h4>Within-cluster regression</h4>
+            <p>OLS models estimated separately for each cluster typology, allowing the relationship between land use variables and VMT to vary by station type. This tests whether density, mix, and entropy operate differently across the typological spectrum.</p>
+          </div>
+        </div>
+        <div class="method-step">
+          <div class="step-num">04</div>
+          <div class="step-body">
+            <h4>Longitudinal long-difference regression</h4>
+            <p>Changes in VMT between two periods are regressed on changes in land use variables, identifying whether growth in housing or commercial density at station areas corresponds to measurable VMT reductions over time.</p>
+          </div>
+        </div>
+        <div class="method-note">
+          <strong>Limitations:</strong> Spatial autocorrelation has not been tested via Moran's I. Parking supply data may not reflect current conditions. The silhouette score for k=6 reflects cluster overlap visible in the PCA projection (PC1+PC2+PC3 explain 92.8% of clustering variable variance).
+        </div>
+      </div>
+
+      <div class="method-section">
+        <h2>Data sources</h2>
+        <p><strong>Massachusetts Vehicle Census</strong> — odometer readings aggregated to station area buffers as the primary VMT measure.</p>
+        <p><strong>MassBuild</strong> — housing units and commercial square footage by year, used to construct longitudinal land use change variables.</p>
+        <p><strong>GTFS / MBTA schedule data</strong> — peak hour train frequency as the transit input to clustering.</p>
+        <p><strong>US Census / ACS</strong> — demographic controls (income, age structure).</p>
+        <p><strong>MassGIS parcels + OSM</strong> — land use entropy and street network variables.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS & RECOMMENDATION PAGE -->
+  <div class="page" id="page-insights">
+    <div id="methodology-inner">
+      <h1>Insights &amp; Recommendation</h1>
+      <p class="lead">Content coming soon.</p>
+    </div>
+  </div>
+
+  <!-- DATA PAGE -->
+  <div class="page" id="page-data">
+    <div id="data-header">
+      <h1>Station data explorer</h1>
+      <p>Search and filter VMT, land use, and cluster data across all MBTA Communities station areas. Click a row to view on the map.</p>
+    </div>
+    <div id="data-body">
+      <!-- Controls -->
+      <div id="dt-controls">
+        <input id="dt-search" type="text" placeholder="Search stations…" autocomplete="off" />
+        <div id="dt-cluster-filters">
+          <button class="dt-filter-btn active" data-cluster="0">All</button>
+        </div>
+      </div>
+      <!-- Table -->
+      <div id="dt-wrap">
+        <table class="dt" id="dt-table">
+          <thead>
+            <tr class="dt-grp-header"><th colspan="4"></th><th colspan="7" class="dt-num">Land Use &amp; Density</th><th colspan="5" class="dt-num">Infrastructure</th><th colspan="3" class="dt-num">Access &amp; POI</th><th colspan="4" class="dt-num">Mode Share</th><th colspan="3" class="dt-num">Demographics: Age</th><th colspan="4" class="dt-num">Demographics: Race</th><th colspan="3" class="dt-num">Demographics: Other</th></tr>
+            <tr>
+              <th class="dt-sort" data-col="name">Station</th>
+              <th data-col="type">Type</th>
+              <th class="dt-sort dt-num" data-col="vmt_pc">VMT/cap</th>
+              <th data-col="dominant_lu">Dom. LU</th>
+              <th class="dt-sort dt-num" data-col="hu_den">HU/ac</th>
+              <th class="dt-sort dt-num" data-col="job_den">Jobs/ac</th>
+              <th class="dt-sort dt-num" data-col="job_mix">Job:pop</th>
+              <th class="dt-sort dt-num" data-col="lu_entropy">LU entr</th>
+              <th class="dt-sort dt-num" data-col="intx_density_ac">Intx/ac</th>
+              <th class="dt-sort dt-num" data-col="sidewalk_cov">Sidewalk</th>
+              <th class="dt-sort dt-num" data-col="bikelane_cov">Bikelane</th>
+              <th class="dt-sort dt-num" data-col="transit_phr">Transit/hr</th>
+              <th class="dt-sort dt-num" data-col="n_bus_mbta">MBTA bus</th>
+              <th class="dt-sort dt-num" data-col="n_rta">RTA</th>
+              <th class="dt-sort dt-num" data-col="park_spaces">Parking</th>
+              <th class="dt-sort dt-num" data-col="n_bluebike">Bluebike</th>
+              <th class="dt-sort dt-num" data-col="food_score">Food</th>
+              <th class="dt-sort dt-num" data-col="inst_score">Inst</th>
+              <th class="dt-sort dt-num" data-col="leis_score">Leisure</th>
+              <th class="dt-sort dt-num" data-col="pct_transit">Transit</th>
+              <th class="dt-sort dt-num" data-col="pct_car">Car</th>
+              <th class="dt-sort dt-num" data-col="pct_walk">Walk</th>
+              <th class="dt-sort dt-num" data-col="pct_bike">Bike</th>
+              <th class="dt-sort dt-num" data-col="pct_young_adult">Young</th>
+              <th class="dt-sort dt-num" data-col="pct_working_age">Work</th>
+              <th class="dt-sort dt-num" data-col="pct_senior">Senior</th>
+              <th class="dt-sort dt-num" data-col="pct_white">White</th>
+              <th class="dt-sort dt-num" data-col="pct_black">Black</th>
+              <th class="dt-sort dt-num" data-col="pct_asian">Asian</th>
+              <th class="dt-sort dt-num" data-col="pct_other">Other</th>
+              <th class="dt-sort dt-num" data-col="vehicle_per_unit">Veh/unit</th>
+              <th class="dt-sort dt-num" data-col="income">Income</th>
+              <th class="dt-sort dt-num" data-col="pct_bachelors">Bach+</th>
+            </tr>
+          </thead>
+          <tbody id="dt-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SCRIPTS ── -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.27.0/plotly.min.js"></script>
+
+<script>
+// ─────────────────────────────────────────────
+// CONFIGURATION
+// ─────────────────────────────────────────────
+const MAPBOX_TOKEN = 'pk.eyJ1IjoieGl4aWVyaW4iLCJhIjoiY21vMTFpbmE5MGVnNTJwb2x6cjhyZ3BzbCJ9.FrcSWLXpL_ORxeXVdLxrnA';
+const GOOGLE_SV_KEY = 'AIzaSyCiVuBcEPz31GE91uBGZnHtYcVY6pA-rno';   // optional — leave empty to skip Street View images
+
+const STYLE_MINIMAL   = 'mapbox://styles/mapbox/dark-v11';
+const STYLE_SATELLITE = 'mapbox://styles/mapbox/satellite-streets-v12';
+
+// ─────────────────────────────────────────────
+// CLUSTER METADATA  (matches Ward 4var k=6 model)
+// ─────────────────────────────────────────────
+const CLUSTER_META = {
+  1: { name: "Urban Employment Node",         color: "#0cb2af",
+       desc: "High activity intensity, job-dominant land use, high transit frequency." },
+  2: { name: "Urban Residential Node",        color: "#a1c65d",
+       desc: "High activity intensity, predominantly residential land use, high transit frequency." },
+  3: { name: "Suburban Employment Node",      color: "#fac723",
+       desc: "Low-moderate activity, high job mix, transit-served." },
+  4: { name: "Transitional Mixed-Use Area",   color: "#f29222",
+       desc: "High activity intensity, diverse land uses, low transit frequency." },
+  5: { name: "Suburban Residential Fringe",     color: "#e95e50",
+       desc: "Low-moderate activity, residential-dominant, low transit frequency." },
+  6: { name: "Exurban Mixed-Use Fringe",                color: "#5b6abf",
+       desc: "Lowest activity intensity, job-dominant, minimal transit service." }
+};
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let STATIONS  = [];
+let mapReady  = false;
+let dataReady = false;
+let currentStyle = 'minimal';
+let map;
+let legendSelectedClusters = new Set();
+let luLayerVisible = false;
+let _clickedStation = null;  // last station pinned by click
+let luDataReady = false;
+
+// ─────────────────────────────────────────────
+// LAND USE COLORS (MassGIS palette)
+// ─────────────────────────────────────────────
+const LU_COLORS = {
+  'Residential 1-2 Family':   '#FFFFA8',
+  'Residential Multifamily':  '#FFAA00',
+  'Residential Other':        '#FFD48A',
+  'Mixed Use':                '#C8A052',
+  'Commercial/Office':        '#E84B22',
+  'Industrial/Manufacturing': '#C29ED7',
+  'Transportation/Utility':   '#BEBEBE',
+  'Public Facilities':        '#b7d5f0',
+  'Open Space':               '#73DF80',
+  'Parking Facilities':       '#9C9C9C',
+  'Vacant Land':              '#CCCCCC',
+  'Other':                    '#727272'
+};
+
+function luColorExpr() {
+  const entries = Object.entries(LU_COLORS);
+  return ['match', ['get', 'lu_cat'],
+    ...entries.flatMap(([k, v]) => [k, v]),
+    '#727272'
+  ];
+}
+
+// ─────────────────────────────────────────────
+// DATA LOADING
+// ─────────────────────────────────────────────
+
+// Municipalities classified as Rapid Transit or Commuter Rail under MBTA Communities Act
+const RT_CR_COMMUNITIES = new Set([
+  // Rapid Transit
+  'Braintree','Brookline','Cambridge','Chelsea','Everett','Malden','Medford',
+  'Milton','Newton','Quincy','Revere','Somerville',
+  // Commuter Rail
+  'Abington','Acton','Andover','Ashland','Attleboro','Ayer','Belmont','Beverly',
+  'Billerica','Bridgewater','Brockton','Canton','Cohasset','Concord','Dedham',
+  'Fall River','Fitchburg','Framingham','Franklin','Freetown','Gloucester',
+  'Halifax','Hamilton','Hanson','Haverhill','Hingham','Holbrook','Ipswich',
+  'Kingston','Lawrence','Leominster','Lincoln','Littleton','Lowell','Lynn',
+  'Manchester','Mansfield','Melrose','Middleborough','Natick','Needham',
+  'New Bedford','Newburyport','Norfolk','Norwood','Randolph','Reading','Rockport','Rowley',
+  'Salem','Scituate','Sharon','Shirley','Southborough','Stoughton','Swampscott',
+  'Taunton','Wakefield','Walpole','Waltham','Wellesley','Wenham','Weston',
+  'Westborough','Westwood','Weymouth','Whitman','Wilmington','Winchester',
+  'Woburn','Worcester'
+]);
+
+Promise.all([
+  fetch('data/stations.json').then(r => r.json()),
+  fetch('data/buffers.geojson').then(r => r.json()),
+  fetch('data/mbta_communities.geojson').then(r => r.json()),
+  fetch('data/bus_routes.json').then(r => r.json()),
+  fetch('data/cluster_meta.json').then(r => r.json()).catch(() => ({})),
+  fetch('data/rapid_transit.geojson').then(r => r.json()),
+  fetch('data/commuter_rail_new.geojson').then(r => r.json())
+]).then(([stations, buffers, communities, busRoutes, clusterMeta, rapidTransit, commuterRail]) => {
+  // Patch cluster names from data file
+  Object.entries(clusterMeta).forEach(([c, name]) => {
+    if (CLUSTER_META[+c]) CLUSTER_META[+c].name = name;
+  });
+  STATIONS  = stations;
+  window._buffers = buffers;
+  window._communities = {
+    ...communities,
+    features: communities.features.filter(f => RT_CR_COMMUNITIES.has(f.properties.municipal))
+  };
+  window._busRoutes = busRoutes;
+  window._rapidTransit = rapidTransit;
+  window._commuterRail = commuterRail;
+  dataReady = true;
+  document.getElementById('map-loading').style.display = 'none';
+  if (mapReady) addDataToMap();
+  buildStrip('strip-vmt',     s => +s.vmt_pc,          v => Math.round(v).toLocaleString(),     'mi/yr');
+  buildStrip('strip-density', s => +s.hu_den,          v => v.toFixed(1),                      '/ac');
+  buildStrip('strip-freq',    s => +s.transit_phr,     v => v.toFixed(1),                      '/hr');
+  buildStrip('strip-jobden',  s => +s.job_den,         v => v.toFixed(1),                      '/ac');
+  buildStrip('strip-jobmix',  s => +s.job_mix,         v => v.toFixed(2),                      '');
+  buildStrip('strip-entropy', s => +s.lu_entropy,      v => v.toFixed(2),                      '');
+  buildStrip('strip-intx',    s => +s.intx_density_ac, v => v.toFixed(3),                      '/ac');
+  buildStrip('strip-bike',    s => +s.bikelane_cov,    v => (v*100).toFixed(0) + '%',          '');
+  buildStrip('strip-income',  s => +s.income,          v => '$' + Math.round(v/1000) + 'k',   '');
+  if (document.getElementById('page-data').classList.contains('active')) buildDataTable();
+}).catch(err => {
+  console.error('Data load failed:', err);
+  document.getElementById('map-loading').innerHTML =
+    '<span style="color:#E87B4A">Failed to load station data.<br>Check the console for details.</span>';
+});
+
+// Land use parcel data — loaded lazily when first toggled
+function ensureLuData(cb) {
+  if (luDataReady) { cb(); return; }
+  fetch('data/tod_parcels.geojson')
+    .then(r => r.json())
+    .then(data => {
+      window._parcelData = data;
+      luDataReady = true;
+      cb();
+    })
+    .catch(err => {
+      console.error('Land use data failed to load:', err);
+      document.getElementById('btn-landuse').textContent = 'Land Use';
+    });
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.page;
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('page-' + target).classList.add('active');
+    // Show legend on map page only
+    document.getElementById('nav-legend').classList.toggle('hidden', target !== 'map');
+    if (target === 'clusters' && !window._plotBuilt && dataReady) buildPlot();
+    if (target === 'data' && dataReady) buildDataTable();
+    if (target === 'map' && map) setTimeout(() => map.resize(), 50);
+  });
+});
+
+// ─────────────────────────────────────────────
+// MAP
+// ─────────────────────────────────────────────
+function initMap() {
+  if (MAPBOX_TOKEN === 'YOUR_MAPBOX_TOKEN_HERE') {
+    document.getElementById('map-loading').innerHTML =
+      '<div style="text-align:center;padding:32px;color:#505050;font-family:\'DM Mono\',monospace;font-size:12px;">Set <code style="color:#a8dadc">MAPBOX_TOKEN</code> in the script to enable the map.<br><br>Get a free token at <a href="https://mapbox.com/account/access-tokens" style="color:#a8dadc" target="_blank" rel="noopener noreferrer">mapbox.com</a>.</div>';
+    return;
+  }
+
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+  map = new mapboxgl.Map({
+    container: 'map',
+    style: STYLE_MINIMAL,
+    center: [-71.1, 42.35],
+    zoom: 9.5,
+    attributionControl: false
+  });
+  window._map = map;
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+
+  map.on('load', () => {
+    mapReady = true;
+    if (dataReady) addDataToMap();
+  });
+}
+
+function clusterColorExpr() {
+  return ['match', ['get', 'cluster'],
+    '1', CLUSTER_META[1].color,
+    '2', CLUSTER_META[2].color,
+    '3', CLUSTER_META[3].color,
+    '4', CLUSTER_META[4].color,
+    '5', CLUSTER_META[5].color,
+    '6', CLUSTER_META[6].color,
+    '#888'
+  ];
+}
+
+function addDataToMap() {
+  // ── MBTA Communities municipality boundaries ──────────────────────
+  map.addSource('communities', { type: 'geojson', data: window._communities });
+  map.addLayer({
+    id: 'community-hatch',
+    type: 'fill',
+    source: 'communities',
+    paint: {
+      'fill-color': isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
+      'fill-opacity': 1
+    }
+  });
+  map.addLayer({
+    id: 'community-outline',
+    type: 'line',
+    source: 'communities',
+    paint: {
+      'line-color': '#7d7d7d',
+      'line-width': 0.5,
+      'line-opacity': 0
+    }
+  });
+
+  // ── Commuter Rail lines (always visible, fades in on zoom) ────────
+  map.addSource('commuter-rail', { type: 'geojson', data: window._commuterRail });
+  map.addLayer({
+    id: 'commuter-rail-line',
+    type: 'line',
+    source: 'commuter-rail',
+    paint: {
+      'line-color': isDark ? '#ad7eed' : '#6c489c',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.2, 12, 2.5],
+      'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.55, 10, 0.75]
+    }
+  });
+
+  // ── Rapid Transit lines ───────────────────────────────────────────
+  map.addSource('rapid-transit', { type: 'geojson', data: window._rapidTransit });
+  map.addLayer({
+    id: 'rapid-transit-line',
+    type: 'line',
+    source: 'rapid-transit',
+    paint: {
+      'line-color': [
+        'match', ['get', 'LINE'],
+        'RED',    '#DA291C',
+        'ORANGE', '#ED8B00',
+        'GREEN',  '#00843D',
+        'BLUE',   '#003DA5',
+        'SILVER', '#7C878E',
+        '#888888'
+      ],
+      'line-width': ['interpolate', ['linear'], ['zoom'], 7, 1.5, 12, 3.5],
+      'line-opacity': ['interpolate', ['linear'], ['zoom'], 7, 0.7, 10, 0.9]
+    }
+  });
+
+  // ── Buffer polygons ──────────────────────────────────────────────
+  map.addSource('buffers', { type: 'geojson', data: window._buffers });
+  map.addLayer({
+    id: 'buffer-fill',
+    type: 'fill',
+    source: 'buffers',
+    paint: {
+      'fill-color': clusterColorExpr(),
+      'fill-opacity': isDark ? 0.05 : 0.20
+    }
+  });
+  map.addLayer({
+    id: 'buffer-outline',
+    type: 'line',
+    source: 'buffers',
+    paint: {
+      'line-color': clusterColorExpr(),
+      'line-width': 0.8,
+      'line-opacity': isDark ? 0.5 : 0.70
+    }
+  });
+
+  // ── Station dots ─────────────────────────────────────────────────
+  const stationGeoJSON = {
+    type: 'FeatureCollection',
+    features: STATIONS.map(s => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+      properties: { ...s }
+    }))
+  };
+  map.addSource('stations', { type: 'geojson', data: stationGeoJSON });
+  map.addLayer({
+    id: 'station-dots',
+    type: 'circle',
+    source: 'stations',
+    paint: {
+      'circle-radius': 5,
+      'circle-color': clusterColorExpr(),
+      'circle-stroke-width': 1.5,
+      'circle-stroke-color': isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)',
+      'circle-opacity': isDark ? 0.95 : 0.5
+    }
+  });
+
+  // ── Station name labels (appear when zoomed in) ──────────────────
+  map.addLayer({
+    id: 'station-labels',
+    type: 'symbol',
+    source: 'stations',
+    minzoom: 8,
+    layout: {
+      'text-field': ['get', 'name'],
+      'text-font': ['DIN Pro Regular', 'Arial Unicode MS Regular'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 11, 10, 14, 13],
+      'text-offset': [0.7, 0],
+      'text-anchor': 'left',
+      'text-allow-overlap': false,
+      'text-ignore-placement': false
+    },
+    paint: {
+      'text-color': isDark ? '#f0ede8' : '#1a1a1a',
+      'text-halo-color': isDark ? 'rgba(14,15,17,0.85)' : 'rgba(245,245,242,0.85)',
+      'text-halo-width': 1.5,
+      'text-opacity': ['interpolate', ['linear'], ['zoom'], 11, 0, 12, 1]
+    }
+  });
+
+  map.on('click', 'station-dots', e => {
+    _clickedStation = e.features[0].properties;
+    onStationClick(e);
+  });
+  map.on('click', (e) => {
+    const hits = map.queryRenderedFeatures(e.point, { layers: ['station-dots', 'buffer-fill'] });
+    if (!hits.length) {
+      _clickedStation = null; clearPanel();
+      const mls = document.getElementById('mobile-legend-strip');
+      if (mls) mls.classList.remove('sheet-open');
+    }
+  });
+  map.on('mouseenter', 'station-dots', e => {
+    map.getCanvas().style.cursor = 'pointer';
+    onStationClick(e);
+  });
+  map.on('mouseleave', 'station-dots', () => {
+    map.getCanvas().style.cursor = '';
+    if (_clickedStation) {
+      onStationClick({ features: [{ properties: _clickedStation }] });
+    } else {
+      clearPanel();
+    }
+  });
+
+  // Re-apply legend filter after style swap re-creates layers
+  applyLegendFilter();
+
+  // Re-add parcel layer if it was visible before style swap
+  if (luLayerVisible && luDataReady) addLandUseLayer();
+}
+
+// ─────────────────────────────────────────────
+// LAND USE LAYER
+// ─────────────────────────────────────────────
+function addLandUseLayer() {
+  if (!map || !window._parcelData) return;
+  // Remove existing source/layer if present (after style swap they're gone)
+  if (!map.getSource('parcels')) {
+    map.addSource('parcels', { type: 'geojson', data: window._parcelData });
+  }
+  if (!map.getLayer('parcels-fill')) {
+    // Insert below buffer layers so TOD boundaries remain visible on top
+    const beforeLayer = map.getLayer('community-outline') ? 'community-outline' : undefined;
+    map.addLayer({
+      id: 'parcels-fill',
+      type: 'fill',
+      source: 'parcels',
+      paint: {
+        'fill-color': luColorExpr(),
+        'fill-opacity': 0.65
+      }
+    }, beforeLayer);
+  }
+  map.setLayoutProperty('parcels-fill', 'visibility', 'visible');
+}
+
+function removeLandUseLayer() {
+  if (!map) return;
+  try { map.setLayoutProperty('parcels-fill', 'visibility', 'none'); } catch(e) {}
+}
+
+function applyLegendFilter() {
+  if (!map) return;
+  const filterLayers = ['station-dots', 'buffer-fill', 'buffer-outline', 'station-labels'];
+  const items = document.querySelectorAll('.legend-item, .mobile-legend-item');
+  if (legendSelectedClusters.size === 0) {
+    items.forEach(el => el.classList.remove('legend-dimmed'));
+    filterLayers.forEach(id => { try { map.setFilter(id, null); } catch(e) {} });
+  } else {
+    items.forEach(el => {
+      el.classList.toggle('legend-dimmed', !legendSelectedClusters.has(el.dataset.cluster));
+    });
+    const active = Array.from(legendSelectedClusters);
+    const expr = ['in', ['get', 'cluster'], ['literal', active]];
+    filterLayers.forEach(id => { try { map.setFilter(id, expr); } catch(e) {} });
+  }
+}
+
+function onStationClick(e) {
+  const props = e.features[0].properties;
+  const meta  = CLUSTER_META[props.cluster];
+
+  document.getElementById('panel-cluster-bar').style.background = meta.color;
+  document.getElementById('panel-station-name').textContent = props.name;
+  document.getElementById('panel-cluster-label').textContent =
+    `Cluster ${props.cluster} · ${meta.name}`;
+  if (props.vmt_pc          != null) updateStrip('strip-vmt',     +props.vmt_pc,          v => Math.round(v).toLocaleString(),     meta.color);
+  if (props.hu_den          != null) updateStrip('strip-density', +props.hu_den,          v => v.toFixed(1),                      meta.color);
+  if (props.transit_phr     != null) updateStrip('strip-freq',    +props.transit_phr,     v => v.toFixed(1),                      meta.color);
+  if (props.job_den         != null) updateStrip('strip-jobden',  +props.job_den,         v => v.toFixed(1),                      meta.color);
+  if (props.job_mix         != null) updateStrip('strip-jobmix',  +props.job_mix,         v => v.toFixed(2),                      meta.color);
+  if (props.lu_entropy      != null) updateStrip('strip-entropy', +props.lu_entropy,      v => v.toFixed(2),                      meta.color);
+  if (props.intx_density_ac != null) updateStrip('strip-intx',   +props.intx_density_ac, v => v.toFixed(3),                      meta.color);
+  if (props.bikelane_cov    != null) updateStrip('strip-bike',    +props.bikelane_cov,    v => (v*100).toFixed(0) + '%',          meta.color);
+  if (props.income          != null) updateStrip('strip-income',  +props.income,          v => '$' + Math.round(v/1000) + 'k',   meta.color);
+
+  // Age distribution bar
+  updateAgeBar(+props.pct_young_adult || 0, +props.pct_working_age || 0, +props.pct_senior || 0);
+
+  // Bus routes
+  updateBusRoutes(props.name);
+
+  // Parking spaces
+  const parkEl = document.getElementById('panel-parking');
+  if (parkEl) parkEl.innerHTML = props.park_spaces > 0
+    ? `<div class="val">${(+props.park_spaces).toLocaleString()}</div><div class="lbl">total spaces</div>`
+    : `<div class="val" style="color:var(--text-muted)">None</div><div class="lbl">no parking data</div>`;
+
+  // Bluebike stations
+  const bbEl = document.getElementById('panel-bluebike');
+  if (bbEl) bbEl.innerHTML = `<div class="val">${+props.n_bluebike || 0}</div><div class="lbl">stations within ½ mi</div>`;
+
+  const svImg = document.getElementById('sv-img');
+  const svPh  = document.getElementById('sv-placeholder');
+  if (GOOGLE_SV_KEY) {
+    svImg.onerror = () => {
+      svImg.style.display = 'none';
+      svPh.style.display  = 'block';
+      svPh.textContent = 'No Street View available for this location.';
+    };
+    svImg.src = `https://maps.googleapis.com/maps/api/streetview?size=300x170&location=${props.lat},${props.lng}&key=${GOOGLE_SV_KEY}&fov=90`;
+    svImg.style.display = 'block';
+    svPh.style.display  = 'none';
+  }
+  document.getElementById('sv-link').href =
+    `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${props.lat},${props.lng}`;
+  document.getElementById('sv-link').textContent = `Open ${props.name} in Street View ↗`;
+
+  document.getElementById('side-panel').classList.add('open');
+  const mls = document.getElementById('mobile-legend-strip');
+  if (mls) mls.classList.add('sheet-open');
+}
+
+// ─────────────────────────────────────────────
+// AGE BAR
+// ─────────────────────────────────────────────
+function updateAgeBar(ya, wa, sr) {
+  const tot = (ya || 0) + (wa || 0) + (sr || 0);
+  const el = document.getElementById('panel-age-bar');
+  if (!el) return;
+  if (!tot) {
+    el.innerHTML = '<div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div>';
+    return;
+  }
+  const pY = (ya / tot * 100).toFixed(1);
+  const pW = (wa / tot * 100).toFixed(1);
+  const pS = (sr / tot * 100).toFixed(1);
+  el.innerHTML = `
+    <div class="age-bar">
+      <div class="age-seg" style="width:${pY}%;background:#a8dadc;"></div>
+      <div class="age-seg" style="width:${pW}%;background:rgba(168,218,220,0.42);"></div>
+      <div class="age-seg" style="width:${pS}%;background:rgba(168,218,220,0.18);"></div>
+    </div>
+    <div class="age-legend">
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:#a8dadc;"></div>18–34: ${(ya*100).toFixed(0)}%</div>
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:rgba(168,218,220,0.42);"></div>35–64: ${(wa*100).toFixed(0)}%</div>
+      <div class="age-leg-item"><div class="age-leg-dot" style="background:rgba(168,218,220,0.18);"></div>65+: ${(sr*100).toFixed(0)}%</div>
+    </div>`;
+}
+
+// ─────────────────────────────────────────────
+// BUS ROUTES
+// ─────────────────────────────────────────────
+function updateBusRoutes(stationName) {
+  const el = document.getElementById('panel-bus-routes');
+  if (!el) return;
+  const data = window._busRoutes && window._busRoutes[stationName];
+  if (!data) {
+    el.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">No data</span>';
+    return;
+  }
+  const badges = [];
+  (data.mbta || []).forEach(r => badges.push(`<span class="route-badge">${r}</span>`));
+  (data.rta  || []).forEach(a => badges.push(`<span class="route-badge rta">${a}</span>`));
+  if (!badges.length) {
+    el.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">No bus routes in area</span>';
+  } else {
+    el.innerHTML = `<div class="route-badges">${badges.join('')}</div>`;
+  }
+}
+
+// ─────────────────────────────────────────────
+// STRIP PLOTS (generic)
+// ─────────────────────────────────────────────
+const _STRIPS = {};  // keyed by wrapId, stores { min, range }
+const _SP = { W: 292, H: 52, P: { l: 8, r: 8, t: 18, b: 16 } };
+
+function buildStrip(wrapId, valFn, fmtFn, unit, bold) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap || !STATIONS.length) return;
+
+  const vals = STATIONS.map(valFn).filter(v => isFinite(v));
+  const mn = Math.min(...vals), mx = Math.max(...vals);
+  _STRIPS[wrapId] = { min: mn, range: mx - mn, fmtFn, unit };
+
+  const { W, H, P } = _SP;
+  const pw = W - P.l - P.r, ph = H - P.t - P.b;
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('data-strip', wrapId);
+  svg.style.cssText = 'display:block;overflow:visible;';
+
+  STATIONS.forEach(s => {
+    const v = valFn(s);
+    if (!isFinite(v)) return;
+    const x = P.l + ((v - mn) / (mx - mn)) * pw;
+    const ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('class', 'strip-line');
+    ln.setAttribute('data-val', v);
+    ln.setAttribute('x1', x); ln.setAttribute('x2', x);
+    ln.setAttribute('y1', P.t); ln.setAttribute('y2', P.t + ph);
+    ln.setAttribute('stroke', CLUSTER_META[+s.cluster] ? CLUSTER_META[+s.cluster].color : '#888');
+    ln.setAttribute('stroke-width', '1.5');
+    ln.setAttribute('opacity', '0.45');
+    svg.appendChild(ln);
+  });
+
+  // Axis
+  const ax = document.createElementNS(NS, 'line');
+  ax.setAttribute('x1', P.l); ax.setAttribute('x2', W - P.r);
+  ax.setAttribute('y1', P.t + ph); ax.setAttribute('y2', P.t + ph);
+  ax.setAttribute('stroke', 'rgba(255,255,255,0.1)'); ax.setAttribute('stroke-width', '1');
+  svg.appendChild(ax);
+
+  // Tick labels: min and max only
+  [[0, mn], [1, mx]].forEach(([frac, v]) => {
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('x', P.l + frac * pw);
+    t.setAttribute('y', P.t + ph + 11);
+    t.setAttribute('text-anchor', frac === 0 ? 'start' : 'end');
+    t.setAttribute('font-size', '8'); t.setAttribute('fill', 'rgba(255,255,255,0.3)');
+    t.setAttribute('font-family', 'DM Mono, monospace');
+    t.textContent = fmtFn(v) + (unit ? ' ' + unit : '');
+    svg.appendChild(t);
+  });
+
+  // Selected value label
+  const ml = document.createElementNS(NS, 'text');
+  ml.setAttribute('class', 'strip-label');
+  ml.setAttribute('y', P.t - 5);
+  ml.setAttribute('text-anchor', 'middle'); ml.setAttribute('font-size', bold ? '13' : '11');
+  ml.setAttribute('font-weight', 'bold'); ml.setAttribute('fill', bold ? '#ffffff' : '#fff');
+  ml.setAttribute('font-family', 'DM Mono, monospace'); ml.setAttribute('display', 'none');
+  if (bold) ml.setAttribute('letter-spacing', '0.02em');
+  svg.appendChild(ml);
+
+  wrap.innerHTML = '';
+  wrap.appendChild(svg);
+}
+
+function updateStrip(wrapId, val, fmtFn, color, bold) {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return;
+  const svg = wrap.querySelector('svg');
+  if (!svg) return;
+  const st = _STRIPS[wrapId];
+  const { W, P } = _SP;
+  const pw = W - P.l - P.r;
+  const xSel = P.l + ((val - st.min) / st.range) * pw;
+
+  svg.querySelectorAll('.strip-line').forEach(ln => {
+    const x = +ln.getAttribute('x1');
+    const hit = Math.abs(x - xSel) < 1.5;
+    ln.setAttribute('opacity', hit ? '1' : '0.1');
+    ln.setAttribute('stroke-width', hit ? '2.5' : '1.5');
+    if (hit && color) ln.setAttribute('stroke', color);
+  });
+
+  const ml = svg.querySelector('.strip-label');
+  const clampedX = Math.max(P.l + 14, Math.min(xSel, W - P.r - 14));
+  ml.setAttribute('x', clampedX);
+  ml.setAttribute('fill', bold ? '#ffffff' : (color || '#fff'));
+  ml.setAttribute('font-size', bold ? '13' : '11');
+  ml.textContent = fmtFn(val) + (st.unit ? ' ' + st.unit : '');
+  ml.setAttribute('display', 'block');
+}
+
+function clearPanel() {
+  document.getElementById('panel-cluster-bar').style.background = '';
+  document.getElementById('panel-station-name').textContent = 'Click a point';
+  document.getElementById('panel-cluster-label').textContent = 'Select a station on the map';
+
+  // Reset all strips to dimmed/no-selection state
+  ['strip-vmt','strip-density','strip-freq','strip-jobden','strip-jobmix','strip-entropy','strip-intx','strip-bike','strip-income'].forEach(id => {
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    wrap.querySelectorAll('.strip-line').forEach(ln => {
+      ln.setAttribute('opacity', '0.1');
+      ln.setAttribute('stroke-width', '1.5');
+      ln.setAttribute('stroke', '#666');
+    });
+    const ml = wrap.querySelector('.strip-label');
+    if (ml) ml.setAttribute('display', 'none');
+  });
+
+  // Reset age bar
+  const ageEl = document.getElementById('panel-age-bar');
+  if (ageEl) ageEl.innerHTML = '<div class="age-bar"><div class="age-seg" style="width:100%;background:var(--border-mid);"></div></div><div class="age-legend"><span style="color:var(--text-muted);font-size:9px;font-family:\'DM Mono\',monospace;">Select a station</span></div>';
+
+  // Reset bus routes
+  const busEl = document.getElementById('panel-bus-routes');
+  if (busEl) busEl.innerHTML = '<span style="color:var(--text-muted);font-size:10px;font-family:\'DM Mono\',monospace;">Select a station</span>';
+
+  // Reset parking / bluebike
+  const parkEl = document.getElementById('panel-parking');
+  if (parkEl) parkEl.innerHTML = '<div class="val">—</div><div class="lbl">total spaces</div>';
+  const bbEl = document.getElementById('panel-bluebike');
+  if (bbEl) bbEl.innerHTML = '<div class="val">—</div><div class="lbl">within 0.5 mi</div>';
+
+  // Reset street view
+  const svImg = document.getElementById('sv-img');
+  const svPh  = document.getElementById('sv-placeholder');
+  if (svImg) { svImg.src = ''; svImg.style.display = 'none'; }
+  if (svPh)  { svPh.style.display = 'block'; }
+  const svLink = document.getElementById('sv-link');
+  if (svLink) { svLink.href = '#'; svLink.textContent = 'Open in Google Maps ↗'; }
+}
+
+document.getElementById('panel-close').addEventListener('click', () => {
+  document.getElementById('side-panel').classList.remove('open');
+  const mls = document.getElementById('mobile-legend-strip');
+  if (mls) mls.classList.remove('sheet-open');
+});
+
+// ─────────────────────────────────────────────
+// STATION SEARCH
+// ─────────────────────────────────────────────
+(function() {
+  const input   = document.getElementById('station-search');
+  const results = document.getElementById('search-results');
+  let activeIdx = -1;
+
+  function showResults(matches) {
+    if (!matches.length) { results.style.display = 'none'; return; }
+    results.innerHTML = matches.slice(0, 8).map((s, i) =>
+      `<div class="search-result-item" data-idx="${i}" data-name="${s.name}">
+        ${s.name}<span class="search-result-cluster">${CLUSTER_META[s.cluster].name}</span>
+      </div>`
+    ).join('');
+    results.style.display = 'block';
+    activeIdx = -1;
+    results.querySelectorAll('.search-result-item').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        selectStation(matches[+el.dataset.idx]);
+      });
+    });
+  }
+
+  function selectStation(s) {
+    input.value = s.name;
+    results.style.display = 'none';
+    // Show side panel immediately
+    const feat = { properties: { ...s } };
+    onStationClick({ features: [feat] });
+    if (!map) return;
+    map.flyTo({ center: [s.lng, s.lat], zoom: 14, duration: 800 });
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q || !STATIONS.length) { results.style.display = 'none'; return; }
+    const matches = STATIONS.filter(s => s.name.toLowerCase().includes(q));
+    showResults(matches);
+  });
+
+  input.addEventListener('keydown', e => {
+    const items = results.querySelectorAll('.search-result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIdx = Math.min(activeIdx + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIdx = Math.max(activeIdx - 1, 0);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const target = activeIdx >= 0 ? items[activeIdx] : items[0];
+      if (target) target.dispatchEvent(new MouseEvent('mousedown'));
+      return;
+    } else if (e.key === 'Escape') {
+      results.style.display = 'none'; return;
+    } else { return; }
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => { results.style.display = 'none'; }, 150);
+  });
+
+  document.getElementById('btn-reset-view').addEventListener('click', () => {
+    input.value = '';
+    results.style.display = 'none';
+    if (map) map.flyTo({ center: [-71.1, 42.35], zoom: 9.5, duration: 800 });
+  });
+})();
+
+// Satellite adjustments: lighter + 25% less saturated
+function applySatelliteAdjustments() {
+  const style = map.getStyle();
+  if (!style) return;
+  const roadPattern = /road|highway|tunnel|bridge|street|path|motorway|trunk|primary|secondary|tertiary|link|service|pedestrian|footway|track/i;
+  style.layers.forEach(layer => {
+    if (layer.type === 'raster') {
+      try {
+        map.setPaintProperty(layer.id, 'raster-brightness-min', -0.9);
+        map.setPaintProperty(layer.id, 'raster-saturation', -0.95);
+        map.setPaintProperty(layer.id, 'raster-contrast', -0.25);
+      } catch(e) {}
+    }
+    // Neutralize road line colors to white/grey
+    if (layer.type === 'line' && roadPattern.test(layer.id)) {
+      try {
+        map.setPaintProperty(layer.id, 'line-color', 'rgba(255,255,255,0.5)');
+        map.setPaintProperty(layer.id, 'line-width', 0.5);
+      } catch(e) {}
+    }
+    // Neutralize road case/fill colors
+    if (layer.type === 'fill' && roadPattern.test(layer.id)) {
+      try { map.setPaintProperty(layer.id, 'fill-color', 'rgba(255,255,255,0.5)'); } catch(e) {}
+    }
+  });
+  try {
+    map.setPaintProperty('buffer-fill', 'fill-opacity', 0);
+    map.setPaintProperty('buffer-outline', 'line-width', 2);
+    map.setPaintProperty('buffer-outline', 'line-opacity', 1);
+  } catch(e) {}
+}
+
+// Basemap toggle — re-add layers after style swap
+function restoreLayersAfterStyleSwap() {
+  map.once('styledata', () => {
+    if (dataReady) addDataToMap();
+    if (currentStyle === 'satellite') applySatelliteAdjustments();
+  });
+}
+
+document.getElementById('btn-minimal').addEventListener('click', () => {
+  if (currentStyle === 'minimal' || !map) return;
+  currentStyle = 'minimal';
+  document.getElementById('btn-minimal').classList.add('active');
+  document.getElementById('btn-satellite').classList.remove('active');
+  map.setStyle(STYLE_MINIMAL);
+  restoreLayersAfterStyleSwap();
+});
+
+document.getElementById('btn-satellite').addEventListener('click', () => {
+  if (currentStyle === 'satellite' || !map) return;
+  currentStyle = 'satellite';
+  document.getElementById('btn-satellite').classList.add('active');
+  document.getElementById('btn-minimal').classList.remove('active');
+  map.setStyle(STYLE_SATELLITE);
+  restoreLayersAfterStyleSwap();
+});
+
+// ── Overlay panel header: collapse/expand ──
+document.getElementById('overlay-panel-header').addEventListener('click', () => {
+  document.getElementById('overlay-panel').classList.toggle('collapsed');
+});
+
+// ── Land use toggle ──
+document.getElementById('overlay-landuse').addEventListener('click', () => {
+  if (!map) return;
+  luLayerVisible = !luLayerVisible;
+  const row = document.getElementById('overlay-landuse');
+  const sub = document.getElementById('lu-sub-legend');
+  if (luLayerVisible) {
+    row.classList.add('active');
+    sub.style.display = 'block';
+    if (!luDataReady) {
+      row.querySelector('.overlay-row-label').textContent = 'Land Use (loading…)';
+      ensureLuData(() => {
+        row.querySelector('.overlay-row-label').textContent = 'Land Use';
+        if (mapReady) addLandUseLayer();
+      });
+    } else if (mapReady) {
+      addLandUseLayer();
+    }
+  } else {
+    row.classList.remove('active');
+    sub.style.display = 'none';
+    removeLandUseLayer();
+  }
+});
+
+// ─────────────────────────────────────────────
+// CLUSTER DETAIL PANEL HELPERS
+// ─────────────────────────────────────────────
+let _selectedScatterStation = null;
+
+function highlightScatterStation(name) {
+  _selectedScatterStation = name;
+  const plotDiv = document.getElementById('plot-scatter');
+  if (!plotDiv || !plotDiv.data) return;
+  plotDiv.data.forEach((tr, i) => {
+    if (!tr.text || !tr.text.length) return; // skip CI/OLS
+    if (!name) {
+      Plotly.restyle('plot-scatter', {
+        'marker.opacity': [Array(tr.x.length).fill(0.82)],
+        'marker.size': [Array(tr.x.length).fill(7)]
+      }, [i]);
+    } else {
+      const opacities = tr.text.map(n => n === name ? 1.0 : 0.12);
+      const sizes     = tr.text.map(n => n === name ? 11  : 6);
+      Plotly.restyle('plot-scatter', {
+        'marker.opacity': [opacities],
+        'marker.size': [sizes]
+      }, [i]);
+    }
+  });
+}
+
+function cdSelectStation(station) {
+  const meta = CLUSTER_META[station.cluster];
+  const nameEl    = document.getElementById('cd-name');
+  const descEl    = document.getElementById('cd-desc');
+  const btn       = document.getElementById('cd-goto-map');
+  nameEl.innerHTML = `${station.name}<span style="font-size:11px;font-weight:400;color:${meta.color};opacity:0.85;"> · ${meta.name}</span>`;
+  nameEl.style.color = 'var(--text-primary)';
+  descEl.textContent = meta.desc;
+  btn.style.display = 'block';
+  btn._station = station;
+  highlightScatterStation(station.name);
+}
+
+function cdClear() {
+  document.getElementById('cd-name').innerHTML = 'Click a point';
+  document.getElementById('cd-name').style.color = 'var(--text-primary)';
+  document.getElementById('cd-desc').textContent = 'Select a station in the plot to see cluster-level characteristics here.';
+  document.getElementById('cd-goto-map').style.display = 'none';
+  highlightScatterStation(null);
+}
+
+function buildPcaLegend() {
+  const el = document.getElementById('pca-legend');
+  if (!el) return;
+  el.innerHTML = '<div class="pca-legend-title">Station Typology</div>' +
+    Object.entries(CLUSTER_META).map(([c, m]) =>
+      `<div class="pca-legend-item"><span class="pca-legend-dot" style="background:${m.color};"></span>${m.name}</div>`
+    ).join('');
+}
+
+// ─────────────────────────────────────────────
+// 3D CLUSTER PLOT
+// ─────────────────────────────────────────────
+function buildPlot() {
+  window._plotBuilt = true;
+  const byCluster = {};
+  STATIONS.forEach(s => {
+    if (!byCluster[s.cluster]) byCluster[s.cluster] = [];
+    byCluster[s.cluster].push(s);
+  });
+
+  // Randomly sample ~30% of stations per cluster for label display
+  function sampleIndices(n, frac) {
+    const indices = Array.from({length: n}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return new Set(indices.slice(0, Math.max(1, Math.round(n * frac))));
+  }
+
+  // Build shared cluster data so shadow + main traces use the same sampled labels
+  const clusterData = Object.entries(byCluster).map(([c, stations]) => ({
+    c, stations, meta: CLUSTER_META[+c], labeled: sampleIndices(stations.length, 0.2)
+  }));
+
+  const shadowColor = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.35)';
+  const markerStroke = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+
+  // Shadow traces rendered first to create outline effect
+  const shadowTraces = clusterData.map(({ c, stations, meta, labeled }) => ({
+    type: 'scatter3d', mode: 'text',
+    showlegend: false, hoverinfo: 'skip',
+    x: stations.map(s => s.pc1),
+    y: stations.map(s => s.pc2),
+    z: stations.map(s => s.pc3),
+    text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
+    textposition: 'top center',
+    textfont: { size: 13, color: shadowColor, family: 'DM Mono, monospace' }
+  }));
+
+  // Main traces (markers + cluster-colored labels on top)
+  const traces = clusterData.map(({ c, stations, meta, labeled }) => ({
+    type: 'scatter3d', mode: 'markers+text',
+    name: `${c}: ${meta.name}`,
+    x: stations.map(s => s.pc1),
+    y: stations.map(s => s.pc2),
+    z: stations.map(s => s.pc3),
+    text: stations.map((s, i) => labeled.has(i) ? s.name : ''),
+    textposition: 'top center',
+    textfont: { size: 11, color: meta.color, family: 'DM Mono, monospace' },
+    hovertext: stations.map(s =>
+      `<b>${s.name}</b><br>Cluster ${c}: ${meta.name}<br>VMT: ${Number(s.vmt_pc).toLocaleString()} mi/yr<br>HU density: ${s.hu_den} /ac`),
+    hoverinfo: 'text',
+    customdata: stations.map(s => s.name),
+    marker: { size: 5, color: meta.color, opacity: 0.85,
+              line: { width: 0.5, color: markerStroke } }
+  }));
+
+  const _axGrid  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.14)';
+  const _axZero  = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.22)';
+  const _axTick  = isDark ? '#606060' : '#888888';
+  const _axTitle = isDark ? '#606060' : '#777777';
+  const axStyle  = { gridcolor: _axGrid, zerolinecolor: _axZero, tickfont: { color: _axTick, size: 9 } };
+
+  // Compute full-data ranges to keep axes fixed when toggling clusters
+  const allPc1 = STATIONS.map(s => +s.pc1), allPc2 = STATIONS.map(s => +s.pc2), allPc3 = STATIONS.map(s => +s.pc3);
+  function axRange(vals) { const mn = Math.min(...vals), mx = Math.max(...vals), pad = (mx - mn) * 0.06; return [mn - pad, mx + pad]; }
+  const r1 = axRange(allPc1), r2 = axRange(allPc2), r3 = axRange(allPc3);
+
+  const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    margin: { l: 0, r: 0, t: 0, b: 0 }, showlegend: false,
+    scene: {
+      bgcolor: 'rgba(0,0,0,0)',
+      xaxis: { ...axStyle, range: r1, title: { text: 'PC1 · Activity & Transit (43%)', font: { size: 10, color: _axTitle } } },
+      yaxis: { ...axStyle, range: r2, title: { text: 'PC2 · Land Use Diversity (37%)', font: { size: 10, color: _axTitle } } },
+      zaxis: { ...axStyle, range: r3, title: { text: 'PC3 · Job–Residential Balance (13%)', font: { size: 10, color: _axTitle } } },
+      camera: { eye: { x: 1.5, y: 1.5, z: 0.8 } }
+    },
+    font: { family: 'DM Mono, monospace', size: 10, color: isDark ? '#8a8880' : '#666666' }
+  };
+
+  Plotly.newPlot('plot-3d', traces, layout, { displayModeBar: false, responsive: true });
+
+  // Build legend, scatter, and reset detail panel
+  buildPcaLegend();
+  cdClear();
+  initScatterDropdowns();
+  buildScatter();
+
+  let _lastClickWasPoint = false;
+  document.getElementById('plot-3d').on('plotly_click', function(data) {
+    _lastClickWasPoint = true;
+    const pt = data.points[0];
+    const station = STATIONS.find(s => s.name === pt.customdata);
+    if (!station) return;
+    cdSelectStation(station);
+  });
+
+  // Deselect when clicking empty space in the 3D plot
+  // Use setTimeout so plotly_click (which fires after native click) can set the flag first
+  document.getElementById('plot-3d').addEventListener('click', function() {
+    setTimeout(() => {
+      if (!_lastClickWasPoint) cdClear();
+      _lastClickWasPoint = false;
+    }, 50);
+  });
+}
+
+document.getElementById('cd-goto-map').addEventListener('click', function() {
+  const station = this._station;
+  if (!station) return;
+  // Switch to map tab
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector('.nav-item[data-page="map"]').classList.add('active');
+  document.getElementById('page-map').classList.add('active');
+  // Switch to satellite if not already
+  if (map && currentStyle !== 'satellite') {
+    currentStyle = 'satellite';
+    document.getElementById('btn-satellite').classList.add('active');
+    document.getElementById('btn-minimal').classList.remove('active');
+    map.setStyle(STYLE_SATELLITE);
+    restoreLayersAfterStyleSwap();
+  }
+  // Resize, fly, open side panel
+  if (map) {
+    map.resize();
+    setTimeout(() => {
+      map.flyTo({ center: [station.lng, station.lat], zoom: 14, duration: 800 });
+      _clickedStation = { ...station };
+      onStationClick({ features: [{ properties: { ...station } }] });
+    }, 80);
+  }
+});
+
+// ─────────────────────────────────────────────
+// DATA TABLE
+// ─────────────────────────────────────────────
+let dtSortCol = 'cluster';
+let dtSortAsc = true;
+let dtFilterCluster = 0;
+let dtSearch = '';
+
+function pct(v) { return v == null ? '—' : (v * 100).toFixed(0) + '%'; }
+function num1(v) { return v == null ? '—' : (+v).toFixed(1); }
+function num2(v) { return v == null ? '—' : (+v).toFixed(2); }
+function num3(v) { return v == null ? '—' : (+v).toFixed(3); }
+
+function buildDataTable() {
+  if (window._dtBuilt) return;
+  window._dtBuilt = true;
+
+  // Build cluster filter buttons
+  const filterRow = document.getElementById('dt-cluster-filters');
+  Object.entries(CLUSTER_META).forEach(([c, meta]) => {
+    const btn = document.createElement('button');
+    btn.className = 'dt-filter-btn';
+    btn.dataset.cluster = c;
+    btn.innerHTML = `<span class="dt-filter-dot" style="background:${meta.color}"></span>${meta.name}`;
+    filterRow.appendChild(btn);
+  });
+
+  filterRow.querySelectorAll('.dt-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterRow.querySelectorAll('.dt-filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      dtFilterCluster = +btn.dataset.cluster;
+      renderDataTable();
+    });
+  });
+
+  document.getElementById('dt-search').addEventListener('input', e => {
+    dtSearch = e.target.value.toLowerCase();
+    renderDataTable();
+  });
+
+  document.querySelectorAll('#dt-table th.dt-sort').forEach(th => {
+    th.addEventListener('click', () => {
+      if (dtSortCol === th.dataset.col) {
+        dtSortAsc = !dtSortAsc;
+      } else {
+        dtSortCol = th.dataset.col;
+        dtSortAsc = !th.classList.contains('dt-num');
+      }
+      renderDataTable();
+    });
+  });
+
+  renderDataTable();
+}
+
+function renderDataTable() {
+  let rows = STATIONS.slice();
+
+  if (dtFilterCluster > 0) {
+    rows = rows.filter(s => +s.cluster === dtFilterCluster);
+  }
+  if (dtSearch) {
+    rows = rows.filter(s => s.name.toLowerCase().includes(dtSearch));
+  }
+
+  rows.sort((a, b) => {
+    let av = a[dtSortCol], bv = b[dtSortCol];
+    if (typeof av === 'string' || av == null) {
+      av = av || ''; bv = bv || '';
+      return dtSortAsc ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    }
+    av = +av; bv = +bv;
+    if (isNaN(av)) av = 0; if (isNaN(bv)) bv = 0;
+    return dtSortAsc ? av - bv : bv - av;
+  });
+
+  const tbody = document.getElementById('dt-body');
+  tbody.innerHTML = '';
+  rows.forEach(s => {
+    const meta = CLUSTER_META[+s.cluster] || { name: '—', color: '#888' };
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="dt-station-name" style="color:${meta.color}">${s.name}</span></td>
+      <td class="dt-lu">${s.type || '—'}</td>
+      <td class="dt-num">${s.vmt_pc != null ? Math.round(+s.vmt_pc).toLocaleString() : '—'}</td>
+      <td class="dt-lu">${s.dominant_lu || '—'}</td>
+      <td class="dt-num">${num1(s.hu_den)}</td>
+      <td class="dt-num">${num1(s.job_den)}</td>
+      <td class="dt-num">${num2(s.job_mix)}</td>
+      <td class="dt-num">${num2(s.lu_entropy)}</td>
+      <td class="dt-num">${num3(s.intx_density_ac)}</td>
+      <td class="dt-num">${pct(s.sidewalk_cov)}</td>
+      <td class="dt-num">${pct(s.bikelane_cov)}</td>
+      <td class="dt-num">${num1(s.transit_phr)}</td>
+      <td class="dt-num">${s.n_bus_mbta != null ? s.n_bus_mbta : '—'}</td>
+      <td class="dt-num">${s.n_rta != null ? s.n_rta : '—'}</td>
+      <td class="dt-num">${s.park_spaces != null ? (+s.park_spaces).toLocaleString() : '—'}</td>
+      <td class="dt-num">${s.n_bluebike != null ? s.n_bluebike : '—'}</td>
+      <td class="dt-num">${num1(s.food_score)}</td>
+      <td class="dt-num">${num1(s.inst_score)}</td>
+      <td class="dt-num">${num1(s.leis_score)}</td>
+      <td class="dt-num">${pct(s.pct_transit)}</td>
+      <td class="dt-num">${pct(s.pct_car)}</td>
+      <td class="dt-num">${pct(s.pct_walk)}</td>
+      <td class="dt-num">${pct(s.pct_bike)}</td>
+      <td class="dt-num">${pct(s.pct_young_adult)}</td>
+      <td class="dt-num">${pct(s.pct_working_age)}</td>
+      <td class="dt-num">${pct(s.pct_senior)}</td>
+      <td class="dt-num">${pct(s.pct_white)}</td>
+      <td class="dt-num">${pct(s.pct_black)}</td>
+      <td class="dt-num">${pct(s.pct_asian)}</td>
+      <td class="dt-num">${pct(s.pct_other)}</td>
+      <td class="dt-num">${num2(s.vehicle_per_unit)}</td>
+      <td class="dt-num">${s.income != null ? '$' + Math.round(+s.income / 1000) + 'k' : '—'}</td>
+      <td class="dt-num">${pct(s.pct_bachelors)}</td>
+    `;
+    tr.addEventListener('click', () => {
+      document.querySelector('.nav-item[data-page="map"]').click();
+      setTimeout(() => {
+        if (map) {
+          map.resize();
+          setTimeout(() => {
+            map.flyTo({ center: [+s.lng, +s.lat], zoom: 14, duration: 800 });
+            _clickedStation = { ...s };
+            onStationClick({ features: [{ properties: { ...s } }] });
+          }, 80);
+        }
+      }, 300);
+    });
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('#dt-table th').forEach(th => {
+    th.classList.remove('dt-sort-asc', 'dt-sort-desc');
+    if (th.dataset.col === dtSortCol) {
+      th.classList.add(dtSortAsc ? 'dt-sort-asc' : 'dt-sort-desc');
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+// SCATTER PLOT
+// ─────────────────────────────────────────────
+const SCATTER_VARS = [
+  { key: 'vmt_pc',          label: 'VMT per Capita' },
+  { key: 'hu_den',          label: 'Housing Density (D1)' },
+  { key: 'job_den',         label: 'Job Density (D1)' },
+  { key: 'job_mix',         label: 'Jobs-to-Pop Ratio (D2)' },
+  { key: 'lu_entropy',      label: 'Land-Use Entropy (D2)' },
+  { key: 'intx_density_ac', label: 'Intersection Density (D3)' },
+  { key: 'sidewalk_cov',    label: 'Sidewalk Coverage (D3)' },
+  { key: 'bikelane_cov',    label: 'Bike Lane Coverage (D3)' },
+  { key: 'transit_phr',     label: 'Transit Freq. Peak Hr (D4)' },
+  { key: 'n_bus_mbta',      label: 'Bus Route Diversity (D4)' },
+  { key: 'park_spaces',     label: 'Park-and-Ride Spaces (D4)' },
+  { key: 'income',          label: 'Median Income (Control)' },
+  { key: 'pct_young_adult', label: '% Young Adults 18\u201334 (Control)' },
+  { key: 'pct_working_age', label: '% Working Age 35\u201364 (Control)' },
+  { key: 'pct_senior',      label: '% Seniors 65+ (Control)' },
+  { key: 'pct_transit',     label: 'Transit Mode Share (Control)' }
+];
+
+let _scatterDropdownsBuilt = false;
+
+function initScatterDropdowns() {
+  if (_scatterDropdownsBuilt) return;
+  _scatterDropdownsBuilt = true;
+  const selY = document.getElementById('scatter-y');
+  const selX = document.getElementById('scatter-x');
+  SCATTER_VARS.forEach(v => {
+    selY.appendChild(Object.assign(document.createElement('option'), { value: v.key, textContent: v.label }));
+    selX.appendChild(Object.assign(document.createElement('option'), { value: v.key, textContent: v.label }));
+  });
+  selY.value = 'vmt_pc';
+  selX.value = 'hu_den';
+  selY.addEventListener('change', buildScatter);
+  selX.addEventListener('change', buildScatter);
+}
+
+function pearsonR(xs, ys) {
+  const n = xs.length;
+  if (n < 3) return 0;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0, sdx = 0, sdy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx, dy = ys[i] - my;
+    num += dx * dy; sdx += dx * dx; sdy += dy * dy;
+  }
+  const den = Math.sqrt(sdx * sdy);
+  return den === 0 ? 0 : num / den;
+}
+
+function rStars(r, n) {
+  const t = r * Math.sqrt(n - 2) / Math.sqrt(1 - r * r);
+  const absT = Math.abs(t);
+  // Approximate p-value from |t| with df = n-2 using Wilson-Hilferty normal approximation
+  const df = n - 2;
+  const x = absT / Math.sqrt(df / (df - 2 + absT * absT / df));
+  // Two-tailed p ~ 2*(1 - Phi(|t| * sqrt(2/(df+1))))  rough approx
+  // Use simple threshold on |t| for star assignment
+  if (absT > 3.291) return '***';   // p < 0.001 approx
+  if (absT > 1.960) return '**';    // p < 0.05 approx
+  if (absT > 1.645) return '*';     // p < 0.10 approx
+  return '';
+}
+
+function olsCIBand(xs, ys, xGrid) {
+  const n = xs.length;
+  const mx = xs.reduce((a, b) => a + b, 0) / n;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let Sxx = 0, Sxy = 0;
+  for (let i = 0; i < n; i++) { Sxx += (xs[i]-mx)**2; Sxy += (xs[i]-mx)*(ys[i]-my); }
+  const b1 = Sxy / Sxx;
+  const b0 = my - b1 * mx;
+  const yhat = xs.map(x => b0 + b1 * x);
+  const SSres = ys.reduce((s, y, i) => s + (y - yhat[i])**2, 0);
+  const MSE = SSres / (n - 2);
+  const tCrit = 1.96; // 95% CI, large n
+  const upper = [], lower = [], fit = [];
+  xGrid.forEach(x => {
+    const y = b0 + b1 * x;
+    const se = Math.sqrt(MSE * (1/n + (x - mx)**2 / Sxx));
+    fit.push(y);
+    upper.push(y + tCrit * se);
+    lower.push(y - tCrit * se);
+  });
+  return { fit, upper, lower, b0, b1 };
+}
+
+function buildScatter() {
+  if (!dataReady || !STATIONS.length) return;
+  const xKey = document.getElementById('scatter-x').value;
+  const yKey = document.getElementById('scatter-y').value;
+  const xLabel = SCATTER_VARS.find(v => v.key === xKey)?.label || xKey;
+  const yLabel = SCATTER_VARS.find(v => v.key === yKey)?.label || yKey;
+
+  // Collect valid rows
+  const rows = STATIONS.filter(s => s[xKey] != null && s[yKey] != null &&
+    !isNaN(+s[xKey]) && !isNaN(+s[yKey]));
+  const xs = rows.map(s => +s[xKey]);
+  const ys = rows.map(s => +s[yKey]);
+
+  const r = pearsonR(xs, ys);
+  const stars = rStars(r, xs.length);
+
+  // x grid for OLS line
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const xPad = (xMax - xMin) * 0.04;
+  const xGrid = Array.from({ length: 80 }, (_, i) => xMin - xPad + i * (xMax - xMin + 2*xPad) / 79);
+  const { fit, upper, lower } = olsCIBand(xs, ys, xGrid);
+
+  // Group dots by cluster
+  const byCluster = {};
+  rows.forEach(s => {
+    const c = s.cluster;
+    if (!byCluster[c]) byCluster[c] = [];
+    byCluster[c].push(s);
+  });
+
+  const dotTraces = Object.entries(byCluster).map(([c, stns]) => ({
+    type: 'scatter', mode: 'markers',
+    name: `${c}: ${CLUSTER_META[+c].name}`,
+    x: stns.map(s => +s[xKey]),
+    y: stns.map(s => +s[yKey]),
+    text: stns.map(s => s.name),
+    hovertemplate: '<span style="font-size:10px">%{text}</span><extra></extra>',
+    hoverinfo: 'text',
+    marker: {
+      color: CLUSTER_META[+c].color,
+      size: 7,
+      opacity: 0.82,
+      line: { width: 0.5, color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' }
+    },
+    showlegend: true
+  }));
+
+  const ciTrace = {
+    type: 'scatter', mode: 'lines', name: '95% CI',
+    x: [...xGrid, ...xGrid.slice().reverse()],
+    y: [...upper, ...lower.slice().reverse()],
+    fill: 'toself',
+    fillcolor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)',
+    line: { color: 'transparent' },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const olsTrace = {
+    type: 'scatter', mode: 'lines', name: 'OLS',
+    x: xGrid, y: fit,
+    line: { color: isDark ? '#ffffff' : '#333333', width: 1.8 },
+    hoverinfo: 'skip',
+    showlegend: false
+  };
+
+  const axStyle = {
+    gridcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)',
+    zerolinecolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.15)',
+    tickfont: { color: isDark ? '#505050' : '#888888', size: 9, family: 'DM Mono, monospace' },
+    title: { font: { size: 10, color: isDark ? '#606060' : '#777777', family: 'DM Mono, monospace' } }
+  };
+
+  const layout = {
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    autosize: true,
+    height: 380,
+    margin: { l: 0, r: 0, t: 30, b: 20 },
+    showlegend: true,
+    legend: {
+      font: { size: 9, color: isDark ? '#606060' : '#777777', family: 'DM Mono, monospace' },
+      bgcolor: 'rgba(0,0,0,0)',
+      bordercolor: 'transparent',
+      borderwidth: 0,
+      orientation: 'h',
+      x: 0, xanchor: 'left',
+      y: -0.25, yanchor: 'top'
+    },
+    xaxis: { ...axStyle, title: { ...axStyle.title, text: xLabel }, range: [xMin - xPad * 2, xMax + xPad * 2] },
+    yaxis: { ...axStyle, title: { ...axStyle.title, text: yLabel }, range: [Math.min(...ys) - (Math.max(...ys) - Math.min(...ys)) * 0.05, Math.max(...ys) + (Math.max(...ys) - Math.min(...ys)) * 0.08] },
+    annotations: [{
+      x: 0.5, y: 1.12, xref: 'paper', yref: 'paper',
+      text: `r = ${r.toFixed(2)}${stars}`,
+      showarrow: false,
+      font: { size: 11, color: isDark ? '#a8dadc' : '#0cb2af', family: 'DM Mono, monospace' },
+      align: 'center'
+    }],
+    font: { family: 'DM Mono, monospace', size: 10, color: isDark ? '#8a8880' : '#888888' }
+  };
+
+  Plotly.react('plot-scatter', [ciTrace, ...dotTraces, olsTrace], layout, {
+    displayModeBar: false, responsive: true
+  }).then(() => highlightScatterStation(_selectedScatterStation));
+}
+
+// ─────────────────────────────────────────────
+// LEGEND FILTER
+// ─────────────────────────────────────────────
+document.querySelectorAll('.legend-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const c = el.dataset.cluster;
+    if (legendSelectedClusters.has(c)) {
+      legendSelectedClusters.delete(c);
+    } else {
+      legendSelectedClusters.add(c);
+    }
+    applyLegendFilter();
+  });
+});
+
+// ─────────────────────────────────────────────
+// THEME TOGGLE
+// ─────────────────────────────────────────────
+let isDark = true;
+const STYLE_MINIMAL_LIGHT = 'mapbox://styles/mapbox/light-v11';
+
+function applyTheme(dark) {
+  isDark = dark;
+  const html = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-toggle-icon');
+
+  if (dark) {
+    html.removeAttribute('data-theme');
+    btn.innerHTML = `${icon.outerHTML} Light mode`;
+  } else {
+    html.setAttribute('data-theme', 'light');
+    btn.innerHTML = `${icon.outerHTML} Dark mode`;
+  }
+  // Re-attach after innerHTML swap
+  document.getElementById('theme-toggle-icon').setAttribute('stroke', 'currentColor');
+
+  // Swap Mapbox style only if map is loaded and we're not in satellite mode
+  if (map && currentStyle !== 'satellite') {
+    const newStyle = dark ? STYLE_MINIMAL : STYLE_MINIMAL_LIGHT;
+    map.setStyle(newStyle);
+    restoreLayersAfterStyleSwap();
+  }
+
+  // Relayout Plotly charts with new axis colors
+  // Rebuild 3D plot to pick up all theme-sensitive colors (traces + axes)
+  if (window._plotBuilt) {
+    window._plotBuilt = false;
+    buildPlot();
+  }
+
+  const ps = document.getElementById('plot-scatter');
+  if (ps && ps.layout) {
+    buildScatter();
+  }
+
+  // When in satellite mode the style is NOT being swapped, so update map layers directly.
+  // In minimal mode the style swap triggers addDataToMap() which already uses isDark.
+  if (map && currentStyle === 'satellite') {
+    if (map.getLayer('station-labels')) {
+      map.setPaintProperty('station-labels', 'text-color', dark ? '#f0ede8' : '#1a1a1a');
+      map.setPaintProperty('station-labels', 'text-halo-color', dark ? 'rgba(14,15,17,0.85)' : 'rgba(245,245,242,0.85)');
+    }
+    if (map.getLayer('station-dots')) {
+      map.setPaintProperty('station-dots', 'circle-stroke-color', dark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)');
+      map.setPaintProperty('station-dots', 'circle-opacity', dark ? 0.95 : 0.25);
+    }
+    if (map.getLayer('buffer-fill')) {
+      map.setPaintProperty('buffer-fill', 'fill-opacity', dark ? 0.05 : 0.20);
+    }
+    if (map.getLayer('buffer-outline')) {
+      map.setPaintProperty('buffer-outline', 'line-opacity', dark ? 0.50 : 0.70);
+    }
+    if (map.getLayer('commuter-rail-line')) {
+      map.setPaintProperty('commuter-rail-line', 'line-color', dark ? '#c4a86b' : '#8b6f3a');
+    }
+    if (map.getLayer('community-hatch')) {
+      map.setPaintProperty('community-hatch', 'fill-color', dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)');
+    }
+  }
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => applyTheme(!isDark));
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+initMap();
+
+// ─────────────────────────────────────────────
+// MOBILE NAV + LEGEND
+// ─────────────────────────────────────────────
+(function() {
+  const btn      = document.getElementById('mobile-menu-btn');
+  const nav      = document.getElementById('nav');
+  const backdrop = document.getElementById('nav-backdrop');
+  function openNav()  {
+    nav.classList.add('mobile-open');
+    backdrop.classList.add('visible');
+    if (map) setTimeout(() => map.resize(), 320);
+  }
+  function closeNav() {
+    nav.classList.remove('mobile-open');
+    backdrop.classList.remove('visible');
+    if (map) setTimeout(() => map.resize(), 320);
+  }
+  btn.addEventListener('click', openNav);
+  backdrop.addEventListener('click', closeNav);
+  // Close nav when a page link is tapped on mobile
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 640px)').matches) closeNav();
+    });
+  });
+  // On mobile, start with side panel closed
+  if (window.matchMedia('(max-width: 640px)').matches) {
+    document.getElementById('side-panel').classList.remove('open');
+  }
+})();
+
+// Mobile legend strip: mirror the nav legend filter behaviour
+document.querySelectorAll('.mobile-legend-item').forEach(el => {
+  el.addEventListener('click', () => {
+    const c = el.dataset.cluster;
+    if (legendSelectedClusters.has(c)) legendSelectedClusters.delete(c);
+    else legendSelectedClusters.add(c);
+    applyLegendFilter();
+  });
+});
+
+// ─────────────────────────────────────────────
+// MOBILE CLUSTER PANEL EXPAND
+// ─────────────────────────────────────────────
+(function() {
+  const btn   = document.getElementById('cd-expand-btn');
+  const icon  = document.getElementById('cd-expand-icon');
+  const panel = document.getElementById('cluster-detail-panel');
+  const page  = document.getElementById('page-clusters');
+  if (!btn) return;
+  let expanded = false;
+  btn.addEventListener('click', () => {
+    expanded = !expanded;
+    panel.classList.toggle('cd-expanded', expanded);
+    page.classList.toggle('panel-expanded', expanded);
+    // Rotate arrow: up = collapse, down = expand
+    icon.setAttribute('points', expanded ? '4,6 8,10 12,6' : '4,10 8,6 12,10');
+    // Trigger Plotly resize after transition
+    setTimeout(() => {
+      const p3 = document.getElementById('plot-3d');
+      if (p3 && p3.layout) Plotly.relayout('plot-3d', { autosize: true });
+      const ps = document.getElementById('plot-scatter');
+      if (ps && ps.layout) Plotly.relayout('plot-scatter', { autosize: true });
+    }, 360);
+  });
+})();
+</script>
+</body>
+</html>
