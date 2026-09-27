@@ -30,6 +30,9 @@
     --c4: #f29222; --c4-bg: rgba(242,146,34,0.15);
     --c5: #e95e50; --c5-bg: rgba(233,94,80,0.15);
     --c6: #5b6abf; --c6-bg: rgba(91,106,191,0.15);
+
+    /* Siting quadrant palette — deliberately distinct hues from --c1..--c6 above */
+    --q1: #a855f7; --q2: #ec4899; --q3: #64748b; --q4: #16a34a;
   }
 
   html[data-theme="light"] {
@@ -162,6 +165,9 @@
   .overlay-row.active + #lu-sub-legend { display: block; }
   .lu-legend-item { display: flex; align-items: center; gap: 7px; font-size: 10px; color: var(--text-muted); padding: 1px 0; }
   .lu-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; opacity: 0.9; }
+  /* siting quadrant sub-legend */
+  #siting-overlay-sub-legend { padding: 6px 0 2px 35px; display: none; }
+  .overlay-row.active + #siting-overlay-sub-legend { display: block; }
 
   /* ── STATION SEARCH ── */
   #station-search-wrap {
@@ -348,7 +354,6 @@
   /* ── INSIGHTS: LMG heatmap ── */
   .lmg-wrap { overflow-x: auto; margin: 14px 0 4px; min-width: 0; max-width: 100%; }
   .lmg-grid { display: grid; grid-template-columns: minmax(140px, 1.6fr) repeat(5, minmax(52px, 1fr)); gap: 2px; min-width: 400px; }
-  .lmg-corner { }
   .lmg-colhead { font-family: 'DM Mono', monospace; font-size: 9.5px; color: var(--text-muted); text-align: center; padding: 4px 0; }
   .lmg-rowhead { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; text-align: right; line-height: 1.3; }
   .lmg-cell { background: color-mix(in srgb, var(--accent) calc(var(--lmg-op) * 100%), transparent); border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 9.5px; color: var(--text-primary); display: flex; align-items: center; justify-content: center; padding: 9px 2px; }
@@ -387,6 +392,23 @@
   .siting-legend-item.off { opacity: 0.3; }
   .siting-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
+  /* shared station search (tabs 1 + 2) */
+  .siting-search-wrap { position: relative; max-width: 260px; margin-bottom: 10px; }
+  .siting-search-input {
+    width: 100%; height: 32px; padding: 0 12px; box-sizing: border-box;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    color: var(--text-primary); font-family: 'DM Sans', sans-serif;
+    font-size: 11px; border-radius: 4px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .siting-search-input::placeholder { color: var(--text-muted); }
+  .siting-search-input:focus { border-color: var(--accent); }
+  .siting-search-results {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 15;
+    background: var(--bg-panel); border: 1px solid var(--border-mid);
+    border-radius: 4px; overflow: hidden; display: none;
+  }
+
   /* tab 1: scatter */
   #siting-chart-area { position: relative; width: 100%; }
   #siting-svg { width: 100%; height: auto; display: block; }
@@ -398,8 +420,9 @@
   .siting-qdesc { font-family: 'DM Sans', sans-serif; font-size: 9px; fill: var(--text-muted); paint-order: stroke; stroke: var(--bg-card); stroke-width: 2.5px; stroke-linejoin: round; }
   .siting-slabel { font-family: 'DM Sans', sans-serif; font-size: 8.5px; fill: var(--text-secondary); pointer-events: none; transition: opacity 0.2s; paint-order: stroke; stroke: var(--bg-card); stroke-width: 2.5px; stroke-linejoin: round; }
   .siting-slabel.dim { opacity: 0.1; }
-  .siting-dot { stroke: var(--bg-card); stroke-width: 0.6; transition: opacity 0.2s; }
+  .siting-dot { stroke: var(--bg-card); stroke-width: 0.6; transition: opacity 0.2s, r 0.25s ease, stroke-width 0.25s ease; }
   .siting-dot.dim { opacity: 0.1; }
+  .siting-dot.search-hit { stroke: var(--text-primary); stroke-width: 2.5px; }
 
   /* tab 2: map */
   #siting-map-wrap { position: relative; width: 100%; }
@@ -813,6 +836,10 @@
         </svg>
       </div>
       <div id="overlay-panel-body">
+        <div class="overlay-row active" id="overlay-buffers">
+          <div class="overlay-toggle"></div>
+          <span class="overlay-row-label">Station Areas</span>
+        </div>
         <div class="overlay-row" id="overlay-landuse">
           <div class="overlay-toggle"></div>
           <span class="overlay-row-label">Land Use</span>
@@ -831,10 +858,13 @@
           <div class="lu-legend-item"><div class="lu-swatch" style="background:#CCCCCC;border:1px solid rgba(0,0,0,0.1)"></div>Vacant Land</div>
           <div class="lu-legend-item"><div class="lu-swatch" style="background:#727272"></div>Other / No Data</div>
         </div>
-        <div class="overlay-row disabled" id="overlay-hudensity"><div class="overlay-toggle"></div><span class="overlay-row-label">Housing Density</span></div>
-        <div class="overlay-row disabled" id="overlay-landvalue"><div class="overlay-toggle"></div><span class="overlay-row-label">Land Value</span></div>
-        <div class="overlay-row disabled" id="overlay-flood"><div class="overlay-toggle"></div><span class="overlay-row-label">Flood Risk</span></div>
-        <div class="overlay-row disabled" id="overlay-publicland"><div class="overlay-toggle"></div><span class="overlay-row-label">Vacant Land</span></div>
+        <div class="overlay-row" id="overlay-siting"><div class="overlay-toggle"></div><span class="overlay-row-label">Siting Quadrant</span></div>
+        <div id="siting-overlay-sub-legend">
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:var(--q1)"></div>Q1 Immediate opportunity</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:var(--q2)"></div>Q2 Conditional density</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:var(--q3)"></div>Q3 Long-term investment</div>
+          <div class="lu-legend-item"><div class="lu-swatch" style="background:var(--q4)"></div>Q4 Preserve and maintain</div>
+        </div>
       </div>
     </div>
   </div>
@@ -973,7 +1003,7 @@
     </div>
     <div id="clusters-body">
       <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;">
-        <p id="clusters-desc">Two-stage Ward.D2 hierarchical clustering on activity intensity, employment mix, land use entropy, and transit frequency. Built environment clusters first (k=3), then subdivides by transit frequency (k=2), producing six types. VMT is excluded from clustering inputs. Cluster overlap in this projection reflects the continuous urban gradient of the network rather than a failure to separate. Click any point to explore station detail.</p>
+        <p id="clusters-desc">Two-stage Ward.D2 hierarchical clustering on activity intensity, employment mix, land use entropy, and transit frequency. </p>
         <div id="plot-3d" style="flex:1;"></div>
         <div id="pca-legend"></div>
       </div>
@@ -1004,25 +1034,27 @@
   <!-- METHODOLOGY PAGE -->
   <div class="page" id="page-methodology">
     <div id="methodology-inner">
-      <h1>Research Design</h1>
-      <p class="lead">MBTA Communities station areas differ substantially in built environment, transit access, and socioeconomic context, so a single network-wide model would average out the variation that matters most for local policy. The research design therefore runs three sequential stages: a network-wide regression identifies global VMT predictors, hierarchical clustering segments stations into six typologies, and within-cluster regressions uncover VMT dynamics inside each station type.</p>
+      <h1>Research Introduction</h1>
+      <p class="lead">Transportation decarbonization in Massachusetts has largely focused on vehicle electrification, despite the state's Clean Energy and Climate Plan identifying reductions in vehicle miles traveled (VMT) as essential to meeting emissions targets and positioning transit-oriented development (TOD) as a key strategy through the MBTA Communities program. The MBTA Communities Act (2021) requires 177 municipalities served by the MBTA to zone for as-of-right multifamily housing, much of it near transit stations.</p>
 
-      <div class="method-section">
+      <section class="method-section">
         <h2>Research questions</h2>
-        <p>This thesis examines how built environment and transportation characteristics influence VMT in MBTA Communities, with the goal of developing actionable strategies for municipalities. Three questions guide the research:</p>
+        <p>As the Act enters implementation and the state approaches its 2030 climate targets, this thesis examines what forms of development most effectively reduce VMT across the diverse physical, transportation, and demographic contexts of MBTA station areas. Three questions guide the research:</p>
         <ol class="rq-list">
           <li>What land use and transit service characteristics currently define MBTA Communities station areas? Can the station areas be classified into distinct, useful typologies based on the characteristics?</li>
           <li>Which factors are most strongly associated with VMT reduction in MBTA Communities?</li>
           <li>What context-specific policy and design interventions can MBTA Communities implement to maximize VMT reduction?</li>
         </ol>
-      </div>
+      </section>
 
-      <div class="method-section">
-        <h2>Unit of analysis</h2>
-        <p>Each observation is a 0.5-mile station area buffer around an MBTA Communities station, consistent with the threshold used in the Act itself. The analysis covers 163 of 169 station areas. Eastern Avenue, Box District, Islington, River Works, Haverhill, and Anderson/Woburn are excluded because each contains a commercial car rental business within the buffer; rental vehicle odometer readings are assigned to the rental company address, inflating the VMT measure with vehicles not driven by local residents.</p>
+      <section class="method-section">
+        <h2>Research Design</h2>
+        <p>Using VMT data from the Massachusetts Vehicle Census and built environment, transportation, and demographic predictors grounded in the Five Ds (Ewing &amp; Cervero, 2010) and node-place frameworks (Bertolini, 1999), the analysis combines cross-sectional regression, a hierarchical clustering typology of 169 station areas*, and within-cluster regression to identify both system-wide and context-specific drivers of VMT. Each observation is a 0.5-mile station area buffer around an MBTA Communities station, consistent with the threshold used in the Act itself.</p>
+        
         <p>VMT per capita is derived from Massachusetts Vehicle Census odometer readings collected at vehicle registration and assigned to the registered owner's block group. Block groups are clipped to the buffer and area-weighted; a second normalization factor accounts for sensitive and unbuildable land using the gross density denominator from MBTA Communities Act guidance. The dependent variable is log-transformed in all models.</p>
-        <p>Variable selection is organized by two frameworks: the Five Ds (Ewing &amp; Cervero, 2010) for the regression blocks, and Node-Place theory (Bertolini, 1999) for the clustering structure.</p>
-      </div>
+        
+        <p><small>*The analysis covers 163 of 169 station areas. Eastern Avenue, Box District, Islington, River Works, Haverhill, and Anderson/Woburn are excluded because each contains a commercial car rental business within the buffer; rental vehicle odometer readings are assigned to the rental company address, inflating the VMT measure with vehicles not driven by local residents.</small></p>
+      </section>
 
       <div class="method-section">
         <h2>Data inventory</h2>
@@ -1155,13 +1187,13 @@
 
       <div class="method-section">
         <h2>Regional Findings</h2>
-        <p>From the cross-sectional regression across all 163 station areas (Section 5.2). These hold, or fail to hold, network-wide.</p>
+        <p>From the cross-sectional regression across all 163 station areas (Section 5.2).</p>
 
         <div class="finding">
           <div class="finding-num">1</div>
           <div class="finding-body">
             <h4>Housing density's independent association attenuates as the other D variables enter.</h4>
-            <p>Housing density predicts VMT strongly on its own, but the effect evaporates once the other built environment variables enter the model. Density correlates with less driving because dense places also tend to have jobs, transit, and walkable streets nearby. It is the bundle doing the work, not density alone.</p>
+            <p>Housing density predicts VMT strongly on its own, but the effect evaporates once the other built environment variables enter the model. Density correlates with less driving because dense places also tend to have jobs, transit, and walkable streets nearby. </p>
           </div>
         </div>
 
@@ -2313,6 +2345,10 @@
 
           <div class="siting-panel active" data-panel="scatter">
             <div class="siting-legend" id="siting-legend-scatter"></div>
+            <div class="siting-search-wrap">
+              <input class="siting-search-input" id="siting-search-scatter" type="text" placeholder="Search station…" autocomplete="off" />
+              <div class="siting-search-results" id="siting-search-results-scatter"></div>
+            </div>
             <div id="siting-chart-area">
               <svg id="siting-svg" viewBox="0 0 760 560" preserveAspectRatio="xMidYMid meet"></svg>
               <div id="siting-tooltip"></div>
@@ -2322,6 +2358,10 @@
 
           <div class="siting-panel" data-panel="map">
             <div class="siting-legend" id="siting-legend-map"></div>
+            <div class="siting-search-wrap">
+              <input class="siting-search-input" id="siting-search-map" type="text" placeholder="Search station…" autocomplete="off" />
+              <div class="siting-search-results" id="siting-search-results-map"></div>
+            </div>
             <div id="siting-map-wrap">
               <div id="siting-map"></div>
               <div id="siting-map-empty">
@@ -2583,6 +2623,8 @@ let currentStyle = 'minimal';
 let map;
 let legendSelectedClusters = new Set();
 let luLayerVisible = false;
+let bufferLayerVisible = true;
+let sitingOverlayVisible = false;
 let _clickedStation = null;  // last station pinned by click
 let luDataReady = false;
 
@@ -2712,7 +2754,7 @@ function ensureLuData(cb) {
     })
     .catch(err => {
       console.error('Land use data failed to load:', err);
-      document.getElementById('btn-landuse').textContent = 'Land Use';
+      document.querySelector('#overlay-landuse .overlay-row-label').textContent = 'Land Use';
     });
 }
 
@@ -2730,16 +2772,16 @@ function ensureLuData(cb) {
 const SITING_DATA = [["Abington",5,-0.717,12.05],["Alewife",1,0.873,10.01],["Andover",4,-0.323,2.47],["Ashland",5,-1.214,15.56],["Assembly",1,1.252,19.89],["Attleboro",4,-0.258,2.13],["Auburndale",5,-0.275,2.16],["Ayer",6,-0.265,7.76],["Ball Square",2,0.3,1.28],["Ballardvale",5,-0.07,3.82],["Beachmont",1,0.212,29.13],["Beaconsfield",2,-0.065,1.07],["Bellingham Square",1,0.765,2.95],["Belmont",5,0.169,2.93],["Beverly",4,0.572,1.52],["Beverly Farms",5,-0.859,5.04],["Boston College",2,0.756,1.12],["Bradford",5,-0.703,4.87],["Braintree",3,0.047,8.67],["Brandeis/Roberts",4,-0.076,2.84],["Brandon Hall",2,0.761,0.6],["Bridgewater",5,-0.978,8.23],["Brockton",4,-0.286,12.88],["Brookline Hills",2,-0.285,1.42],["Brookline Village",1,1.229,14.43],["Campello",4,-0.548,6.82],["Canton Center",5,-0.307,12.69],["Canton Junction",5,-0.835,4.97],["Capen Street",2,0.733,8.6],["Central",1,1.482,1.13],["Central Avenue",2,0.716,2.28],["Chelsea",1,0.914,4.56],["Chestnut Hill",1,0.171,5.66],["Church Street",6,-0.982,8.74],["Cohasset",6,-0.585,8.25],["Concord",5,-0.442,0.54],["Coolidge Corner",2,1.007,0.76],["Davis",2,1.308,0.16],["Dean Road",2,0.701,0.29],["Dedham Corp. Center",6,-0.211,5.87],["East Somerville",1,1.208,3.34],["East Taunton",6,-1.323,30.54],["East Weymouth",5,-0.251,9.49],["Eliot",2,0.197,1.98],["Endicott",5,-0.294,4.31],["Englewood Avenue",2,1.008,1.0],["Fairbanks Street",2,0.846,0.74],["Fall River Depot",4,-0.152,3.25],["Fitchburg",4,-0.15,6.51],["Forge Park/495",6,-1.018,22.47],["Framingham",4,-0.359,1.74],["Franklin",4,-0.476,3.98],["Freetown",5,-1.426,14.1],["Gilman Square",2,0.948,0.88],["Gloucester",4,-0.096,4.58],["Grafton",5,-0.967,22.27],["Greenbush",6,-0.556,11.79],["Greenwood",5,0.252,4.02],["Halifax",5,-1.419,8.29],["Hamilton/Wenham",5,-0.504,18.53],["Hanson",6,-1.155,4.18],["Harvard",1,1.849,4.57],["Hawes Street",1,1.58,7.0],["Hersey",5,-0.52,0.13],["Holbrook/Randolph",5,-0.464,14.41],["Ipswich",4,-0.075,1.38],["Kendal Green",5,-0.225,4.43],["Kendall/MIT",1,1.632,12.3],["Kent Street",1,0.059,5.17],["Kingston",6,-1.201,15.02],["Lawrence",4,-0.842,5.48],["Lechmere",1,1.593,22.38],["Lincoln",6,-0.581,2.29],["Littleton/Route 495",6,-0.93,16.03],["Longwood",1,1.453,6.47],["Lowell",4,-0.142,8.14],["Lynn",4,0.496,1.26],["Magoun Square",2,1.17,0.85],["Malden Center",1,0.899,2.13],["Manchester",5,-0.244,1.91],["Mansfield",5,-0.726,2.9],["Medford/Tufts",1,1.447,1.2],["Melrose/Cedar Park",5,-0.112,0.49],["Melrose/Highlands",5,-0.615,3.84],["Middleborough",5,-0.704,11.89],["Milton",2,0.538,7.73],["Montello",4,-0.141,10.71],["Montserrat",5,-0.414,2.75],["Nantasket Junction",5,-0.581,12.42],["Natick Center",5,-0.121,2.49],["Needham Center",5,-0.011,0.27],["Needham Heights",5,-0.043,3.26],["Needham Junction",5,0.096,1.98],["New Bedford",4,-0.914,7.79],["Newburyport",6,-1.119,27.27],["Newton Centre",2,0.435,1.69],["Newton Highlands",2,0.495,1.76],["Newtonville",5,-0.504,1.87],["Norfolk",5,-0.414,8.04],["North Beverly",5,-0.619,1.98],["North Billerica",5,-0.881,5.73],["North Leominster",6,-0.282,14.07],["North Quincy",1,0.299,0.31],["North Scituate",5,-0.675,7.78],["North Wilmington",5,-0.662,7.94],["Norwood Central",4,-0.541,3.31],["Norwood Depot",5,0.121,1.19],["Oak Grove",2,0.434,0.96],["Porter",2,1.343,0.47],["Quincy Adams",1,1.567,5.31],["Quincy Center",1,0.936,3.05],["Reading",5,-0.123,1.2],["Reservoir",2,0.627,4.04],["Revere Beach",1,0.847,15.82],["Riverside",2,0.519,1.24],["Rockport",5,-0.603,3.88],["Route 128",3,-0.577,8.82],["Rowley",5,-1.444,19.28],["Saint Marys Street",1,1.679,10.61],["Saint Paul Street",1,1.19,3.02],["Salem",4,0.555,1.44],["Sharon",5,-0.123,2.19],["Shirley",6,-0.486,13.0],["Silver Hill",5,-0.753,4.97],["South Acton",6,-0.285,7.58],["South Attleboro",6,-0.861,9.1],["South Weymouth",5,-0.525,32.09],["Southborough",5,-0.915,7.09],["Stoughton",4,-0.174,3.78],["Summit Avenue",2,1.144,0.74],["Swampscott",5,0.176,1.5],["Tappan Street",2,0.78,0.18],["Union Square",1,1.405,2.39],["Valley Road",2,0.533,3.72],["Waban",2,0.054,3.87],["Wachusett",5,-0.906,22.4],["Wakefield",4,0.477,1.18],["Walpole",6,-0.634,6.59],["Waltham",4,-0.362,1.54],["Washington Square",2,0.676,0.29],["Waverley",4,0.176,1.28],["Wedgemere",5,-0.185,0.73],["Wellesley Farms",5,-0.59,3.48],["Wellesley Hills",5,0.4,0.66],["Wellesley Square",4,0.268,1.02],["Wellington",1,0.923,1.14],["West Concord",4,-0.246,5.69],["West Gloucester",5,-0.775,8.26],["West Hingham",6,-0.915,5.65],["West Medford",5,0.374,1.43],["West Natick",5,-0.797,4.71],["West Newton",5,-0.171,2.44],["Westborough",5,-1.408,3.58],["Weymouth Landing/East Braintree",5,-0.732,4.29],["Whitman",5,-0.652,23.28],["Wilmington",5,-0.396,7.01],["Winchester Center",4,-0.1,1.1],["Windsor Gardens",5,-0.501,9.82],["Wollaston",5,0.421,0.53],["Wonderland",1,0.464,24.05],["Woodland",2,1.177,1.0],["Worcester",4,-0.121,6.15],["Wyoming Hill",5,0.36,1.58]];
 
 const SITING_QUADS = {
-  q1: { key:'q1', label:'Q1 Immediate opportunity', axis:'Q1 Bundle present, room to build', color:'var(--c1)',
+  q1: { key:'q1', label:'Q1 Immediate opportunity', axis:'Q1 Bundle present, room to build', color:'var(--q1)',
         blurb:'Bundle is in place and land is available. Added density compounds with existing employment, transit, and walkability. Highest VMT reduction per unit added.',
         short:'Bundle in place, land available. Highest VMT reduction per unit added.' },
-  q2: { key:'q2', label:'Q2 Conditional density', axis:'Q2 Bundle absent, room to build', color:'var(--c4)',
+  q2: { key:'q2', label:'Q2 Conditional density', axis:'Q2 Bundle absent, room to build', color:'var(--q2)',
         blurb:'Can absorb density, but the bundle is incomplete. New housing must be paired with parallel investments in transit, street connectivity, and employment to deliver VMT reduction.',
         short:'Room to build, bundle incomplete. Pair housing with transit, streets, jobs.' },
-  q3: { key:'q3', label:'Q3 Long-term investment', axis:'Q3 Bundle absent, little room to build', color:'var(--c6)',
+  q3: { key:'q3', label:'Q3 Long-term investment', axis:'Q3 Bundle absent, little room to build', color:'var(--q3)',
         blurb:'Neither lever is readily available. Bundle investment must precede density. Compliance relies on ADUs and small-scale infill, not ground-up development.',
         short:'Neither lever ready. Bundle investment first; ADUs and infill only.' },
-  q4: { key:'q4', label:'Q4 Preserve and maintain', axis:'Q4 Bundle present, little room to build', color:'var(--c2)',
+  q4: { key:'q4', label:'Q4 Preserve and maintain', axis:'Q4 Bundle present, little room to build', color:'var(--q4)',
         blurb:'Bundle already delivers low VMT, but little room for new construction. Strategy is incremental densification and protecting the conditions that keep driving low.',
         short:'Low VMT already, little room left. Densify incrementally, protect what works.' }
 };
@@ -2971,7 +3013,7 @@ let sitingMapLayersReady = false;
 let sitingGeoJSON = null;
 let sitingCoordsByStation = {};
 
-const SITING_QUAD_HEX = { q1: '#0cb2af', q2: '#f29222', q3: '#5b6abf', q4: '#a1c65d' };
+const SITING_QUAD_HEX = { q1: '#a855f7', q2: '#ec4899', q3: '#64748b', q4: '#16a34a' };
 
 function sitingQuadColorExpr() {
   return ['match', ['get', 'quad'],
@@ -3241,6 +3283,100 @@ function renderSitingChart() {
   renderSitingLegend('siting-legend-map');
 }
 
+// ── Station search (shared by the Siting Profile and Map tabs) ──
+function focusSitingScatterStation(name) {
+  const svg = document.getElementById('siting-svg');
+  const tip = document.getElementById('siting-tooltip');
+  const area = document.getElementById('siting-chart-area');
+  if (!svg || !tip || !area) return;
+  const dot = svg.querySelector(`.siting-dot[data-station="${CSS.escape(name)}"]`);
+  if (!dot) return;
+  sitingScatterPinned = name;
+  const meta = CLUSTER_META[+dot.dataset.cluster] || {};
+  tip.innerHTML = `<strong>${dot.dataset.station}</strong><br>`
+    + `<span class="tip-q" style="color:${meta.color || '#888'}">${meta.name || ''}</span><br>`
+    + `<span class="tip-vals">bundle ${dot.dataset.z} \u00b7 vacant ${dot.dataset.v}%</span>`;
+  tip.style.display = 'block';
+  const dotRect = dot.getBoundingClientRect();
+  const areaRect = area.getBoundingClientRect();
+  let left = dotRect.left - areaRect.left + dotRect.width + 8;
+  if (left + 220 > areaRect.width) left = areaRect.width - 225;
+  tip.style.left = Math.max(4, left) + 'px';
+  tip.style.top = (dotRect.top - areaRect.top) + 'px';
+  dot.setAttribute('r', '7');
+  dot.classList.add('search-hit');
+  setTimeout(() => {
+    dot.setAttribute('r', '3.7');
+    dot.classList.remove('search-hit');
+  }, 1400);
+}
+
+function focusSitingMapStation(name) {
+  sitingInit();
+  const row = sitingRows.find(r => r.station === name);
+  const coords = sitingCoordsByStation[name];
+  if (!row || !coords || !sitingMap) return;
+  sitingMap.flyTo({ center: coords, zoom: 13, duration: 700 });
+  sitingMap.once('moveend', () => {
+    showSitingPopup(row, { lng: coords[0], lat: coords[1] });
+  });
+}
+
+function setupSitingSearch(inputId, resultsId, onSelect) {
+  const input = document.getElementById(inputId);
+  const results = document.getElementById(resultsId);
+  if (!input || !results) return;
+  let activeIdx = -1;
+
+  function select(name) {
+    input.value = name;
+    results.style.display = 'none';
+    onSelect(name);
+  }
+
+  function showResults(matches) {
+    if (!matches.length) { results.style.display = 'none'; return; }
+    results.innerHTML = matches.slice(0, 8).map((name, i) => {
+      const row = sitingRows.find(r => r.station === name);
+      const meta = row ? CLUSTER_META[row.cluster] : null;
+      return `<div class="search-result-item" data-idx="${i}" data-name="${name}">${name}`
+        + (meta ? `<span class="search-result-cluster">${meta.name}</span>` : '') + `</div>`;
+    }).join('');
+    results.style.display = 'block';
+    activeIdx = -1;
+    results.querySelectorAll('.search-result-item').forEach(el => {
+      el.addEventListener('mousedown', e => { e.preventDefault(); select(el.dataset.name); });
+    });
+  }
+
+  input.addEventListener('input', () => {
+    sitingInit();
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.style.display = 'none'; return; }
+    const matches = sitingRows.map(r => r.station).filter(n => n.toLowerCase().includes(q));
+    showResults(matches);
+  });
+
+  input.addEventListener('keydown', e => {
+    const items = results.querySelectorAll('.search-result-item');
+    if (!items.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIdx = Math.min(activeIdx + 1, items.length - 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      const target = activeIdx >= 0 ? items[activeIdx] : items[0];
+      if (target) select(target.dataset.name);
+      return;
+    } else if (e.key === 'Escape') { results.style.display = 'none'; return; }
+    else return;
+    items.forEach((el, i) => el.classList.toggle('active', i === activeIdx));
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => { results.style.display = 'none'; }, 150);
+  });
+}
+
 document.querySelectorAll('.siting-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     sitingActiveTab = btn.dataset.tab;
@@ -3253,6 +3389,10 @@ document.querySelectorAll('.siting-tab').forEach(btn => {
     renderSitingChart();
   });
 });
+
+setupSitingSearch('siting-search-scatter', 'siting-search-results-scatter', focusSitingScatterStation);
+setupSitingSearch('siting-search-map', 'siting-search-results-map', focusSitingMapStation);
+
 // ─────────────────────────────────────────────
 // NAVIGATION
 // ─────────────────────────────────────────────
@@ -3464,8 +3604,15 @@ function addDataToMap() {
   // Re-apply legend filter after style swap re-creates layers
   applyLegendFilter();
 
+  // Restore buffer visibility state after style swap
+  if (!bufferLayerVisible) {
+    map.setLayoutProperty('buffer-fill', 'visibility', 'none');
+    map.setLayoutProperty('buffer-outline', 'visibility', 'none');
+  }
+
   // Re-add parcel layer if it was visible before style swap
   if (luLayerVisible && luDataReady) addLandUseLayer();
+  if (sitingOverlayVisible) addSitingOverlayLayer();
 }
 
 // ─────────────────────────────────────────────
@@ -3496,6 +3643,43 @@ function addLandUseLayer() {
 function removeLandUseLayer() {
   if (!map) return;
   try { map.setLayoutProperty('parcels-fill', 'visibility', 'none'); } catch(e) {}
+}
+
+// ─────────────────────────────────────────────
+// SITING QUADRANT LAYER (Map page overlay)
+// Reuses the already-loaded 'buffers' source; colors each station's polygon
+// by its Siting Framework quadrant (SITING_DATA is a static const, so no
+// extra fetch is needed — see the Recommendations section below).
+// ─────────────────────────────────────────────
+function sitingQuadColorExprForBuffers() {
+  sitingInit();
+  const stops = [];
+  sitingRows.forEach(r => { stops.push(r.station, SITING_QUAD_HEX[r.quad]); });
+  return ['match', ['get', 'station'], ...stops, '#888888'];
+}
+
+function addSitingOverlayLayer() {
+  if (!map || !map.getSource('buffers')) return;
+  if (!map.getLayer('siting-quad-fill')) {
+    const beforeLayer = map.getLayer('community-outline') ? 'community-outline' : undefined;
+    map.addLayer({
+      id: 'siting-quad-fill',
+      type: 'fill',
+      source: 'buffers',
+      paint: {
+        'fill-color': sitingQuadColorExprForBuffers(),
+        'fill-opacity': 0.55
+      }
+    }, beforeLayer);
+  } else {
+    map.setPaintProperty('siting-quad-fill', 'fill-color', sitingQuadColorExprForBuffers());
+  }
+  map.setLayoutProperty('siting-quad-fill', 'visibility', 'visible');
+}
+
+function removeSitingOverlayLayer() {
+  if (!map) return;
+  try { map.setLayoutProperty('siting-quad-fill', 'visibility', 'none'); } catch(e) {}
 }
 
 function applyLegendFilter() {
@@ -3898,6 +4082,16 @@ document.getElementById('overlay-panel-header').addEventListener('click', () => 
   document.getElementById('overlay-panel').classList.toggle('collapsed');
 });
 
+// ── Station area buffer toggle ──
+document.getElementById('overlay-buffers').addEventListener('click', () => {
+  if (!map) return;
+  bufferLayerVisible = !bufferLayerVisible;
+  document.getElementById('overlay-buffers').classList.toggle('active', bufferLayerVisible);
+  const vis = bufferLayerVisible ? 'visible' : 'none';
+  try { map.setLayoutProperty('buffer-fill', 'visibility', vis); } catch(e) {}
+  try { map.setLayoutProperty('buffer-outline', 'visibility', vis); } catch(e) {}
+});
+
 // ── Land use toggle ──
 document.getElementById('overlay-landuse').addEventListener('click', () => {
   if (!map) return;
@@ -3920,6 +4114,20 @@ document.getElementById('overlay-landuse').addEventListener('click', () => {
     row.classList.remove('active');
     sub.style.display = 'none';
     removeLandUseLayer();
+  }
+});
+
+// ── Siting quadrant toggle (colors station-area polygons by Q1–Q4) ──
+document.getElementById('overlay-siting').addEventListener('click', () => {
+  if (!map) return;
+  sitingOverlayVisible = !sitingOverlayVisible;
+  const row = document.getElementById('overlay-siting');
+  if (sitingOverlayVisible) {
+    row.classList.add('active');
+    if (mapReady) addSitingOverlayLayer();
+  } else {
+    row.classList.remove('active');
+    removeSitingOverlayLayer();
   }
 });
 
